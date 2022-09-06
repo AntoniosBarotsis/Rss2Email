@@ -1,5 +1,5 @@
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
@@ -15,23 +15,10 @@ impl XmlFeed for Rss {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.channel.title;
 
-    // let last_build_date =
-    //   self
-    //     .channel
-    //     .last_build_date
-    //     .or(self.channel.pub_date)
-    //     .or(match self.channel.items.first() {
-    //       Some(item) => item.to_owned().pub_date,
-    //       None => None,
-    //     });
-
-    let last_build_date =
-      self
-        .channel.pub_date
-        .or(match self.channel.items.first() {
-          Some(item) => item.to_owned().pub_date,
-          None => None,
-        });
+    let last_build_date = self.channel.pub_date.or(match self.channel.items.first() {
+      Some(item) => item.to_owned().pub_date,
+      None => None,
+    });
 
     let posts: Vec<Post> = self
       .channel

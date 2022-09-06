@@ -1,5 +1,5 @@
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
