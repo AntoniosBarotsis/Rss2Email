@@ -21,3 +21,5 @@ Cargo.lock
 
 *.log
 feeds.txt
+
+.env
