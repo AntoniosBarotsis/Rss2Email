@@ -24,6 +24,11 @@ and include the link to your RSS feed!
 I have made some strong assumptions (that seem to be correct in the feeds I tried) about the dates so 
 Getting that wrong is almost expected. Submit a bug report!
 
+More specifically, dates in feeds that use the actual RSS specification seem to be formatted according to
+the [RFC 2822](https://www.rfc-editor.org/rfc/rfc2822#section-3.3) specification while the other feed format
+I came across (same one used in the Rust Blog) seems to be formatted in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
+according to [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339#section-5).
+
 ### Something Else is Wrong!
 
 I'm very new to rust (as in been doing this for 2 weeks now) and that plus the fact that I am overengineering
@@ -35,8 +40,8 @@ preferably with reproducable examples!
 
 ## Contributing to the Codebase
 
-Make sure to detail your desired changes in either an issue or a discussion first, then you can go ahead
-and start working on your fork.
+Make sure to detail your desired changes in either an issue or a discussion first, I will try to reply to them
+and then you can go ahead and start working on your fork.
 
 The way the whole different feed format is a bit weird so let me explain how that works.
 
@@ -61,3 +66,6 @@ let possible_roots = vec![
 
 This is probably far from a good solution but as I said earlier, I wanted to experiment with the language
 and it does work so...
+
+As a last note, if you are planning on contributing a new feed format, please consider leaving a comment similar to those
+at the start of both [`feed.rs`](./src/xml/feed.rs) and [`rss.rs`](./src/xml/rss.rs) for better maintainability.

@@ -15,13 +15,13 @@ This section was getting rather lengthy so I moved it to [the Wiki](https://gith
 
 ## Why is this so Slow?
 
-Currently, the RSS feeds are downloaded in a sequential, blocking manner as they are only small text files
-and should thus not take too long (plus this is not supposed to run that often but rather something
-like once a week or so). 
+Currently, the RSS feeds are downloaded in a sequential, blocking, non-concurrent manner as they are 
+only small text files and should thus not take too long (plus this is not supposed to run that often but
+rather something like once a week or so). 
 
 If you find yourself either using a *lot* of RSS feeds or really big ones somehow, do give me a heads up
-by submitting an issue and I'll do what I can to make this faster. As of now, there is no reason to do that. That said, I might randomly
-decide to do this regardless.
+by submitting an issue and I'll do what I can to make this faster. As of now, there is no reason to do that.
+*That said, I might randomly decide to do this regardless*.
 
 ## Contributing
 
