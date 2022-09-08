@@ -1,3 +1,5 @@
+use log::{info, error};
+
 /// Sends an email to and from the specified address.
 pub(crate) fn send_email(address: String, api_key: String, contents: String) {
   let contents = contents.replace('\"', "\\\"");
@@ -10,5 +12,8 @@ pub(crate) fn send_email(address: String, api_key: String, contents: String) {
     .set("Content-Type", "application/json")
     .send_string(&message);
 
-  println!("{:?}", req)
+  match req{
+    Ok(req) => info!("{:?}", req),
+    Err(e) => error!("{}", e),
+  }
 }
