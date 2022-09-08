@@ -6,7 +6,6 @@
 ///     ...
 ///   </entry>
 /// </feed>
-
 use chrono::DateTime;
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
