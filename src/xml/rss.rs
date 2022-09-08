@@ -1,3 +1,12 @@
+/// Author: Antonios Barotsis
+/// Github: https://github.com/AntoniosBarotsis
+///
+/// <rss>
+///   <channel>
+///     ...
+///   </channel>
+/// </rss>
+
 use chrono::DateTime;
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
