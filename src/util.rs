@@ -1,6 +1,7 @@
 use std::{fs, time::SystemTime};
 
 use chrono::{DateTime, FixedOffset, Utc};
+use itertools::Itertools;
 use log::{info, warn};
 use std::fmt::Write as _;
 
@@ -13,7 +14,7 @@ use crate::{
 pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
-  let links = links.split('\n').map(|s| s.to_string());
+  let links = links.split('\n').map(|s| s.to_string()).unique();
 
   let contents: Vec<Blog> = links
     .into_iter()
@@ -21,12 +22,17 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
     .filter_map(|link| {
       let xml = get_page(&link);
 
+      if let Err(e) = xml {
+        warn!("Error in {}\n{:?}", link, e);
+        return None;
+      } 
+
       let xml = xml.unwrap();
 
       let res = parse_xml(xml);
 
-      if res.is_err() {
-        warn!("Error in {}\n{}", link, res.unwrap_err());
+      if let Err(e) = res {
+        warn!("Error in {}\n{}", link, e);
         return None;
       }
 
@@ -48,6 +54,7 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
         posts,
       }
     })
+    .filter(|x| !x.posts.is_empty())
     .collect();
 
   contents
