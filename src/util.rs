@@ -20,41 +20,34 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
     .into_iter()
     .filter(|link| !link.is_empty())
     .filter_map(|link| {
-      let xml = get_page(&link);
+      let xml = get_page(&link)
+        .map_err(|e| warn!("Error in {}\n{:?}", link, e))
+        .ok()?;
 
-      if let Err(e) = xml {
-        warn!("Error in {}\n{:?}", link, e);
-        return None;
-      } 
-
-      let xml = xml.unwrap();
-
-      let res = parse_xml(xml);
-
-      if let Err(e) = res {
-        warn!("Error in {}\n{}", link, e);
+      parse_xml(xml)
+        .map_err(|e| warn!("Error in {}\n{}", link, e))
+        .ok()
+    })
+    .filter_map(|x| {
+      if !within_n_days(days, x.last_build_date) {
         return None;
       }
 
-      res.ok()
-    })
-    .filter(|x| within_n_days(days, x.last_build_date))
-    .map(|x| {
-      let title = x.title;
-      let last_build_date = x.last_build_date;
-      let posts: Vec<Post> = x
+      let recent_posts: Vec<Post> = x
         .posts
         .into_iter()
         .filter(|x| within_n_days(days, x.last_build_date))
         .collect();
 
-      Blog {
-        title,
-        last_build_date,
-        posts,
+      if recent_posts.is_empty() {
+        return None;
       }
+
+      Some(Blog {
+        posts: recent_posts,
+        ..x
+      })
     })
-    .filter(|x| !x.posts.is_empty())
     .collect();
 
   contents
