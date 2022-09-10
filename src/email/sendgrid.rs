@@ -1,4 +1,4 @@
-use log::{info, error};
+use log::{error, info};
 
 /// Sends an email to and from the specified address.
 pub(crate) fn send_email(address: String, api_key: String, contents: String) {
@@ -12,7 +12,7 @@ pub(crate) fn send_email(address: String, api_key: String, contents: String) {
     .set("Content-Type", "application/json")
     .send_string(&message);
 
-  match req{
+  match req {
     Ok(req) => info!("{:?}", req),
     Err(e) => error!("{}", e),
   }

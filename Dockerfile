@@ -1,11 +1,5 @@
 FROM rust:1.63-alpine as builder
 
-# COPY ./ ./
-
-# RUN cargo build --release
-
-# CMD ["./target/release/rss2email"]
-
 RUN apk add --no-cache musl-dev
 WORKDIR /opt
 RUN cargo new --bin rss2email
