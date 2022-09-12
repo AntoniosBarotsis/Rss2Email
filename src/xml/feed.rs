@@ -36,18 +36,14 @@ pub struct Entry {
 impl XmlFeed for Feed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
-    let last_build_date = self.updated;
+    let last_build_date = self.updated.ok_or_else(|| "Date not found.".to_owned())?;
     let posts: Vec<Post> = self
       .entries
       .iter()
       .filter_map(|x| x.clone().into_post().ok())
       .collect();
 
-    if last_build_date.is_none() {
-      return Err("Date not found.".to_owned());
-    }
-
-    match DateTime::parse_from_rfc3339(&last_build_date.unwrap()) {
+    match DateTime::parse_from_rfc3339(&last_build_date) {
       Ok(last_build_date) => Ok(Blog {
         title,
         last_build_date,
@@ -67,11 +63,9 @@ impl BlogPost for Entry {
       .or(self.summary)
       .unwrap_or_else(|| "".to_owned());
 
-    if self.pub_date.is_none() {
-      return Err("Date not found.".to_owned());
-    }
+    let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
 
-    match DateTime::parse_from_rfc2822(&self.pub_date.unwrap()) {
+    match DateTime::parse_from_rfc2822(&pub_date) {
       Ok(last_build_date) => Ok(Post {
         title,
         link,

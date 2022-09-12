@@ -1,7 +1,10 @@
+#![deny(rust_2018_idioms)]
+#![warn(clippy::unwrap_used)]
+
 use crate::util::{download_blogs, map_to_html};
 use dotenv::dotenv;
 use env_logger::Env;
-use log::info;
+use log::{error, info};
 
 use crate::{email::sendgrid::send_email, util::time_func};
 
@@ -10,7 +13,7 @@ mod email;
 mod util;
 mod xml;
 
-fn core_main() {
+fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
   dotenv().ok();
@@ -24,7 +27,11 @@ fn core_main() {
     Ok(txt) => match txt.parse::<i64>() {
       Ok(n) => n,
       Err(_) => {
-        panic!("Days variable is set to \"{}\" which is not a number.", txt)
+        error!("Days variable is set to \"{}\" which is not a number.", txt);
+        return Err(format!(
+          "Days variable is set to \"{}\" which is not a number.",
+          txt
+        ));
       }
     },
     Err(_) => days_default,
@@ -45,14 +52,16 @@ fn core_main() {
 
   if cfg!(debug_assertions) {
     println!("{}", html);
+    Ok(())
   } else {
-    send_email(address, sendgrid_api_key, html);
+    send_email(&address, &sendgrid_api_key, &html);
+    Ok(())
   }
 }
 
 #[cfg(not(feature = "aws-lambda"))]
-fn main() {
-  core_main();
+fn main() -> Result<(), String> {
+  core_main()
 }
 
 #[cfg(feature = "aws-lambda")]

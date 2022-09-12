@@ -24,19 +24,19 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
         .map_err(|e| warn!("Error in {}\n{:?}", link, e))
         .ok()?;
 
-      parse_xml(xml)
+      parse_xml(&xml)
         .map_err(|e| warn!("Error in {}\n{}", link, e))
         .ok()
     })
     .filter_map(|x| {
-      if !within_n_days(days, x.last_build_date) {
+      if !within_n_days(days, &x.last_build_date) {
         return None;
       }
 
       let recent_posts: Vec<Post> = x
         .posts
         .into_iter()
-        .filter(|x| within_n_days(days, x.last_build_date))
+        .filter(|x| within_n_days(days, &x.last_build_date))
         .collect();
 
       let non_empty = !recent_posts.is_empty();
@@ -68,12 +68,12 @@ pub(crate) fn map_to_html(blogs: &Vec<Blog>) -> String {
 }
 
 /// Returns true if the passed date is within `n` days from the current date.
-fn within_n_days(n: i64, date: DateTime<FixedOffset>) -> bool {
+fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
   let today = Utc::now();
 
   let tz = date.timezone();
   let today = today.with_timezone(&tz);
-  (today - date).num_days() <= n
+  (today - *date).num_days() <= n
 }
 
 /// Helper function for downloading the contents of a web page.

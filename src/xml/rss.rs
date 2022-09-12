@@ -23,10 +23,16 @@ impl XmlFeed for Rss {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.channel.title;
 
-    let last_build_date = self.channel.pub_date.or(match self.channel.items.first() {
-      Some(item) => item.to_owned().pub_date,
-      None => None,
-    });
+    let site_last_build_date = self.channel.pub_date;
+    let last_post_build_date = self
+      .channel
+      .items
+      .first()
+      .and_then(|x| x.to_owned().pub_date);
+
+    let last_build_date = site_last_build_date
+      .or(last_post_build_date)
+      .ok_or_else(|| "Date not found.".to_owned())?;
 
     let posts: Vec<Post> = self
       .channel
@@ -35,11 +41,7 @@ impl XmlFeed for Rss {
       .filter_map(|x| x.clone().into_post().ok())
       .collect();
 
-    if last_build_date.is_none() {
-      return Err("Date not found.".to_owned());
-    }
-
-    match DateTime::parse_from_rfc2822(&last_build_date.unwrap()) {
+    match DateTime::parse_from_rfc2822(&last_build_date) {
       Ok(last_build_date) => Ok(Blog {
         title,
         last_build_date,
@@ -78,11 +80,9 @@ impl BlogPost for Item {
     let link = self.link;
     let description = self.description;
 
-    if self.pub_date.is_none() {
-      return Err("Date not found.".to_owned());
-    }
+    let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
 
-    match DateTime::parse_from_rfc2822(&self.pub_date.unwrap()) {
+    match DateTime::parse_from_rfc2822(&pub_date) {
       Ok(last_build_date) => Ok(Post {
         title,
         link,

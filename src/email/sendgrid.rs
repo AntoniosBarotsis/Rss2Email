@@ -1,7 +1,7 @@
 use log::{error, info};
 
 /// Sends an email to and from the specified address.
-pub(crate) fn send_email(address: String, api_key: String, contents: String) {
+pub(crate) fn send_email(address: &str, api_key: &str, contents: &str) {
   let contents = contents.replace('\"', "\\\"");
   let message = format!(
     r#"{{"personalizations": [{{"to": [{{"email": "{address}"}}]}}],"from": {{"email": "{address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#

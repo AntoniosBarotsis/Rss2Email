@@ -10,10 +10,10 @@ pub mod rss;
 mod traits;
 
 /// Turns XML text into a `Blog` if possible.
-pub fn parse_xml(xml: String) -> Result<Blog, String> {
+pub fn parse_xml(xml: &str) -> Result<Blog, String> {
   let possible_roots = vec![
-    from_str::<Rss>(&xml).into_blog(),
-    from_str::<Feed>(&xml).into_blog(),
+    from_str::<Rss>(xml).into_blog(),
+    from_str::<Feed>(xml).into_blog(),
   ];
 
   let actual_root = possible_roots.iter().find_map(|x| x.as_ref().ok());
