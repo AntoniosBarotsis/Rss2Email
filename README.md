@@ -13,6 +13,10 @@ I would much rather see a summary of these posts in my mailbox.
 
 This section was getting rather lengthy so I moved it to [the Wiki](https://github.com/AntoniosBarotsis/Rss2Email/wiki#getting-started)!
 
+### ⚠ Docker ⚠
+
+Please read [this](https://github.com/AntoniosBarotsis/Rss2Email/wiki#-important-) if you are planning on building the docker image.
+
 ## Why is this so Slow?
 
 Currently, the RSS feeds are downloaded in a sequential, blocking, non-concurrent manner as they are 
