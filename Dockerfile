@@ -1,18 +1,22 @@
 FROM rust:1.63-alpine as builder
 
+# Read https://github.com/AntoniosBarotsis/Rss2Email/wiki#deploying
+ARG compile_flag="--features aws-lambda"
+# ARG compile_flag=""
+
 RUN apk add --no-cache musl-dev
 WORKDIR /opt
 RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
-RUN cargo build --release
+RUN cargo build --release $compile_flag
 
 RUN rm ./src/*.rs
 RUN rm ./target/release/deps/rss2email*
 
 ADD ./src ./src
-RUN cargo build --release
+RUN cargo build --release $compile_flag
 
 FROM scratch
 WORKDIR /opt/rss2email

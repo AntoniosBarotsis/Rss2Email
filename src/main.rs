@@ -10,7 +10,7 @@ mod email;
 mod util;
 mod xml;
 
-fn main() {
+fn core_main() {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
   dotenv().ok();
@@ -47,5 +47,45 @@ fn main() {
     println!("{}", html);
   } else {
     send_email(address, sendgrid_api_key, html);
+  }
+}
+
+#[cfg(not(feature = "aws-lambda"))]
+fn main() {
+  core_main();
+}
+
+#[cfg(feature = "aws-lambda")]
+fn main() -> Result<(), aws_lambda::LambdaErr> {
+  aws_lambda::aws_lambda_wrapper()
+}
+
+#[cfg(feature = "aws-lambda")]
+mod aws_lambda {
+  use crate::core_main;
+  use lambda_runtime::{run, service_fn, Error, LambdaEvent};
+  use serde::Deserialize;
+  pub(crate) type LambdaErr = Error;
+
+  #[derive(Deserialize)]
+  struct Request {}
+
+  async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
+    // Extract some useful information from the request
+    core_main();
+    Ok(())
+  }
+
+  #[tokio::main]
+  pub(crate) async fn aws_lambda_wrapper() -> Result<(), Error> {
+    tracing_subscriber::fmt()
+      .with_max_level(tracing::Level::INFO)
+      // disable printing the name of the module in every log line.
+      .with_target(false)
+      // disabling time is handy because CloudWatch will add the ingestion time.
+      .without_time()
+      .init();
+
+    run(service_fn(function_handler)).await
   }
 }
