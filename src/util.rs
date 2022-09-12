@@ -39,11 +39,9 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
         .filter(|x| within_n_days(days, x.last_build_date))
         .collect();
 
-      if recent_posts.is_empty() {
-        return None;
-      }
+      let non_empty = !recent_posts.is_empty();
 
-      Some(Blog {
+      non_empty.then_some(Blog {
         posts: recent_posts,
         ..x
       })
