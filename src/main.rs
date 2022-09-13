@@ -1,6 +1,39 @@
-#![deny(rust_2018_idioms)]
-#![warn(clippy::unwrap_used)]
-#![warn(clippy::pedantic)]
+#![warn(
+  rust_2018_idioms,
+  clippy::pedantic,
+  clippy::unwrap_used,
+  clippy::nursery,
+  absolute_paths_not_starting_with_crate,
+  elided_lifetimes_in_paths,
+  explicit_outlives_requirements,
+  keyword_idents,
+  macro_use_extern_crate,
+  meta_variable_misuse,
+  missing_abi,
+  missing_copy_implementations,
+  missing_debug_implementations,
+  non_ascii_idents,
+  noop_method_call,
+  pointer_structural_match,
+  rust_2021_incompatible_closure_captures,
+  rust_2021_incompatible_or_patterns,
+  rust_2021_prefixes_incompatible_syntax,
+  rust_2021_prelude_collisions,
+  single_use_lifetimes,
+  trivial_casts,
+  trivial_numeric_casts,
+  unsafe_code,
+  unsafe_op_in_unsafe_fn,
+  unstable_features,
+  unused_crate_dependencies,
+  unused_extern_crates,
+  unused_import_braces,
+  unused_lifetimes,
+  unused_macro_rules,
+  unused_qualifications,
+  unused_results,
+  variant_size_differences
+)]
 
 use crate::util::{download_blogs, map_to_html};
 use dotenv::dotenv;
@@ -17,7 +50,7 @@ mod xml;
 fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
-  dotenv().ok();
+  let _env = dotenv().ok().ok_or("Failed to load .env file")?;
 
   let sendgrid_api_key = std::env::var("SENDGRID_API_KEY").expect("SENDGRID_API_KEY must be set.");
   let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
@@ -54,11 +87,11 @@ fn core_main() -> Result<(), String> {
 
   if cfg!(debug_assertions) {
     info!("{}", html);
-    Ok(())
   } else {
     send_email(&address, &sendgrid_api_key, &html);
-    Ok(())
   }
+
+  Ok(())
 }
 
 #[cfg(not(feature = "aws-lambda"))]
@@ -68,7 +101,7 @@ fn main() -> Result<(), String> {
 
 #[cfg(feature = "aws-lambda")]
 fn main() -> Result<(), aws_lambda::LambdaErr> {
-  aws_lambda::aws_lambda_wrapper()
+  aws_lambda::lambda_wrapper()
 }
 
 #[cfg(feature = "aws-lambda")]
@@ -76,19 +109,20 @@ mod aws_lambda {
   use crate::core_main;
   use lambda_runtime::{run, service_fn, Error, LambdaEvent};
   use serde::Deserialize;
-  pub(crate) type LambdaErr = Error;
+  pub type LambdaErr = Error;
 
   #[derive(Deserialize)]
   struct Request {}
 
+  #[allow(clippy::unused_async)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
-    core_main();
+    let _res = core_main();
     Ok(())
   }
 
   #[tokio::main]
-  pub(crate) async fn aws_lambda_wrapper() -> Result<(), Error> {
+  pub async fn lambda_wrapper() -> Result<(), Error> {
     tracing_subscriber::fmt()
       .with_max_level(tracing::Level::INFO)
       // disable printing the name of the module in every log line.

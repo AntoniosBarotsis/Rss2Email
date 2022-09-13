@@ -45,11 +45,7 @@ impl XmlFeed for Rss {
     let title = self.channel.title;
 
     let site_last_build_date = self.channel.pub_date;
-    let last_post_build_date = self
-      .channel
-      .items
-      .first()
-      .and_then(|x| x.clone().pub_date);
+    let last_post_build_date = self.channel.items.first().and_then(|x| x.clone().pub_date);
 
     let last_build_date = site_last_build_date
       .or(last_post_build_date)

@@ -11,10 +11,13 @@ use crate::{
 };
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
-pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
+pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
-  let links = links.split('\n').map(std::string::ToString::to_string).unique();
+  let links = links
+    .split('\n')
+    .map(std::string::ToString::to_string)
+    .unique();
 
   let contents: Vec<Blog> = links
     .into_iter()
@@ -52,7 +55,7 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
 }
 
 /// Generates the HTML contents corresponding to the given Blog collection.
-pub(crate) fn map_to_html(blogs: &Vec<Blog>) -> String {
+pub fn map_to_html(blogs: &Vec<Blog>) -> String {
   let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
 
   for blog in blogs {
@@ -88,7 +91,7 @@ fn get_page(url: &str) -> Result<String, ureq::Error> {
 
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
-pub(crate) fn time_func<F, O>(f: F, fname: &str) -> O
+pub fn time_func<F, O>(f: F, fname: &str) -> O
 where
   F: Fn() -> O,
   O: Clone,
