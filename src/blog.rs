@@ -11,6 +11,6 @@ pub struct Blog {
 pub struct Post {
   pub title: String,
   pub link: String,
-  pub description: String,
+  pub description: Option<String>,
   pub last_build_date: DateTime<FixedOffset>,
 }

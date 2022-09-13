@@ -58,10 +58,7 @@ impl BlogPost for Entry {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
     let link = self.link;
-    let description = self
-      .description
-      .or(self.summary)
-      .unwrap_or_else(|| "".to_owned());
+    let description = self.description.or(self.summary);
 
     let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
 

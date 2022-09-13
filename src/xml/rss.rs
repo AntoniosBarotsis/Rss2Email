@@ -19,6 +19,25 @@ pub struct Rss {
   pub channel: Channel,
 }
 
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Channel {
+  pub title: String,
+  pub last_build_date: Option<String>,
+  pub pub_date: Option<String>,
+  #[serde(rename = "item")]
+  pub items: Vec<Item>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Item {
+  pub title: String,
+  pub link: String,
+  pub description: Option<String>,
+  pub pub_date: Option<String>,
+}
+
 impl XmlFeed for Rss {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.channel.title;
@@ -28,7 +47,7 @@ impl XmlFeed for Rss {
       .channel
       .items
       .first()
-      .and_then(|x| x.to_owned().pub_date);
+      .and_then(|x| x.clone().pub_date);
 
     let last_build_date = site_last_build_date
       .or(last_post_build_date)
@@ -50,28 +69,6 @@ impl XmlFeed for Rss {
       Err(e) => Err(format!("Date error: {}", e)),
     }
   }
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Channel {
-  pub title: String,
-  // https://github.com/RReverser/serde-xml-rs/issues/64#issuecomment-1231886555
-  // #[serde(rename = "link", default)]
-  // pub link: String,
-  pub last_build_date: Option<String>,
-  pub pub_date: Option<String>,
-  #[serde(rename = "item")]
-  pub items: Vec<Item>,
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Item {
-  pub title: String,
-  pub link: String,
-  pub description: String,
-  pub pub_date: Option<String>,
 }
 
 impl BlogPost for Item {
