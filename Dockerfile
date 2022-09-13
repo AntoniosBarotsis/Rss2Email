@@ -1,8 +1,10 @@
 FROM rust:1.63-alpine as builder
 
 # Read https://github.com/AntoniosBarotsis/Rss2Email/wiki#deploying
-ARG compile_flag="--features aws-lambda"
-# ARG compile_flag=""
+#
+# TLDR; run docker build with `--build-arg compile_flag="--features aws-lambda"`
+# if you want to build for Lambda
+ARG compile_flag=""
 
 RUN apk add --no-cache musl-dev
 WORKDIR /opt
