@@ -1,5 +1,6 @@
 #![deny(rust_2018_idioms)]
 #![warn(clippy::unwrap_used)]
+#![warn(clippy::pedantic)]
 
 use crate::util::{download_blogs, map_to_html};
 use dotenv::dotenv;
@@ -24,22 +25,23 @@ fn core_main() -> Result<(), String> {
   // TODO Email provider as an env var
 
   let days = match std::env::var("DAYS") {
-    Ok(txt) => match txt.parse::<i64>() {
-      Ok(n) => n,
-      Err(_) => {
+    Ok(txt) => {
+      if let Ok(n) = txt.parse::<i64>() {
+        n
+      } else {
         error!("Days variable is set to \"{}\" which is not a number.", txt);
         return Err(format!(
           "Days variable is set to \"{}\" which is not a number.",
           txt
         ));
       }
-    },
+    }
     Err(_) => days_default,
   };
 
   info!("Days set to {:?}", days);
 
-  let blogs = time_func(|| download_blogs(days), "download_blogs".to_owned());
+  let blogs = time_func(|| download_blogs(days), "download_blogs");
 
   let posts_amt = blogs.iter().flat_map(|x| &x.posts).count();
   info!(
@@ -51,7 +53,7 @@ fn core_main() -> Result<(), String> {
   let html = map_to_html(&blogs);
 
   if cfg!(debug_assertions) {
-    println!("{}", html);
+    info!("{}", html);
     Ok(())
   } else {
     send_email(&address, &sendgrid_api_key, &html);

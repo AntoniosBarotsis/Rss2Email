@@ -10,7 +10,7 @@ pub(crate) trait XmlFeed {
   fn into_blog(self) -> Result<Blog, String>;
 }
 
-/// Helper wrapper for `Result<T, String>` where `T: `XmlFeed`,
+/// Helper wrapper for `Result<T, String>` where `T: XmlFeed`,
 pub(crate) trait ResultToBlog<T>
 where
   T: XmlFeed,

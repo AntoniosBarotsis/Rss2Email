@@ -7,14 +7,14 @@ use std::fmt::Write as _;
 
 use crate::{
   blog::{Blog, Post},
-  xml::parse_xml,
+  xml::parse_rss,
 };
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
-  let links = links.split('\n').map(|s| s.to_string()).unique();
+  let links = links.split('\n').map(std::string::ToString::to_string).unique();
 
   let contents: Vec<Blog> = links
     .into_iter()
@@ -24,7 +24,7 @@ pub(crate) fn download_blogs(days: i64) -> Vec<Blog> {
         .map_err(|e| warn!("Error in {}\n{:?}", link, e))
         .ok()?;
 
-      parse_xml(&xml)
+      parse_rss(&xml)
         .map_err(|e| warn!("Error in {}\n{}", link, e))
         .ok()
     })
@@ -88,7 +88,7 @@ fn get_page(url: &str) -> Result<String, ureq::Error> {
 
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
-pub(crate) fn time_func<F, O>(f: F, fname: String) -> O
+pub(crate) fn time_func<F, O>(f: F, fname: &str) -> O
 where
   F: Fn() -> O,
   O: Clone,
@@ -106,7 +106,7 @@ where
       "Elapsed time for {} was {:?}ms",
       fname,
       since_the_epoch.as_millis()
-    )
+    );
   }
 
   res

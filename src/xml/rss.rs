@@ -1,9 +1,11 @@
 /// Author: Antonios Barotsis
-/// Github: https://github.com/AntoniosBarotsis
+/// [Github](https://github.com/AntoniosBarotsis)
 ///
 /// <rss>
 ///   <channel>
-///     ...
+///     <item>
+///       ...
+///     </item>
 ///   </channel>
 /// </rss>
 use chrono::DateTime;

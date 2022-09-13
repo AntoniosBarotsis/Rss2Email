@@ -1,5 +1,5 @@
 /// Author: Antonios Barotsis
-/// Github: https://github.com/AntoniosBarotsis
+/// [Github](https://github.com/AntoniosBarotsis)
 ///
 /// <feed>
 ///   <entry>
