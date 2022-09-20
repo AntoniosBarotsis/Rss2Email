@@ -31,6 +31,7 @@ pub struct Entry {
   pub description: Option<String>,
   pub summary: Option<String>,
   pub pub_date: Option<String>,
+  pub updated: Option<String>,
 }
 
 impl XmlFeed for Feed {
@@ -60,9 +61,12 @@ impl BlogPost for Entry {
     let link = self.link;
     let description = self.description.or(self.summary);
 
-    let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
+    let pub_date = self
+      .pub_date
+      .or(self.updated)
+      .ok_or_else(|| "Date not found.".to_owned())?;
 
-    match DateTime::parse_from_rfc2822(&pub_date) {
+    match DateTime::parse_from_rfc3339(&pub_date) {
       Ok(last_build_date) => Ok(Post {
         title,
         link,

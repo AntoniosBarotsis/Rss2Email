@@ -17,7 +17,7 @@ pub fn parse_rss(xml: &str) -> Result<Blog, String> {
   ];
 
   let (roots, errors): (Vec<_>, Vec<_>) = possible_roots.into_iter().partition_result();
-  
+
   roots
     .first()
     .cloned()
