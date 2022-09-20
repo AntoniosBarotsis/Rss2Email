@@ -17,6 +17,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = links
     .split('\n')
     .map(std::string::ToString::to_string)
+    .filter(|l| !l.is_empty())
     .unique();
 
   let contents: Vec<Blog> = links
