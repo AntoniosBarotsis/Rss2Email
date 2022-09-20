@@ -16,18 +16,10 @@ pub fn parse_rss(xml: &str) -> Result<Blog, String> {
     from_str::<Feed>(xml).into_blog(),
   ];
 
-  let actual_root = possible_roots.iter().find_map(|x| x.as_ref().ok());
-
-  match actual_root {
-    Some(res) => Ok(res.clone()),
-    None => {
-      let errs: Vec<&String> = possible_roots
-        .iter()
-        .map(|x| x.as_ref().unwrap_err())
-        .unique()
-        .collect();
-
-      Err(format!("{:?}", errs))
-    }
-  }
+  let (roots, errors): (Vec<_>, Vec<_>) = possible_roots.into_iter().partition_result();
+  
+  roots
+    .first()
+    .cloned()
+    .ok_or_else(|| format!("{:?}", errors.iter().unique().collect::<Vec<_>>()))
 }
