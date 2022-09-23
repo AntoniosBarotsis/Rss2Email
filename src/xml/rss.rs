@@ -1,10 +1,15 @@
-/// Author: Antonios Barotsis
-/// [Github](https://github.com/AntoniosBarotsis)
+/// [Specification](https://www.rssboard.org/rss-specification)
 ///
 /// <rss>
 ///   <channel>
+///     <title></title>
+///     <lastBuildDate>RFC 2822</lastBuildDate>
+///     <pubDate>RFC 2822</pubDate>
 ///     <item>
-///       ...
+///       <title></title>
+///       <link></link>
+///       <pubDate>RFC 2822</pubDate>
+///       <description></description>?
 ///     </item>
 ///   </channel>
 /// </rss>
