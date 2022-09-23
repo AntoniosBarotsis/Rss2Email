@@ -1,9 +1,13 @@
-/// Author: Antonios Barotsis
-/// [Github](https://github.com/AntoniosBarotsis)
+/// [Specification](https://www.rfc-editor.org/rfc/rfc4287)
 ///
 /// <feed>
+///   <title></title>
+///   <updated>ISO.8601</updated>
 ///   <entry>
-///     ...
+///     <title></title>
+///     <link href=""/>
+///     <updated>ISO.8601</updated>
+///     <summary></summary>?
 ///   </entry>
 /// </feed>
 use chrono::DateTime;
@@ -18,7 +22,6 @@ use super::traits::{BlogPost, ResultToBlog, XmlFeed};
 #[serde(rename_all = "camelCase")]
 pub struct Feed {
   pub title: String,
-  pub updated: Option<String>,
   #[serde(rename = "entry")]
   pub entries: Vec<Entry>,
 }
@@ -27,44 +30,45 @@ pub struct Feed {
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
   pub title: String,
-  pub link: String,
-  pub description: Option<String>,
+  pub link: Link,
   pub summary: Option<String>,
-  pub pub_date: Option<String>,
-  pub updated: Option<String>,
+  pub updated: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct Link {
+  href: String,
 }
 
 impl XmlFeed for Feed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
-    let last_build_date = self.updated.ok_or_else(|| "Date not found.".to_owned())?;
     let posts: Vec<Post> = self
       .entries
       .iter()
       .filter_map(|x| x.clone().into_post().ok())
       .collect();
 
-    match DateTime::parse_from_rfc3339(&last_build_date) {
-      Ok(last_build_date) => Ok(Blog {
-        title,
-        last_build_date,
-        posts,
-      }),
-      Err(e) => Err(format!("Date error: {}", e)),
-    }
+    let last_build_date = posts
+      .iter()
+      .map(|x| x.last_build_date)
+      .max()
+      .ok_or("Date error")?;
+
+    Ok(Blog {
+      title,
+      last_build_date,
+      posts,
+    })
   }
 }
 
 impl BlogPost for Entry {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
-    let link = self.link;
-    let description = self.description.or(self.summary);
-
-    let pub_date = self
-      .pub_date
-      .or(self.updated)
-      .ok_or_else(|| "Date not found.".to_owned())?;
+    let link = self.link.href;
+    let description = self.summary;
+    let pub_date = self.updated;
 
     match DateTime::parse_from_rfc3339(&pub_date) {
       Ok(last_build_date) => Ok(Post {

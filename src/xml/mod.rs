@@ -3,9 +3,9 @@ use serde_xml_rs::from_str;
 
 use crate::blog::Blog;
 
-use self::{feed::Feed, rss::Rss, traits::ResultToBlog};
+use self::{atom::Feed, rss::Rss, traits::ResultToBlog};
 
-pub mod feed;
+pub mod atom;
 pub mod rss;
 mod traits;
 
