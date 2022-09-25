@@ -9,8 +9,7 @@ use std::fmt::Write as _;
 
 use crate::{
   blog::{Blog, Post},
-  email::{email_provider::EmailProvider, sendgrid::SendGrid},
-  xml::parse_rss,
+  xml::parse_web_feed,
 };
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
@@ -25,7 +24,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
         .map_err(|e| warn!("Error in {}\n{:?}", link, e))
         .ok()?;
 
-      parse_rss(&xml)
+      parse_web_feed(&xml)
         .map_err(|e| warn!("Error in {}\n{}", link, e))
         .ok()
     })
@@ -109,14 +108,6 @@ fn get_page(url: &str) -> Result<String, ureq::Error> {
     .into_string()?;
 
   Ok(body)
-}
-
-/// Abstracts away the email backend.
-///
-/// Currently only Sendgrid is implemented but in the future,
-/// the implementation choice will be made here.
-pub fn get_email_provider() -> impl EmailProvider {
-  SendGrid::new()
 }
 
 /// Helper function that times and prints the elapsed execution time

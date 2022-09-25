@@ -9,8 +9,8 @@ pub mod atom;
 pub mod rss;
 mod traits;
 
-/// Turns XML text into a `Blog` if possible.
-pub fn parse_rss(xml: &str) -> Result<Blog, String> {
+/// Turns an XML feed into a `Blog` if possible.
+pub fn parse_web_feed(xml: &str) -> Result<Blog, String> {
   let possible_roots = vec![
     from_str::<Rss>(xml).into_blog(),
     from_str::<Feed>(xml).into_blog(),
