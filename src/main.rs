@@ -35,12 +35,13 @@
   variant_size_differences
 )]
 
-use crate::util::{download_blogs, map_to_html};
+use crate::email::email_provider::EmailProvider;
+use crate::util::{download_blogs, get_email_provider, map_to_html};
 use dotenv::dotenv;
 use env_logger::Env;
 use log::{error, info};
 
-use crate::{email::sendgrid::send_email, util::time_func};
+use crate::util::time_func;
 
 mod blog;
 mod email;
@@ -55,7 +56,9 @@ fn core_main() -> Result<(), String> {
   let sendgrid_api_key = std::env::var("SENDGRID_API_KEY").expect("SENDGRID_API_KEY must be set.");
   let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
   let days_default = 7;
+
   // TODO Email provider as an env var
+  let email_provider = get_email_provider();
 
   let days = match std::env::var("DAYS") {
     Ok(txt) => {
@@ -88,7 +91,7 @@ fn core_main() -> Result<(), String> {
   if cfg!(debug_assertions) {
     info!("{}", html);
   } else {
-    send_email(&address, &sendgrid_api_key, &html);
+    email_provider.send_email(&address, &sendgrid_api_key, &html);
   }
 
   Ok(())

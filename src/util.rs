@@ -9,6 +9,7 @@ use std::fmt::Write as _;
 
 use crate::{
   blog::{Blog, Post},
+  email::{email_provider::EmailProvider, sendgrid::SendGrid},
   xml::parse_rss,
 };
 
@@ -52,7 +53,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 }
 
 /// Parses links from `feeds.txt`.
-/// 
+///
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
 fn read_feeds() -> Vec<String> {
@@ -61,10 +62,12 @@ fn read_feeds() -> Vec<String> {
   // Not really necessary but yes
   // https://docs.rs/regex/latest/regex/#example-avoid-compiling-the-same-regex-in-a-loop
   lazy_static! {
-    static ref RE: Regex = #[allow(clippy::unwrap_used)] Regex::new(r"#.*$").unwrap();
+    static ref RE: Regex = #[allow(clippy::unwrap_used)]
+    Regex::new(r"#.*$").unwrap();
   }
 
-  links.split('\n')
+  links
+    .split('\n')
     .map(std::string::ToString::to_string)
     .map(|l| RE.replace_all(&l, "").to_string())
     .filter(|l| !l.is_empty())
@@ -106,6 +109,14 @@ fn get_page(url: &str) -> Result<String, ureq::Error> {
     .into_string()?;
 
   Ok(body)
+}
+
+/// Abstracts away the email backend.
+///
+/// Currently only Sendgrid is implemented but in the future,
+/// the implementation choice will be made here.
+pub fn get_email_provider() -> impl EmailProvider {
+  SendGrid::new()
 }
 
 /// Helper function that times and prints the elapsed execution time
