@@ -2,7 +2,9 @@ use std::{fs, time::SystemTime};
 
 use chrono::{DateTime, FixedOffset, Utc};
 use itertools::Itertools;
+use lazy_static::lazy_static;
 use log::{info, warn};
+use regex::Regex;
 use std::fmt::Write as _;
 
 use crate::{
@@ -12,14 +14,7 @@ use crate::{
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
-  let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
-
-  let links = links
-    .split('\n')
-    .map(std::string::ToString::to_string)
-    .filter(|l| !l.is_empty())
-    .map(|l| l.trim().to_owned())
-    .unique();
+  let links = read_feeds();
 
   let contents: Vec<Blog> = links
     .into_iter()
@@ -54,6 +49,28 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
     .collect();
 
   contents
+}
+
+/// Parses links from `feeds.txt`.
+/// 
+/// Assumed one link per line. Any text between a `#` and a line end
+/// is considered a comment.
+fn read_feeds() -> Vec<String> {
+  let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
+
+  // Not really necessary but yes
+  // https://docs.rs/regex/latest/regex/#example-avoid-compiling-the-same-regex-in-a-loop
+  lazy_static! {
+    static ref RE: Regex = #[allow(clippy::unwrap_used)] Regex::new(r"#.*$").unwrap();
+  }
+
+  links.split('\n')
+    .map(std::string::ToString::to_string)
+    .map(|l| RE.replace_all(&l, "").to_string())
+    .filter(|l| !l.is_empty())
+    .map(|l| l.trim().to_owned())
+    .unique()
+    .collect::<Vec<String>>()
 }
 
 /// Generates the HTML contents corresponding to the given Blog collection.
