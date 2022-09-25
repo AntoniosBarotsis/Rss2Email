@@ -13,7 +13,11 @@ pub fn send_email(address: &str, api_key: &str, contents: &str) {
     .send_string(&message);
 
   match req {
-    Ok(req) => info!("Email request sent with {} {}", req.status(), req.status_text()),
+    Ok(req) => info!(
+      "Email request sent with {} {}",
+      req.status(),
+      req.status_text()
+    ),
     Err(e) => error!("{}", e),
   }
 }
