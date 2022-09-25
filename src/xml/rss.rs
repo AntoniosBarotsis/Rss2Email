@@ -14,6 +14,7 @@
 ///   </channel>
 /// </rss>
 use chrono::DateTime;
+use log::warn;
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
@@ -60,7 +61,16 @@ impl XmlFeed for Rss {
       .channel
       .items
       .iter()
-      .filter_map(|x| x.clone().into_post().ok())
+      .filter_map(|x| match x.clone().into_post() {
+        Ok(post) => Some(post),
+        Err(e) => {
+          warn!(
+            "\"{}\"'s post titled \"{}\" errored with {}",
+            title, x.title, e
+          );
+          None
+        }
+      })
       .collect();
 
     match DateTime::parse_from_rfc2822(&last_build_date) {
