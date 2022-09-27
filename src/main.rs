@@ -54,7 +54,7 @@ fn core_main() -> Result<(), String> {
 
   let _env = dotenv().ok().ok_or("Failed to load .env file")?;
 
-  let sendgrid_api_key = std::env::var("SENDGRID_API_KEY").expect("SENDGRID_API_KEY must be set.");
+  let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
   let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
   let days_default = 7;
 
@@ -89,7 +89,7 @@ fn core_main() -> Result<(), String> {
   if cfg!(debug_assertions) {
     info!("{}", html);
   } else {
-    get_email_provider().send_email(&address, &sendgrid_api_key, &html);
+    get_email_provider().send_email(&address, &api_key, &html);
   }
 
   Ok(())
