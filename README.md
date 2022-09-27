@@ -2,6 +2,10 @@
 
 This project collects blog posts made over the last `n` days from RSS feeds and emails them to you!
 
+<p align="center">
+  <img src="assets/res.jpg" alt="Example">
+</p>
+
 ## Why?
 
 I have a few blogs in mind that I do find interesting but they do not provide a newsletter.
