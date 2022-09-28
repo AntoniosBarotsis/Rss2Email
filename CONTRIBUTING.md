@@ -1,5 +1,14 @@
 # Contributing
 
+## Running the Code
+
+I go into more detail [in the Wiki](https://github.com/AntoniosBarotsis/Rss2Email/wiki/3.-Running-the-Code) but basically, you can just
+
+- Create a `feeds.txt` file with some links (see [here](https://github.com/AntoniosBarotsis/Rss2Email/wiki/2.-Setting-up-the-emails) for example)
+- `cargo run`
+
+You should see HTML dumped in your console.
+
 ## Issues
 
 ### My feed isn't working, what's wrong?
