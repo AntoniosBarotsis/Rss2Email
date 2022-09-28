@@ -15,11 +15,11 @@ I would much rather see a summary of these posts in my mailbox.
 
 ## Getting Started
 
-This section was getting rather lengthy so I moved it to [the Wiki](https://github.com/AntoniosBarotsis/Rss2Email/wiki#getting-started)!
+This section was getting rather lengthy so I moved it to [the Wiki](https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home)!
 
 ### ⚠ Docker ⚠
 
-Please read [this](https://github.com/AntoniosBarotsis/Rss2Email/wiki#-important-) if you are planning on building the docker image.
+Please read [this](https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#-important-) if you are planning on building the docker image.
 
 ## Why is this so Slow?
 
