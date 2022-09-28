@@ -53,9 +53,6 @@ fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
   let _env = dotenv().ok().ok_or("Failed to load .env file")?;
-
-  let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
-  let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
   let days_default = 7;
 
   let days = match std::env::var("DAYS") {
@@ -89,6 +86,10 @@ fn core_main() -> Result<(), String> {
   if cfg!(debug_assertions) {
     info!("{}", html);
   } else {
+    // Only load email related variables if ran on release
+    let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
+    let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
+    
     get_email_provider().send_email(&address, &api_key, &html);
   }
 
