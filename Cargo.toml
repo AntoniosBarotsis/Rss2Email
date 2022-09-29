@@ -25,3 +25,10 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["f
 
 [features]
 aws-lambda = [ "dep:lambda_runtime", "dep:tokio", "dep:tracing", "dep:tracing-subscriber" ]
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "map_to_html"
+harness = false
