@@ -1,5 +1,5 @@
 use chrono::{FixedOffset, TimeZone};
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, Criterion};
 use rss2email::{map_to_html, Blog, Post};
 
 fn mock_blog() -> Vec<Blog> {
@@ -26,5 +26,4 @@ pub fn criterion_benchmark(c: &mut Criterion) {
   c.bench_function("map to html", |b| b.iter(|| map_to_html(&blogs)));
 }
 
-criterion_group!(benches, criterion_benchmark);
-criterion_main!(benches);
+criterion_group!(map_to_html_bench, criterion_benchmark);
