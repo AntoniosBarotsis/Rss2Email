@@ -37,16 +37,13 @@
 
 use crate::email::email_provider::get_email_provider;
 use crate::email::email_provider::EmailProvider;
-use crate::util::{download_blogs, map_to_html};
 use dotenv::dotenv;
 use env_logger::Env;
 use log::{error, info};
-
-use crate::util::time_func;
+use rss2email::{download_blogs, map_to_html, time_func};
 
 mod blog;
 mod email;
-mod util;
 mod xml;
 
 fn core_main() -> Result<(), String> {
@@ -89,7 +86,7 @@ fn core_main() -> Result<(), String> {
     // Only load email related variables if ran on release
     let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
-    
+
     get_email_provider().send_email(&address, &api_key, &html);
   }
 
