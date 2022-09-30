@@ -27,7 +27,7 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["f
 aws-lambda = [ "dep:lambda_runtime", "dep:tokio", "dep:tracing", "dep:tracing-subscriber" ]
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = { version = "0.4.0", features = [ "html_reports" ]}
 
 [[bench]]
 name = "bench_main"

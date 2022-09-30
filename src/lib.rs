@@ -56,7 +56,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 ///
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
-fn read_feeds() -> Vec<String> {
+pub fn read_feeds() -> Vec<String> {
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
   // Not really necessary but yes
@@ -102,7 +102,7 @@ fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
 }
 
 /// Helper function for downloading the contents of a web page.
-fn get_page(url: &str) -> Result<String, ureq::Error> {
+pub fn get_page(url: &str) -> Result<String, ureq::Error> {
   let body: String = ureq::get(url)
     .set("Example-Header", "header value")
     .call()?
