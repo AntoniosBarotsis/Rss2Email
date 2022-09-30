@@ -42,9 +42,7 @@ use env_logger::Env;
 use log::{error, info};
 use rss2email::{download_blogs, map_to_html, time_func};
 
-mod blog;
 mod email;
-mod xml;
 
 fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();

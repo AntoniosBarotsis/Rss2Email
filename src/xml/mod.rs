@@ -10,7 +10,6 @@ pub mod rss;
 mod traits;
 
 /// Turns an XML feed into a `Blog` if possible.
-#[allow(dead_code)] // This is in fact used in lib.rs
 pub fn parse_web_feed(xml: &str) -> Result<Blog, String> {
   let possible_roots = vec![
     from_str::<Rss>(xml).into_blog(),
