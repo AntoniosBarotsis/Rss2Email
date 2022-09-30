@@ -2,18 +2,19 @@ use std::time::Duration;
 
 use criterion::*;
 use regex::Regex;
-use rss2email::{read_feeds, get_page};
+use rss2email::{get_page, read_feeds};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
   let mut group = c.benchmark_group("get page");
   group.sampling_mode(SamplingMode::Flat);
-  
+
   let feeds = read_feeds();
 
   // Ok, for this it's probably best to check here first https://regex101.com/r/KyY0vd/1
   // but basically, I wanted to get some parts of the URLs that hopefully won't cause
-  // collisions in the benchmark IDs. 
-  let seperator = Regex::new(r"://([a-zA-Z0-9.?-]+)/?([a-zA-Z0-9?-]+)?(?:[^=\n]+)?(?:=(\w+))?").expect("Invalid regex");
+  // collisions in the benchmark IDs.
+  let seperator = Regex::new(r"://([a-zA-Z0-9.?-]+)/?([a-zA-Z0-9?-]+)?(?:[^=\n]+)?(?:=(\w+))?")
+    .expect("Invalid regex");
 
   for feed in feeds {
     let captures = seperator.captures(&feed).unwrap();
