@@ -1,4 +1,4 @@
-FROM rust:1.64-alpine as builder
+FROM docker.io/rust:1.64-alpine as builder
 
 # Read https://github.com/AntoniosBarotsis/Rss2Email/wiki#deploying
 #
