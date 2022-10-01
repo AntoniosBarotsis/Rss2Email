@@ -23,7 +23,10 @@ RUN cargo build --release $compile_flag
 FROM scratch
 WORKDIR /opt/rss2email
 COPY --from=builder /opt/rss2email/target/release/rss2email .
-COPY ./.env ./.env
-COPY ./feeds.txt ./feeds.txt
+# Place configuring files in a dedicated folder
+COPY ./.env ./config/.env
+COPY ./feeds.txt ./config/feeds.txt
 
-CMD ["./rss2email"]
+# Start the container from this dedicated folder
+WORKDIR /opt/rss2email/config
+CMD ["/opt/rss2email/rss2email"]
