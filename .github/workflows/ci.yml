@@ -14,25 +14,21 @@ jobs:
 
     strategy:
       matrix:
-        channel: ["stable"]
-        experimental: [false]
-        include:
-          - channel: "nightly"
-            experimental: true
+        channel: [ "stable", "nightly" ]
 
-    continue-on-error: ${{ matrix.experimental }}
-    name: Build & Test - Channel ${{ matrix.channel }}
+    continue-on-error: ${{ matrix.channel == 'nightly' }}
+    name: Build & Test (${{ matrix.channel }})
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Rust Nightly
+    - name: Setup ${{ matrix.channel }} Rust
       uses: ATiltedTree/setup-rust@v1
       with:
         rust-version: ${{ matrix.channel }}
 
-    - name: Build ${{ matrix.channel }}
+    - name: ${{ matrix.channel }} build
       run: cargo +${{ matrix.channel }} build --verbose
 
-    - name: Run ${{ matrix.channel }} tests
+    - name: ${{ matrix.channel }} tests
       run: cargo +${{ matrix.channel }} test --verbose
