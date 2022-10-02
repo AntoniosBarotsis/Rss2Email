@@ -8,28 +8,32 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  stable:
+  build_test:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel: ["+stable"]
+        experimental: [false]
+        include:
+          - channel: "+nightly"
+            experimental: true
+
+    continue-on-error: ${{ matrix.experimental }}
+    name: Build & Test - Channel ${{ matrix.channel }}
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
 
-  nightly:
-
-    runs-on: ubuntu-latest
-
-    steps:
     - name: Setup Rust Nightly
       uses: ATiltedTree/setup-rust@v1
       with:
         rust-version: nightly
-    - uses: actions/checkout@v3
+      if: matrix.channel == '+nightly'
+
     - name: Build
-      run: cargo +nightly build --verbose
-    - name: Run tests
-      run: cargo +nightly test --verbose
+      run: cargo build --verbose
+
+    - name: Run ${{ matrix.channel }} tests
+      run: cargo ${{ matrix.channel }} test --verbose
