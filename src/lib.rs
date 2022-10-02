@@ -103,19 +103,19 @@ fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
 
 #[derive(Debug)]
 pub enum DownloadError {
-  Ureq(ureq::Error),
+  Ureq(Box<ureq::Error>),
   Io(std::io::Error),
   Custom(String),
 }
 
 impl From<std::io::Error> for DownloadError {
   fn from(error: std::io::Error) -> Self {
-    DownloadError::Io(error)
+    Self::Io(error)
   }
 }
 impl From<ureq::Error> for DownloadError {
   fn from(error: ureq::Error) -> Self {
-    DownloadError::Ureq(error)
+    Self::Ureq(Box::new(error))
   }
 }
 

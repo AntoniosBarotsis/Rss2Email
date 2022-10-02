@@ -1,0 +1,43 @@
+name: Rust
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel: ["+stable"]
+        experimental: [false]
+        include:
+          - channel: "+nightly"
+            experimental: true
+
+    continue-on-error: ${{ matrix.experimental }}
+    name: Build & Test - Channel ${{ matrix.channel }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Rust Nightly
+      uses: ATiltedTree/setup-rust@v1
+      with:
+        rust-version: nightly
+      if: matrix.channel == '+nightly'
+
+    - name: Build
+      run: cargo build --verbose
+
+    - name: Run ${{ matrix.channel }} tests
+      run: cargo ${{ matrix.channel }} test --verbose
+    
+    - name: Fail on purpose
+      run: exit 1
+      if: matrix.channel == '+nightly'

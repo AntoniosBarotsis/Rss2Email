@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use criterion::{BenchmarkId, Criterion, SamplingMode, criterion_group};
+use criterion::{criterion_group, BenchmarkId, Criterion, SamplingMode};
 use regex::Regex;
 use rss2email::{get_page, read_feeds};
 
