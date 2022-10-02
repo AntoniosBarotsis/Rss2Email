@@ -101,10 +101,38 @@ mod tests {
   }
 
   #[test]
-  fn test_parse_feed_without_entry() {}
+  fn test_parse_feed_without_entry() {
+    let content = read_atom("no-entries.xml");
+    let result = parse_web_feed(&content);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("Empty feed"));
+  }
 
   #[test]
-  fn test_parse_feed_with_many_entries() {}
+  fn test_parse_feed_with_many_entries() {
+    let content = read_atom("multi-entries.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+
+    let first_date = post_date("2022-09-18T21:00:00+00:00");
+    let second_date = post_date("2022-10-21T21:10:00+00:00");
+    assert_eq!(
+      blog,
+      Blog {
+        title: "Multi-Entries Feed".into(),
+        last_build_date: second_date,
+        posts: vec![Post {
+          title: "First title".into(),
+          link:"http://awesome.com/link1.html".into(),
+          description: Some("First content".into()),
+          last_build_date: first_date,
+        }, Post {
+          title: "Second title".into(),
+          link:"http://com.net/why-not.html".into(),
+          description: None,
+          last_build_date: second_date,
+        }],
+      });
+  }
 
   // Ignored:
   // - multiple feeds in a single document

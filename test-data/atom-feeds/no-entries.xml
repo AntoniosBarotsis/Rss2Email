@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- minimal, only containing the relevant attributes-->
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Multi-Entries Feed</title>
+    <link href="http://example.org/" />
+    <updated>2022-09-13T18:30:02Z</updated>
+</feed>

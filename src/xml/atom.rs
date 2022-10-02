@@ -23,7 +23,7 @@ use super::traits::{BlogPost, ResultToBlog, XmlFeed};
 pub struct Feed {
   pub title: String,
   #[serde(rename = "entry")]
-  pub entries: Vec<Entry>,
+  pub entries: Option<Vec<Entry>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -44,11 +44,15 @@ pub struct Link {
 impl XmlFeed for Feed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
-    let posts: Vec<Post> = self
-      .entries
-      .iter()
-      .filter_map(|x| x.clone().into_post().ok())
-      .collect();
+    let posts: Vec<Post> = self.entries.map_or_else(std::vec::Vec::new, |entries| {
+      entries
+        .iter()
+        .filter_map(|x| x.clone().into_post().ok())
+        .collect()
+    });
+    if posts.is_empty() {
+      return Err(format!("Empty feed: {}", title));
+    }
 
     let last_build_date = posts
       .iter()
