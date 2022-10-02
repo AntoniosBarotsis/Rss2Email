@@ -102,7 +102,7 @@ fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
 }
 
 #[derive(Debug)]
-enum DownloadError {
+pub enum DownloadError {
   Ureq(ureq::Error),
   Io(std::io::Error),
   Custom(String),
@@ -125,7 +125,7 @@ fn is_supported_content(content_type: &str) -> bool {
 }
 
 /// Helper function for downloading the contents of a web page.
-fn get_page(url: &str) -> Result<String, DownloadError> {
+pub fn get_page(url: &str) -> Result<String, DownloadError> {
   let response = ureq::get(url).call()?;
 
   if !is_supported_content(response.content_type()) {
