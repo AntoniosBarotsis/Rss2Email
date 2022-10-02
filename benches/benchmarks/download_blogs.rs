@@ -1,4 +1,4 @@
-use criterion::{Criterion, criterion_group};
+use criterion::{criterion_group, Criterion};
 use rss2email::download_blogs;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
