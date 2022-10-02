@@ -7,10 +7,11 @@ use log::{info, warn};
 use regex::Regex;
 use std::fmt::Write as _;
 
-use crate::{
-  blog::{Blog, Post},
-  xml::parse_web_feed,
-};
+pub use blog::{Blog, Post};
+mod blog;
+mod xml;
+
+use crate::xml::parse_web_feed;
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
@@ -55,7 +56,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 ///
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
-fn read_feeds() -> Vec<String> {
+pub fn read_feeds() -> Vec<String> {
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
   // Not really necessary but yes
