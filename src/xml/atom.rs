@@ -30,7 +30,8 @@ pub struct Feed {
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
   pub title: String,
-  pub link: Link,
+  #[serde(rename = "link")]
+  pub links: Vec<Link>,
   pub summary: Option<String>,
   pub updated: String,
 }
@@ -66,7 +67,8 @@ impl XmlFeed for Feed {
 impl BlogPost for Entry {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
-    let link = self.link.href;
+    // Use the first link for now
+    let link = self.links[0].href.clone();
     let description = self.summary;
     let pub_date = self.updated;
 
