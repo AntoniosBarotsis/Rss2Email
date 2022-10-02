@@ -14,10 +14,10 @@ jobs:
 
     strategy:
       matrix:
-        channel: ["+stable"]
+        channel: ["stable"]
         experimental: [false]
         include:
-          - channel: "+nightly"
+          - channel: "nightly"
             experimental: true
 
     continue-on-error: ${{ matrix.experimental }}
@@ -29,11 +29,10 @@ jobs:
     - name: Setup Rust Nightly
       uses: ATiltedTree/setup-rust@v1
       with:
-        rust-version: nightly
-      if: matrix.channel == '+nightly'
+        rust-version: ${{ matrix.channel }}
 
-    - name: Build
-      run: cargo build --verbose
+    - name: Build ${{ matrix.channel }}
+      run: cargo +${{ matrix.channel }} build --verbose
 
     - name: Run ${{ matrix.channel }} tests
-      run: cargo ${{ matrix.channel }} test --verbose
+      run: cargo +${{ matrix.channel }} test --verbose
