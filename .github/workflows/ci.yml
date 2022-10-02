@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Setup Rust Nightly
+      uses: ATiltedTree/setup-rust@v1
+      with:
+        rust-version: nightly
     - uses: actions/checkout@v3
     - name: Build
       run: cargo +nightly build --verbose
