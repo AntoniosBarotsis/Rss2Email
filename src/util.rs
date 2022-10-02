@@ -103,7 +103,6 @@ fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
 /// Helper function for downloading the contents of a web page.
 fn get_page(url: &str) -> Result<String, ureq::Error> {
   let body: String = ureq::get(url)
-    .set("Example-Header", "header value")
     .call()?
     .into_string()?;
 
