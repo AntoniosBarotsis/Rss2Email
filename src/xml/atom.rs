@@ -16,19 +16,21 @@ use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
 
-use super::traits::{BlogPost, ResultToBlog, XmlFeed};
+use super::traits::{BlogPost, ResultToBlog, WebFeed};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Feed {
+#[serde(rename = "feed")]
+pub struct AtomFeed {
   pub title: String,
   #[serde(rename = "entry")]
-  pub entries: Vec<Entry>,
+  pub entries: Vec<AtomPost>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Entry {
+#[serde(rename = "entry")]
+pub struct AtomPost {
   pub title: String,
   pub link: Link,
   pub summary: Option<String>,
@@ -40,7 +42,7 @@ pub struct Link {
   href: String,
 }
 
-impl XmlFeed for Feed {
+impl WebFeed for AtomFeed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
     let posts: Vec<Post> = self
@@ -63,7 +65,7 @@ impl XmlFeed for Feed {
   }
 }
 
-impl BlogPost for Entry {
+impl BlogPost for AtomPost {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
     let link = self.link.href;
@@ -82,7 +84,7 @@ impl BlogPost for Entry {
   }
 }
 
-impl ResultToBlog<Feed> for Result<Feed, Error> {
+impl ResultToBlog<AtomFeed> for Result<AtomFeed, Error> {
   fn into_blog(self) -> Result<Blog, String> {
     match self {
       Ok(res) => res.into_blog(),
