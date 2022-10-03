@@ -111,5 +111,6 @@ rustflags = [
     "-Wunused_macro_rules",
     "-Wunused_qualifications",
     "-Wunused_results",
+    "-Aclippy::module-name-repetitions",
     "-Wvariant_size_differences",
 ]
