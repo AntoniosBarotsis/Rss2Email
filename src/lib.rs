@@ -70,8 +70,8 @@ pub fn read_feeds() -> Vec<String> {
     .split('\n')
     .map(std::string::ToString::to_string)
     .map(|l| RE.replace_all(&l, "").to_string())
-    .filter(|l| !l.is_empty())
     .map(|l| l.trim().to_owned())
+    .filter(|l| !l.is_empty())
     .unique()
     .collect::<Vec<String>>()
 }
@@ -120,7 +120,12 @@ impl From<ureq::Error> for DownloadError {
 }
 
 fn is_supported_content(content_type: &str) -> bool {
-  let supported = vec!["application/xml", "application/rss+xml"];
+  let supported = vec![
+    "application/xml",
+    "text/xml",
+    "application/rss+xml",
+    "application/atom+xml",
+  ];
   supported.contains(&content_type)
 }
 
