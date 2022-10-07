@@ -79,7 +79,7 @@ pub fn read_feeds() -> Vec<String> {
 }
 
 /// Splits the feeds on either
-/// 
+///
 /// - `\n` for input coming from `feeds.txt`
 /// - `;`  for input coming from an environment variable
 const fn feeds_splitter(c: char) -> bool {
