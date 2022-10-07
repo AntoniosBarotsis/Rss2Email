@@ -26,6 +26,8 @@ jobs:
       uses: ATiltedTree/setup-rust@v1
       with:
         rust-version: ${{ matrix.channel }}
+    
+    - uses: Swatinem/rust-cache@v2
 
     - name: ${{ matrix.channel }} build
       run: cargo +${{ matrix.channel }} build --verbose
