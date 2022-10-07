@@ -95,10 +95,8 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
 /// Returns true if the passed date is within `n` days from the current date.
 fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
   let today = Utc::now();
-
-  let tz = date.timezone();
-  let today = today.with_timezone(&tz);
-  (today - *date).num_days() <= n
+  let date = date.with_timezone(&Utc);
+  (today - date).num_days() <= n
 }
 
 #[derive(Debug)]
