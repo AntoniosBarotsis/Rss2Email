@@ -57,7 +57,9 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
 pub fn read_feeds() -> Vec<String> {
-  let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
+  let links = std::env::var("FEEDS")
+    .or_else(|_| fs::read_to_string("feeds.txt"))
+    .expect("Error in reading the feeds");
 
   // Not really necessary but yes
   // https://docs.rs/regex/latest/regex/#example-avoid-compiling-the-same-regex-in-a-loop
@@ -67,13 +69,21 @@ pub fn read_feeds() -> Vec<String> {
   }
 
   links
-    .split('\n')
+    .split(feeds_splitter)
     .map(std::string::ToString::to_string)
     .map(|l| RE.replace_all(&l, "").to_string())
     .map(|l| l.trim().to_owned())
     .filter(|l| !l.is_empty())
     .unique()
     .collect::<Vec<String>>()
+}
+
+/// Splits the feeds on either
+/// 
+/// - `\n` for input coming from `feeds.txt`
+/// - `;`  for input coming from an environment variable
+const fn feeds_splitter(c: char) -> bool {
+  c == '\n' || c == ';'
 }
 
 /// Generates the HTML contents corresponding to the given Blog collection.
