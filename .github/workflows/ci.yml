@@ -35,6 +35,8 @@ jobs:
     - name: ${{ matrix.channel }} tests
       run: cargo +${{ matrix.channel }} test --verbose
 
+  # This is more of a sanity check, these 2 should always
+  # succeed so long as the first 2 succeed
   docker_build:
     strategy:
       matrix:
@@ -56,5 +58,5 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
-      - name: Base build
+      - name: Docker build (${{ matrix.name }})
         run: docker build ${{ matrix.args }} .
