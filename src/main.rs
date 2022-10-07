@@ -41,6 +41,7 @@ use crate::util::{download_blogs, map_to_html};
 use dotenv::dotenv;
 use env_logger::Env;
 use log::{error, info};
+use std::env;
 
 use crate::util::time_func;
 
@@ -53,6 +54,18 @@ fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
   let _env = dotenv().ok().ok_or("Failed to load .env file")?;
+
+  // Check if using env variable or not -- must delimit using ':', semicolon does not work
+  let args: Vec<String> = env::args().collect();    
+  let mut parsed_args: std::str::Split<&str>;
+  let mut arg_links: Vec<&str> = Vec::new();
+  let mut feed_flag = args.len();
+  // check if env vars are present
+  if (args.len() > 1) {
+    parsed_args = args[1].split("*");
+    arg_links = parsed_args.collect::<Vec<&str>>(); // contains all feed links
+    feed_flag = args.len();
+  }
 
   let sendgrid_api_key = std::env::var("SENDGRID_API_KEY").expect("SENDGRID_API_KEY must be set.");
   let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
@@ -75,7 +88,7 @@ fn core_main() -> Result<(), String> {
 
   info!("Days set to {:?}", days);
 
-  let blogs = time_func(|| download_blogs(days), "download_blogs");
+  let blogs = time_func(|| download_blogs(days, feed_flag, arg_links.clone()), "download_blogs");
 
   let posts_amt = blogs.iter().flat_map(|x| &x.posts).count();
   info!(
