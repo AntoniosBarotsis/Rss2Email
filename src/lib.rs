@@ -1,6 +1,6 @@
 use std::{fs, time::SystemTime};
 
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
@@ -93,7 +93,7 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
 }
 
 /// Returns true if the passed date is within `n` days from the current date.
-fn within_n_days(n: i64, date: &DateTime<FixedOffset>) -> bool {
+fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
   let today = Utc::now();
   let date = date.with_timezone(&Utc);
   (today - date).num_days() <= n

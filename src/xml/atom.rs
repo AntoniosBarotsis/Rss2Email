@@ -10,7 +10,7 @@
 ///     <summary></summary>?
 ///   </entry>
 /// </feed>
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
@@ -77,7 +77,7 @@ impl BlogPost for AtomPost {
         title,
         link,
         description,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(format!("Date error: {}", e)),
     }

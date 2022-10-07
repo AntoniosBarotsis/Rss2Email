@@ -13,7 +13,7 @@
 ///     </item>
 ///   </channel>
 /// </rss>
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use log::warn;
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
@@ -78,7 +78,7 @@ impl WebFeed for RssFeed {
     match DateTime::parse_from_rfc2822(&last_build_date) {
       Ok(last_build_date) => Ok(Blog {
         title,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
         posts,
       }),
       Err(e) => Err(format!("Date error: {}", e)),
@@ -99,7 +99,7 @@ impl BlogPost for RssPost {
         title,
         link,
         description,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(format!("Date error: {}", e)),
     }
