@@ -12,6 +12,7 @@ RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
+ADD ./benches ./benches
 RUN cargo build --release $compile_flag
 
 RUN rm ./src/*.rs
