@@ -1,0 +1,60 @@
+name: Build & Tests
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel: [ "stable", "nightly" ]
+
+    continue-on-error: ${{ matrix.channel == 'nightly' }}
+    name: Build & Test (${{ matrix.channel }})
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup ${{ matrix.channel }} Rust
+      uses: ATiltedTree/setup-rust@v1
+      with:
+        rust-version: ${{ matrix.channel }}
+    
+    - uses: Swatinem/rust-cache@v2
+
+    - name: ${{ matrix.channel }} build
+      run: cargo +${{ matrix.channel }} build --verbose
+
+    - name: ${{ matrix.channel }} tests
+      run: cargo +${{ matrix.channel }} test --verbose
+
+  docker_build:
+    strategy:
+      matrix:
+        name: [ 'base' ]
+        args: [ '-t rss2email-base' ]
+        include:
+          - name: 'AWS Lambda'
+            args: '-t rss2email-aws --build-arg compile_flag="--features aws-lambda"'
+
+    name: Docker build (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    needs: build_test
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create required files
+        run: |
+          cp .env.example .env
+          touch feeds.txt
+
+      - name: Base build
+        run: docker build ${{ matrix.args }} .

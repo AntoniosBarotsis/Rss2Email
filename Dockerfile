@@ -1,6 +1,6 @@
 FROM rust:1.64-alpine as builder
 
-# Read https://github.com/AntoniosBarotsis/Rss2Email/wiki#deploying
+# Read https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#deploying
 #
 # TLDR; run docker build with `--build-arg compile_flag="--features aws-lambda"`
 # if you want to build for Lambda
@@ -12,6 +12,7 @@ RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
+ADD ./benches ./benches
 RUN cargo build --release $compile_flag
 
 RUN rm ./src/*.rs

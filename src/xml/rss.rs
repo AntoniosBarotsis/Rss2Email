@@ -13,17 +13,18 @@
 ///     </item>
 ///   </channel>
 /// </rss>
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use log::warn;
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
 
-use super::traits::{BlogPost, ResultToBlog, XmlFeed};
+use super::traits::{BlogPost, ResultToBlog, WebFeed};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
-pub struct Rss {
+#[serde(rename = "rss")]
+pub struct RssFeed {
   pub channel: Channel,
 }
 
@@ -34,19 +35,20 @@ pub struct Channel {
   pub last_build_date: Option<String>,
   pub pub_date: Option<String>,
   #[serde(rename = "item")]
-  pub items: Vec<Item>,
+  pub items: Vec<RssPost>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Item {
+#[serde(rename = "item")]
+pub struct RssPost {
   pub title: String,
   pub link: String,
   pub description: Option<String>,
   pub pub_date: Option<String>,
 }
 
-impl XmlFeed for Rss {
+impl WebFeed for RssFeed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.channel.title;
 
@@ -76,7 +78,7 @@ impl XmlFeed for Rss {
     match DateTime::parse_from_rfc2822(&last_build_date) {
       Ok(last_build_date) => Ok(Blog {
         title,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
         posts,
       }),
       Err(e) => Err(format!("Date error: {}", e)),
@@ -84,7 +86,7 @@ impl XmlFeed for Rss {
   }
 }
 
-impl BlogPost for Item {
+impl BlogPost for RssPost {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
     let link = self.link;
@@ -97,14 +99,14 @@ impl BlogPost for Item {
         title,
         link,
         description,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(format!("Date error: {}", e)),
     }
   }
 }
 
-impl ResultToBlog<Rss> for Result<Rss, Error> {
+impl ResultToBlog<RssFeed> for Result<RssFeed, Error> {
   fn into_blog(self) -> Result<Blog, String> {
     match self {
       Ok(res) => res.into_blog(),
