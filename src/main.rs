@@ -70,6 +70,7 @@ mod aws_lambda {
   use lambda_runtime::{run, service_fn, Error, LambdaEvent};
   use serde::Deserialize;
   pub type LambdaErr = Error;
+  use log::warn;
 
   #[derive(Deserialize)]
   struct Request {}
@@ -77,7 +78,7 @@ mod aws_lambda {
   #[allow(clippy::unused_async)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
-    let _res = core_main();
+    let _res = core_main().map_err(|x| warn!("{}", x));
     Ok(())
   }
 
