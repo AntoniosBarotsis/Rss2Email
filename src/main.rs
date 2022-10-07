@@ -57,11 +57,11 @@ fn core_main() -> Result<(), String> {
 
   // Check if using env variable or not -- must delimit using ':', semicolon does not work
   let args: Vec<String> = env::args().collect();    
-  let mut parsed_args: std::str::Split<&str>;
+  let parsed_args: std::str::Split<'_, &str>;
   let mut arg_links: Vec<&str> = Vec::new();
   let mut feed_flag = args.len();
   // check if env vars are present
-  if (args.len() > 1) {
+  if args.len() > 1 {
     parsed_args = args[1].split("*");
     arg_links = parsed_args.collect::<Vec<&str>>(); // contains all feed links
     feed_flag = args.len();
