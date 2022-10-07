@@ -14,8 +14,8 @@ mod xml;
 use crate::xml::parse_web_feed;
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
-pub fn download_blogs(days: i64) -> Vec<Blog> {
-  let links = read_feeds();
+pub fn download_blogs(days: i64, feed_flag: usize, env_links: Vec<&str>) -> Vec<Blog> {
+  let links = read_feeds(feed_flag, env_links);
 
   let contents: Vec<Blog> = links
     .into_iter()
@@ -56,7 +56,21 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 ///
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
-pub fn read_feeds() -> Vec<String> {
+fn read_feeds(feed_flag: usize, env_links: Vec<&str>) -> Vec<String> {    
+  if feed_flag > 1 {
+    // use env var for feeds
+    let mut tmp: Vec<String> = Vec::new();
+    for s in env_links {
+      tmp.push(s.to_string());
+    }        
+    // testing
+    /*println!("Env vars were used, now printing...");
+    for s in &tmp {
+      println!("{}",s);
+    }*/
+    return tmp;
+  }
+
   let links = fs::read_to_string("feeds.txt").expect("Error in reading the feeds.txt file");
 
   // Not really necessary but yes
@@ -70,8 +84,8 @@ pub fn read_feeds() -> Vec<String> {
     .split('\n')
     .map(std::string::ToString::to_string)
     .map(|l| RE.replace_all(&l, "").to_string())
-    .map(|l| l.trim().to_owned())
     .filter(|l| !l.is_empty())
+    .map(|l| l.trim().to_owned())
     .unique()
     .collect::<Vec<String>>()
 }

@@ -3,6 +3,9 @@ use crate::email::email_provider::EmailProvider;
 use dotenv::dotenv;
 use env_logger::Env;
 use log::{error, info};
+use rss2email::download_blogs;
+use rss2email::map_to_html;
+use rss2email::time_func;
 use std::env;
 
 mod email;
