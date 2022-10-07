@@ -24,7 +24,6 @@ RUN cargo build --release $compile_flag
 FROM scratch
 WORKDIR /opt/rss2email
 COPY --from=builder /opt/rss2email/target/release/rss2email .
-COPY ./.env ./.env
-COPY ./feeds.txt ./feeds.txt
-
+COPY *.env ./.env
+COPY *feeds.txt ./feeds.txt
 CMD ["./rss2email"]

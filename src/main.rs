@@ -10,7 +10,7 @@ mod email;
 fn core_main() -> Result<(), String> {
   env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
-  let _env = dotenv().ok().ok_or("Failed to load .env file")?;
+  let _env = dotenv();
   let days_default = 7;
 
   let days = match std::env::var("DAYS") {
