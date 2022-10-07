@@ -34,3 +34,16 @@ jobs:
 
     - name: ${{ matrix.channel }} tests
       run: cargo +${{ matrix.channel }} test --verbose
+
+  docker_build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Base build
+      run: docker build .
+
+    - name: AWS Lambda build
+      run: docker build --build-arg compile_flag="--features aws-lambda" .
