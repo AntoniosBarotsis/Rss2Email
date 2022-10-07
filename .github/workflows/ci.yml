@@ -36,14 +36,25 @@ jobs:
       run: cargo +${{ matrix.channel }} test --verbose
 
   docker_build:
+    strategy:
+      matrix:
+        name: [ 'base' ]
+        args: [ '-t rss2email-base' ]
+        include:
+          - name: 'AWS Lambda'
+            args: '-t rss2email-aws --build-arg compile_flag="--features aws-lambda"'
 
+    name: Docker build (${{ matrix.name }})
     runs-on: ubuntu-latest
+    needs: build_test
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Base build
-      run: docker build .
+      - name: Create required files
+        run: |
+          cp .env.example .env
+          touch feeds.txt
 
-    - name: AWS Lambda build
-      run: docker build --build-arg compile_flag="--features aws-lambda" .
+      - name: Base build
+        run: docker build ${{ matrix.args }} .
