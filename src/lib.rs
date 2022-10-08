@@ -5,6 +5,7 @@ use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
+use reqwest::Client;
 use std::fmt::Write as _;
 
 pub use blog::{Blog, Post};
@@ -17,35 +18,55 @@ use crate::xml::parse_web_feed;
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
-  let contents: Vec<Blog> = links
+  let rt = tokio::runtime::Builder::new_current_thread()
+    .enable_all()
+    .build().unwrap();
+
+  let client = Client::new();
+
+  let contents = rt.block_on(futures::future::join_all(
+    links
+      .into_iter()
+      .filter(|link| !link.is_empty())
+      .map(|link| {
+        let client = &client;
+        async move {
+          let xml = get_page_async(link.as_str(), client)
+            .await
+            .map_err(|e| warn!("Error in {}\n{:?}", link, e))
+            .ok()?;
+
+          parse_web_feed(&xml)
+            .map_err(|e| warn!("Error in {}\n{}", link, e))
+            .ok()
+        }
+      }),
+  ));
+
+  let contents: Vec<Blog> = contents
     .into_iter()
-    .filter(|link| !link.is_empty())
-    .filter_map(|link| {
-      let xml = get_page(&link)
-        .map_err(|e| warn!("Error in {}\n{:?}", link, e))
-        .ok()?;
-
-      parse_web_feed(&xml)
-        .map_err(|e| warn!("Error in {}\n{}", link, e))
-        .ok()
-    })
     .filter_map(|x| {
-      if !within_n_days(days, &x.last_build_date) {
-        return None;
+      match x {
+        Some(x) => { 
+          if !within_n_days(days, &x.last_build_date) {
+            return None;
+          }
+    
+          let recent_posts: Vec<Post> = x
+            .posts
+            .into_iter()
+            .filter(|x| within_n_days(days, &x.last_build_date))
+            .collect();
+    
+          let non_empty = !recent_posts.is_empty();
+    
+          non_empty.then_some(Blog {
+            posts: recent_posts,
+            ..x
+          })
+        },
+        None => None
       }
-
-      let recent_posts: Vec<Post> = x
-        .posts
-        .into_iter()
-        .filter(|x| within_n_days(days, &x.last_build_date))
-        .collect();
-
-      let non_empty = !recent_posts.is_empty();
-
-      non_empty.then_some(Blog {
-        posts: recent_posts,
-        ..x
-      })
     })
     .collect();
 
@@ -112,6 +133,7 @@ fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
 #[derive(Debug)]
 pub enum DownloadError {
   Ureq(Box<ureq::Error>),
+  Reqwest(Box<reqwest::Error>),
   Io(std::io::Error),
   Custom(String),
 }
@@ -121,9 +143,16 @@ impl From<std::io::Error> for DownloadError {
     Self::Io(error)
   }
 }
+
 impl From<ureq::Error> for DownloadError {
   fn from(error: ureq::Error) -> Self {
     Self::Ureq(Box::new(error))
+  }
+}
+
+impl From<reqwest::Error> for DownloadError {
+  fn from(error: reqwest::Error) -> Self {
+    Self::Reqwest(Box::new(error))
   }
 }
 
@@ -153,6 +182,33 @@ pub fn get_page(url: &str) -> Result<String, DownloadError> {
   Ok(body)
 }
 
+/// Helper function for downloading the contents of a web page.
+pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
+  let response = client.get(url).send().await?;
+
+  let content_type = response.headers().get(reqwest::header::CONTENT_TYPE);
+
+  match content_type {
+    Some(content_type) => {
+      let content_type = content_type.to_str().unwrap();
+      if !is_supported_content(content_type) {
+        return Err(DownloadError::Custom(format!(
+          "Invalid content {} for {}",
+          content_type, url
+        )));
+      }
+
+      let body = response.text().await;
+      match body {
+        Ok(body) => Ok(body),
+        Err(_) => Err(DownloadError::Custom("Body decode error".to_string())),
+      }
+    }
+    None => Err(DownloadError::Custom(
+      "No content type header found on request.".to_string(),
+    )),
+  }
+}
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
 pub fn time_func<F, O>(f: F, fname: &str) -> O
