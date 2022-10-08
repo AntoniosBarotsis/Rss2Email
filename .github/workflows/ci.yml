@@ -28,6 +28,8 @@ jobs:
         rust-version: ${{ matrix.channel }}
     
     - uses: Swatinem/rust-cache@v2
+      with:
+        shared-key: "shared"
 
     - name: ${{ matrix.channel }} build
       run: cargo +${{ matrix.channel }} build --verbose
@@ -59,3 +61,20 @@ jobs:
 
       - name: Docker build (${{ matrix.name }})
         run: docker build ${{ matrix.args }} .
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "shared"
+
+      - name: Run clippy
+        run: cargo clippy -- -Dwarnings
