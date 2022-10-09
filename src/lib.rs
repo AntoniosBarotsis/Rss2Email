@@ -24,7 +24,7 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
   let rt = tokio::runtime::Builder::new_current_thread()
     .enable_all()
     .build()
-    .unwrap();
+    .expect("Could not build tokio runtime");
 
   let client = Client::new();
 
