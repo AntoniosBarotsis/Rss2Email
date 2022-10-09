@@ -219,8 +219,7 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
   match content_type {
     Some(content_type) => {
       let content_type = content_type
-        .to_str()
-        .unwrap()
+        .to_str()?
         .split(';')
         .collect::<Vec<&str>>()[0]
         .to_owned();
