@@ -1,10 +1,12 @@
 use std::{fs, time::SystemTime};
 
 use chrono::{DateTime, Utc};
+use futures::{stream, StreamExt};
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
+use reqwest::Client;
 use std::fmt::Write as _;
 
 pub use blog::{Blog, Post};
@@ -13,21 +15,44 @@ mod xml;
 
 use crate::xml::parse_web_feed;
 
+static CONCURRENT_REQUESTS: usize = 10;
+
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
   let rt = tokio::runtime::Builder::new_current_thread()
     .enable_all()
-    .build().unwrap();
+    .build()
+    .unwrap();
 
-  let contents = rt.block_on(futures::future::join_all(
-    links
-      .into_iter()
-      .filter(|link| !link.is_empty())
+  let client = Client::new();
+
+  // let contents = rt.block_on(futures::future::join_all(
+  //   links
+  //     .into_iter()
+  //     .filter(|link| !link.is_empty())
+  //     .map(|link| {
+  //       let client = &client;
+  //       async move {
+  //         let xml = get_page_async(link.as_str(), client)
+  //           .await
+  //           .map_err(|e| warn!("Error in {}\n{:?}", link, e))
+  //           .ok()?;
+
+  //         parse_web_feed(&xml)
+  //           .map_err(|e| warn!("Error in {}\n{}", link, e))
+  //           .ok()
+  //       }
+  //     }),
+  // ));
+
+  let contents = rt.block_on(
+    stream::iter(links)
       .map(|link| {
+        let client = &client;
         async move {
-          let xml = get_page_async(link.as_str())
+          let xml = get_page_async(link.as_str(), client)
             .await
             .map_err(|e| warn!("Error in {}\n{:?}", link, e))
             .ok()?;
@@ -36,33 +61,33 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
             .map_err(|e| warn!("Error in {}\n{}", link, e))
             .ok()
         }
-      }),
-  ));
+      })
+      .buffer_unordered(CONCURRENT_REQUESTS)
+      .collect::<Vec<Option<Blog>>>(),
+  );
 
   let contents: Vec<Blog> = contents
     .into_iter()
-    .filter_map(|x| {
-      match x {
-        Some(x) => { 
-          if !within_n_days(days, &x.last_build_date) {
-            return None;
-          }
-    
-          let recent_posts: Vec<Post> = x
-            .posts
-            .into_iter()
-            .filter(|x| within_n_days(days, &x.last_build_date))
-            .collect();
-    
-          let non_empty = !recent_posts.is_empty();
-    
-          non_empty.then_some(Blog {
-            posts: recent_posts,
-            ..x
-          })
-        },
-        None => None
+    .filter_map(|x| match x {
+      Some(x) => {
+        if !within_n_days(days, &x.last_build_date) {
+          return None;
+        }
+
+        let recent_posts: Vec<Post> = x
+          .posts
+          .into_iter()
+          .filter(|x| within_n_days(days, &x.last_build_date))
+          .collect();
+
+        let non_empty = !recent_posts.is_empty();
+
+        non_empty.then_some(Blog {
+          posts: recent_posts,
+          ..x
+        })
       }
+      None => None,
     })
     .collect();
 
@@ -179,22 +204,37 @@ pub fn get_page(url: &str) -> Result<String, DownloadError> {
 }
 
 /// Helper function for downloading the contents of a web page.
-pub async fn get_page_async(url: &str) -> Result<String, DownloadError> {
-  let response = reqwest::get(url).await?;
+pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
+  let response = client
+    .get(url)
+    .header(
+      "Accept",
+      "application/xml, text/xml, application/rss+xml, application/atom+xml",
+    )
+    .header("User-Agent", "Rss2Email");
+  let response = response.send().await?;
 
   let content_type = response.headers().get(reqwest::header::CONTENT_TYPE);
 
   match content_type {
     Some(content_type) => {
-      let content_type = content_type.to_str().unwrap().split(';').collect::<Vec<&str>>()[0];
-      if !is_supported_content(content_type) {
+      let content_type = content_type
+        .to_str()
+        .unwrap()
+        .split(';')
+        .collect::<Vec<&str>>()[0]
+        .to_owned();
+      if !is_supported_content(content_type.as_str()) {
         return Err(DownloadError::Custom(format!(
           "Invalid content {} for {}",
-          content_type, url
+          content_type.as_str(),
+          url
         )));
       }
 
       let body = response.text().await;
+
+      // let body = response.text().await;
       match body {
         Ok(body) => Ok(body),
         Err(_) => Err(DownloadError::Custom("Body decode error".to_string())),
