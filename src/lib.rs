@@ -28,25 +28,6 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
 
   let client = Client::new();
 
-  // let contents = rt.block_on(futures::future::join_all(
-  //   links
-  //     .into_iter()
-  //     .filter(|link| !link.is_empty())
-  //     .map(|link| {
-  //       let client = &client;
-  //       async move {
-  //         let xml = get_page_async(link.as_str(), client)
-  //           .await
-  //           .map_err(|e| warn!("Error in {}\n{:?}", link, e))
-  //           .ok()?;
-
-  //         parse_web_feed(&xml)
-  //           .map_err(|e| warn!("Error in {}\n{}", link, e))
-  //           .ok()
-  //       }
-  //     }),
-  // ));
-
   let contents = rt.block_on(
     stream::iter(links)
       .map(|link| {
