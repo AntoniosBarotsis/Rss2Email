@@ -5,7 +5,6 @@ use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
-use reqwest::Client;
 use std::fmt::Write as _;
 
 pub use blog::{Blog, Post};
@@ -22,16 +21,13 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
     .enable_all()
     .build().unwrap();
 
-  let client = Client::new();
-
   let contents = rt.block_on(futures::future::join_all(
     links
       .into_iter()
       .filter(|link| !link.is_empty())
       .map(|link| {
-        let client = &client;
         async move {
-          let xml = get_page_async(link.as_str(), client)
+          let xml = get_page_async(link.as_str())
             .await
             .map_err(|e| warn!("Error in {}\n{:?}", link, e))
             .ok()?;
@@ -183,17 +179,14 @@ pub fn get_page(url: &str) -> Result<String, DownloadError> {
 }
 
 /// Helper function for downloading the contents of a web page.
-pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
+pub async fn get_page_async(url: &str) -> Result<String, DownloadError> {
   let response = reqwest::get(url).await?;
 
   let content_type = response.headers().get(reqwest::header::CONTENT_TYPE);
 
   match content_type {
     Some(content_type) => {
-      // println!("Content type ---- {:#?} for {}", content_type, url);
-
       let content_type = content_type.to_str().unwrap().split(';').collect::<Vec<&str>>()[0];
-      // println!("Content type ---- {} for {}", content_type, url);
       if !is_supported_content(content_type) {
         return Err(DownloadError::Custom(format!(
           "Invalid content {} for {}",
