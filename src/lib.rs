@@ -8,6 +8,7 @@ use log::{info, warn};
 use regex::Regex;
 use reqwest::Client;
 use std::fmt::Write as _;
+use tokio::runtime::Handle;
 
 pub use blog::{Blog, Post};
 mod blog;
@@ -15,37 +16,44 @@ mod xml;
 
 use crate::xml::parse_web_feed;
 
-static CONCURRENT_REQUESTS: usize = 10;
+const CONCURRENT_REQUESTS: usize = 10;
+
+pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
+  let client = Client::new();
+  stream::iter(links)
+    .map(|link| {
+      let client = &client;
+      async move {
+        let xml = get_page_async(link.as_str(), client)
+          .await
+          .map_err(|e| warn!("Error in {}\n{:?}", link, e))
+          .ok()?;
+
+        parse_web_feed(&xml)
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
+          .ok()
+      }
+    })
+    .buffer_unordered(CONCURRENT_REQUESTS)
+    .collect::<Vec<Option<Blog>>>()
+    .await
+}
 
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
-  let rt = tokio::runtime::Builder::new_current_thread()
-    .enable_all()
-    .build()
-    .expect("Could not build tokio runtime");
+  let contents = match Handle::try_current() {
+    Ok(handle) => std::thread::spawn( move || handle.block_on(get_blogs(links))).join().expect("Error spawning blog download"),
+    Err(_) => {
+      let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("Could not build tokio runtime");
 
-  let client = Client::new();
-
-  let contents = rt.block_on(
-    stream::iter(links)
-      .map(|link| {
-        let client = &client;
-        async move {
-          let xml = get_page_async(link.as_str(), client)
-            .await
-            .map_err(|e| warn!("Error in {}\n{:?}", link, e))
-            .ok()?;
-
-          parse_web_feed(&xml)
-            .map_err(|e| warn!("Error in {}\n{}", link, e))
-            .ok()
-        }
-      })
-      .buffer_unordered(CONCURRENT_REQUESTS)
-      .collect::<Vec<Option<Blog>>>(),
-  );
+      rt.block_on(get_blogs(links))
+    }
+  };
 
   let contents: Vec<Blog> = contents
     .into_iter()
