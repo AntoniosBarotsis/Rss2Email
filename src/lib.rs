@@ -43,16 +43,17 @@ pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
-  let contents = match Handle::try_current() {
-    Ok(handle) => std::thread::spawn( move || handle.block_on(get_blogs(links))).join().expect("Error spawning blog download"),
-    Err(_) => {
-      let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("Could not build tokio runtime");
+  let contents = if let Ok(handle) = Handle::try_current() {
+    std::thread::spawn(move || handle.block_on(get_blogs(links)))
+      .join()
+      .expect("Error spawning blog download")
+  } else {
+    let rt = tokio::runtime::Builder::new_current_thread()
+      .enable_all()
+      .build()
+      .expect("Could not build tokio runtime");
 
-      rt.block_on(get_blogs(links))
-    }
+    rt.block_on(get_blogs(links))
   };
 
   let contents: Vec<Blog> = contents
