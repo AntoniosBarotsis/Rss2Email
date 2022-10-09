@@ -218,25 +218,27 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
 
   match content_type {
     Some(content_type) => {
-      let content_type = content_type
-        .to_str()?
-        .split(';')
-        .collect::<Vec<&str>>()[0]
-        .to_owned();
-      if !is_supported_content(content_type.as_str()) {
-        return Err(DownloadError::Custom(format!(
-          "Invalid content {} for {}",
-          content_type.as_str(),
-          url
-        )));
-      }
+      match content_type.to_str() {
+        Ok(content_type) => {
+          let content_type = content_type.split(';').collect::<Vec<&str>>()[0].to_owned();
+          if !is_supported_content(content_type.as_str()) {
+            return Err(DownloadError::Custom(format!(
+              "Invalid content {} for {}",
+              content_type.as_str(),
+              url
+            )));
+          }
+          let body = response.text().await;
 
-      let body = response.text().await;
-
-      // let body = response.text().await;
-      match body {
-        Ok(body) => Ok(body),
-        Err(_) => Err(DownloadError::Custom("Body decode error".to_string())),
+          // let body = response.text().await;
+          match body {
+            Ok(body) => Ok(body),
+            Err(_) => Err(DownloadError::Custom("Body decode error".to_string())),
+          }
+        }
+        Err(_) => Err(DownloadError::Custom(
+          "Content Type parsing error".to_string(),
+        )),
       }
     }
     None => Err(DownloadError::Custom(
