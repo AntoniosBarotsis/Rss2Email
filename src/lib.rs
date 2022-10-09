@@ -184,13 +184,16 @@ pub fn get_page(url: &str) -> Result<String, DownloadError> {
 
 /// Helper function for downloading the contents of a web page.
 pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
-  let response = client.get(url).send().await?;
+  let response = reqwest::get(url).await?;
 
   let content_type = response.headers().get(reqwest::header::CONTENT_TYPE);
 
   match content_type {
     Some(content_type) => {
-      let content_type = content_type.to_str().unwrap();
+      // println!("Content type ---- {:#?} for {}", content_type, url);
+
+      let content_type = content_type.to_str().unwrap().split(';').collect::<Vec<&str>>()[0];
+      // println!("Content type ---- {} for {}", content_type, url);
       if !is_supported_content(content_type) {
         return Err(DownloadError::Custom(format!(
           "Invalid content {} for {}",
