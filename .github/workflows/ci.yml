@@ -87,6 +87,11 @@ jobs:
           override: true
           profile: minimal
 
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "shared"
+
       - name: Build
         run: cargo build --verbose
 
@@ -95,6 +100,8 @@ jobs:
 
       - name: Run
         run: cargo run --verbose
+        env:
+          FEEDS: ${{ env.FEEDS }}
 
   lint:
     name: Lint
