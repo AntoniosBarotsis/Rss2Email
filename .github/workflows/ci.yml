@@ -90,6 +90,7 @@ jobs:
       - name: Use cached dependencies
         uses: Swatinem/rust-cache@v2
         with:
+          key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
 
       - name: Build
@@ -101,7 +102,7 @@ jobs:
       - name: Run
         run: cargo run --verbose
         env:
-          FEEDS: ${{ env.FEEDS }}
+          FEEDS: ${{ secrets.FEEDS }}
 
   lint:
     name: Lint
