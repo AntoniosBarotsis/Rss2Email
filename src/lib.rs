@@ -1,4 +1,4 @@
-use std::{fs, time::SystemTime};
+use std::{fmt::Display, fs, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 use futures::{stream, StreamExt};
@@ -26,7 +26,7 @@ pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
       async move {
         let xml = get_page_async(link.as_str(), client)
           .await
-          .map_err(|e| warn!("Error in {}\n{:?}", link, e))
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
           .ok()?;
 
         parse_web_feed(&xml)
@@ -147,6 +147,17 @@ pub enum DownloadError {
   Reqwest(Box<reqwest::Error>),
   Io(std::io::Error),
   Custom(String),
+}
+
+impl Display for DownloadError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match &self {
+      Self::Ureq(e) => write!(f, "{}", e),
+      Self::Reqwest(e) => write!(f, "{}", e),
+      Self::Io(e) => write!(f, "{}", e),
+      Self::Custom(e) => write!(f, "{}", e),
+    }
+  }
 }
 
 impl From<std::io::Error> for DownloadError {
