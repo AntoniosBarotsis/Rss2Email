@@ -8,7 +8,10 @@ use rss2email::{download_blogs, map_to_html, time_func};
 mod email;
 
 fn core_main() -> Result<(), String> {
-  if env_logger::Builder::from_env(Env::default().default_filter_or("info")).try_init().is_ok() {};
+  if env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+    .try_init()
+    .is_ok()
+  {};
 
   let _env = dotenv();
   let days_default = 7;
