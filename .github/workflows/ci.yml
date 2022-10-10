@@ -20,6 +20,48 @@ jobs:
           - { target: x86_64-apple-darwin       , os: macos-12     }
           - { target: x86_64-pc-windows-msvc    , os: windows-2022 }
 
+    env:
+      FEEDS: |
+        https://antoniosbarotsis.github.io/index.xml
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCiSIL42pQRpc-8JNiYDFyzQ
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC2Xd-TjJByJyK2w1zNwY0zQ
+        https://blog.rust-lang.org/feed.xml
+        https://blog.rust-lang.org/inside-rust/feed.xml
+        https://this-week-in-rust.org/rss.xml
+        https://rust.libhunt.com/newsletter/feed
+        https://rustsec.org/feed.xml
+        https://console.dev/tools/rss.xml
+        https://console.dev/betas/rss.xml
+        https://console.dev/articles/rss.xml
+        https://console.dev/interviews/rss.xml
+        https://console.dev/profiles/rss.xml
+        https://blog.console.dev/rss/
+        https://blog.jetbrains.com/feed/
+        https://github.blog/feed/
+        https://stackoverflow.blog/feed/
+        https://dusted.codes/feed/rss
+        https://vladmihalcea.com/blog/feed/
+        https://arraying.de/index.xml
+        https://ossinsight.io/blog/rss.xml
+        https://www.smartercode.io/feed
+        https://fasterthanli.me/index.xml
+        https://raphlinus.github.io/feed.xml
+        https://www.huy.rocks/rss.xml
+        https://gideonwolfe.com/index.xml
+        https://blog.m-ou.se/index.xml
+        https://liam.rs/index.xml
+        https://qristin.wordpress.com/feed/
+        https://wakatime.com/blog/all.atom
+        https://developerlife.com/feed.xml
+        https://grafana.com/blog/index.xml
+        https://www.elastic.co/blog/feed
+        https://redis.com/blog/feed
+        https://www.stephanboyer.com/rss
+        https://medium.com/feed/@clockwork-labs
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -48,47 +90,6 @@ jobs:
       # this is supposed to function like an integration test
       - name: Run
         run: cargo run --verbose
-        env:
-          FEEDS: |
-            https://antoniosbarotsis.github.io/index.xml
-            https://www.youtube.com/feeds/videos.xml?channel_id=UCiSIL42pQRpc-8JNiYDFyzQ
-            https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA
-            https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw
-            https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA
-            https://www.youtube.com/feeds/videos.xml?channel_id=UC2Xd-TjJByJyK2w1zNwY0zQ
-            https://blog.rust-lang.org/feed.xml
-            https://blog.rust-lang.org/inside-rust/feed.xml
-            https://this-week-in-rust.org/rss.xml
-            https://rust.libhunt.com/newsletter/feed
-            https://rustsec.org/feed.xml
-            https://console.dev/tools/rss.xml
-            https://console.dev/betas/rss.xml
-            https://console.dev/articles/rss.xml
-            https://console.dev/interviews/rss.xml
-            https://console.dev/profiles/rss.xml
-            https://blog.console.dev/rss/
-            https://blog.jetbrains.com/feed/
-            https://github.blog/feed/
-            https://stackoverflow.blog/feed/
-            https://dusted.codes/feed/rss
-            https://vladmihalcea.com/blog/feed/
-            https://arraying.de/index.xml
-            https://ossinsight.io/blog/rss.xml
-            https://www.smartercode.io/feed
-            https://fasterthanli.me/index.xml
-            https://raphlinus.github.io/feed.xml
-            https://www.huy.rocks/rss.xml
-            https://gideonwolfe.com/index.xml
-            https://blog.m-ou.se/index.xml
-            https://liam.rs/index.xml
-            https://qristin.wordpress.com/feed/
-            https://wakatime.com/blog/all.atom
-            https://developerlife.com/feed.xml
-            https://grafana.com/blog/index.xml
-            https://www.elastic.co/blog/feed
-            https://redis.com/blog/feed
-            https://www.stephanboyer.com/rss
-            https://medium.com/feed/@clockwork-labs
 
       - name: Benchmark
         run: |
