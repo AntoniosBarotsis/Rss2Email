@@ -122,3 +122,6 @@ jobs:
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
+
+      - name: Tmp
+        run: rustc -vV
