@@ -93,7 +93,7 @@ jobs:
       - name: Benchmark
         run: |
           cargo install hyperfine
-          hyperfine 'cargo run' -r 5
+          hyperfine 'cargo run' -r 5 --show-output
 
   # This is more of a sanity check, these 2 should always
   # succeed so long as the first 2 succeed
