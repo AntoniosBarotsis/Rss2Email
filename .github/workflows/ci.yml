@@ -8,42 +8,103 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_test:
-    name: Build & Test (${{ matrix.channel }})
-    runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.channel == 'nightly' }}
-
+  build_test_run:
+    name: Build, test and run on ${{ matrix.job.os }} (${{ matrix.job.target }})
+    runs-on: ${{ matrix.job.os }}
     strategy:
+      fail-fast: false
       matrix:
-        channel: [ "stable", "nightly" ]
+        job:
+          - { target: aarch64-unknown-linux-gnu , os: ubuntu-22.04 }
+          - { target: x86_64-unknown-linux-gnu  , os: ubuntu-22.04 }
+          - { target: x86_64-apple-darwin       , os: macos-12     }
+          - { target: x86_64-pc-windows-msvc    , os: windows-2022 }
+
+    env:
+      FEEDS: |
+        https://antoniosbarotsis.github.io/index.xml
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCiSIL42pQRpc-8JNiYDFyzQ
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC2Xd-TjJByJyK2w1zNwY0zQ
+        https://blog.rust-lang.org/feed.xml
+        https://blog.rust-lang.org/inside-rust/feed.xml
+        https://this-week-in-rust.org/rss.xml
+        https://rust.libhunt.com/newsletter/feed
+        https://rustsec.org/feed.xml
+        https://console.dev/tools/rss.xml
+        https://console.dev/betas/rss.xml
+        https://console.dev/articles/rss.xml
+        https://console.dev/interviews/rss.xml
+        https://console.dev/profiles/rss.xml
+        https://blog.console.dev/rss/
+        https://blog.jetbrains.com/feed/
+        https://github.blog/feed/
+        https://stackoverflow.blog/feed/
+        https://dusted.codes/feed/rss
+        https://vladmihalcea.com/blog/feed/
+        https://arraying.de/index.xml
+        https://ossinsight.io/blog/rss.xml
+        https://www.smartercode.io/feed
+        https://fasterthanli.me/index.xml
+        https://raphlinus.github.io/feed.xml
+        https://www.huy.rocks/rss.xml
+        https://gideonwolfe.com/index.xml
+        https://blog.m-ou.se/index.xml
+        https://liam.rs/index.xml
+        https://qristin.wordpress.com/feed/
+        https://wakatime.com/blog/all.atom
+        https://developerlife.com/feed.xml
+        https://grafana.com/blog/index.xml
+        https://www.elastic.co/blog/feed
+        https://redis.com/blog/feed
+        https://www.stephanboyer.com/rss
+        https://medium.com/feed/@clockwork-labs
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Setup ${{ matrix.channel }} Rust
-      uses: ATiltedTree/setup-rust@v1
-      with:
-        rust-version: ${{ matrix.channel }}
-    
-    - name: Use cached dependencies
-      uses: Swatinem/rust-cache@v2
-      with:
-        shared-key: "shared"
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal
 
-    - name: Build (${{ matrix.channel }})
-      run: cargo +${{ matrix.channel }} build --verbose
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
 
-    - name: Run tests (${{ matrix.channel }})
-      run: cargo +${{ matrix.channel }} test --verbose
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Test
+        run: cargo test --verbose
+
+      # These are the web feeds I am using at the moment, 
+      # this is supposed to function like an integration test
+      - name: Run
+        run: cargo run --verbose
+
+      - name: Install Hyperfine
+        run: cargo install hyperfine
+
+      - name: Benchmark
+        run: hyperfine 'cargo run' -r 5
 
   # This is more of a sanity check, these 2 should always
   # succeed so long as the first 2 succeed
   docker_build:
     name: Docker build (${{ matrix.name }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
+      fail-fast: false
       matrix:
         name: [ 'base' ]
         args: [ '-t rss2email-base' ]
@@ -65,7 +126,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -77,6 +138,7 @@ jobs:
       - name: Use cached dependencies
         uses: Swatinem/rust-cache@v2
         with:
+          key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
 
       - name: Run clippy
