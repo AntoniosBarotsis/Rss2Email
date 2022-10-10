@@ -9,7 +9,7 @@ env:
 
 jobs:
   build_test_run:
-    name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    name: Build test and run on ${{ matrix.job.os }} (${{ matrix.job.target }})
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
@@ -44,6 +44,8 @@ jobs:
       - name: Test
         run: cargo test --verbose
 
+      # These are the web feeds I am using at the moment, 
+      # this is supposed to function like an integration test
       - name: Run
         run: cargo run --verbose
         env:
@@ -87,6 +89,11 @@ jobs:
             https://redis.com/blog/feed
             https://www.stephanboyer.com/rss
             https://medium.com/feed/@clockwork-labs
+
+      - name: Benchmark
+        run: |
+          cargo install hyperfine
+          hyperfine 'cargo run' -r 5
 
   # This is more of a sanity check, these 2 should always
   # succeed so long as the first 2 succeed
