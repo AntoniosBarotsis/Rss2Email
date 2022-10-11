@@ -2,7 +2,8 @@ FROM alpine:3.16.2
 
 RUN apk add --no-cache curl musl-dev
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN sudo $HOME/.cargo/env
+RUN chmod +x $HOME/.cargo/env
+RUN $HOME/.cargo/env
 RUN cargo build
 
 
