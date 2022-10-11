@@ -1,4 +1,6 @@
-FROM rust:1.64-alpine as builder
+ARG  base_image=rust
+FROM ${base_image}:1.64-alpine as builder
+# rust or arm64v8/rust
 
 # Read https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#deploying
 #

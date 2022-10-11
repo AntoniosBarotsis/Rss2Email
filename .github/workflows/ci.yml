@@ -97,20 +97,18 @@ jobs:
       - name: Benchmark
         run: hyperfine 'cargo run' -r 5
 
-  # This is more of a sanity check, these 2 should always
-  # succeed so long as the first 2 succeed
   docker_build:
-    name: Docker build (${{ matrix.name }})
+    name: Docker build (${{ matrix.job.name }})
     runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
-        name: [ 'base' ]
-        args: [ '-t rss2email-base' ]
-        include:
-          - name: 'AWS Lambda'
-            args: '-t rss2email-aws --build-arg compile_flag="--features aws-lambda"'
+        job:
+          - { name: rss2email-base-x86, args: --build-arg base_image="rust"                                                          }
+          - { name: rss2email-base-arm, args: --build-arg base_image="arm64v8/rust"                                                  }
+          - { name: rss2email-aws-x86 , args: --build-arg base_image="rust"         --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-arm , args: --build-arg base_image="arm64v8/rust" --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
@@ -121,8 +119,8 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
-      - name: Docker build (${{ matrix.name }})
-        run: docker build ${{ matrix.args }} .
+      - name: Docker build (${{ matrix.job.name }})
+        run: docker build -t ${{ matrix.job.name}} ${{ matrix.job.args }} .
 
   lint:
     name: Lint
