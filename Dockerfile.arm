@@ -1,4 +1,4 @@
-FROM arm64v8/rust:1.64-alpine
+FROM arm64v8/rust:1.64-alpine as builder
 WORKDIR /usr/src/rss2email
 COPY . .
 RUN cargo install --path .
