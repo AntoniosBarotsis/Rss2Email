@@ -99,7 +99,7 @@ jobs:
 
   docker_build:
     name: Docker build (${{ matrix.job.name }})
-    runs-on: ubuntu-22.04
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
