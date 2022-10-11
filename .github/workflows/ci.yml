@@ -106,9 +106,9 @@ jobs:
       matrix:
         job:
           - { name: rss2email-base-x86, args: --build-arg base_image="rust" }
-          - { name: rss2email-base-arm, args: --platform linux/amd64 --build-arg base_image="arm64v8/rust" }
+          - { name: rss2email-base-arm, args: --build-arg base_image="arm64v8/rust" }
           - { name: rss2email-aws-x86 , args: --build-arg base_image="rust" --build-arg compile_flag="--features aws-lambda" }
-          - { name: rss2email-aws-arm , args: --platform linux/amd64 --build-arg base_image="arm64v8/rust" --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-arm , args: --build-arg base_image="arm64v8/rust" --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
