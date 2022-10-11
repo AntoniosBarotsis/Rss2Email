@@ -16,6 +16,7 @@ FROM arm64v8/rust:1.64-buster as builder
 ARG compile_flag=""
 
 # RUN apk add --no-cache musl-dev
+SHELL ["/bin/bash", "-c"] 
 RUN apt install --no-cache musl-dev
 WORKDIR /opt
 RUN cargo new --bin rss2email
