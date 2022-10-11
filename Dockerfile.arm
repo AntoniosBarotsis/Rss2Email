@@ -1,7 +1,7 @@
 FROM alpine:3.16.2
 
 RUN apk add --no-cache curl musl-dev
-RUN curl -y --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
 RUN cargo build
 
 
