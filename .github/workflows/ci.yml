@@ -120,7 +120,7 @@ jobs:
           touch feeds.txt
 
       - name: Docker build (${{ matrix.job.name }})
-        run: docker build -t ${{ matrix.job.name}} ${{ matrix.job.args }} .
+        run: docker build --platform linux/arm64/v8 -t ${{ matrix.job.name}} ${{ matrix.job.args }} .
 
   lint:
     name: Lint
