@@ -1,10 +1,10 @@
 FROM arm64v8/rust:1.64-alpine as builder
 WORKDIR /usr/src/rss2email
 COPY . .
-RUN cargo install --path .
 
 FROM debian:buster-slim
 RUN apt-get update && apt-get install -y musl-dev && rm -rf /var/lib/apt/lists/*
+RUN cargo install --path .
 COPY --from=builder /usr/local/cargo/bin/rss2email /usr/local/bin/rss2email
 
 # FROM arm64v8/rust:1.64-alpine as builder
