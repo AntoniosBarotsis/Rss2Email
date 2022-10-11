@@ -107,8 +107,8 @@ jobs:
         job:
           - { name: rss2email-base-x86, file: Dockerfile.x86, args: '' }
           - { name: rss2email-base-arm, file: Dockerfile.arm, args: '' }
-          - { name: rss2email-aws-x86 , file: Dockerfile.arm, args: --build-arg compile_flag="--features aws-lambda" }
-          - { name: rss2email-aws-arm , file: Dockerfile.x86, args: --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-x86 , file: Dockerfile.x86, args: --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-arm , file: Dockerfile.arm, args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
