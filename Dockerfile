@@ -8,7 +8,7 @@ FROM ${base_image}:1.64-alpine as builder
 # if you want to build for Lambda
 ARG compile_flag=""
 
-# RUN apk add --no-cache musl-dev
+RUN apk add --no-cache musl-dev
 WORKDIR /opt
 RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
