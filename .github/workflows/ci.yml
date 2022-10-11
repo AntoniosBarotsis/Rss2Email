@@ -105,10 +105,10 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: rss2email-base-x86, args: --build-arg base_image="rust" }
-          - { name: rss2email-base-arm, args: --build-arg base_image="arm64v8/rust" }
-          - { name: rss2email-aws-x86 , args: --build-arg base_image="rust" --build-arg compile_flag="--features aws-lambda" }
-          - { name: rss2email-aws-arm , args: --build-arg base_image="arm64v8/rust" --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-base-x86, file: Dockerfile.x86, args: '' }
+          - { name: rss2email-base-arm, file: Dockerfile.arm, args: '' }
+          - { name: rss2email-aws-x86 , file: Dockerfile.arm, args: --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-arm , file: Dockerfile.x86, args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
@@ -120,7 +120,7 @@ jobs:
           touch feeds.txt
 
       - name: Docker build (${{ matrix.job.name }})
-        run: docker buildx build --platform linux/arm64/v8 -t ${{ matrix.job.name}} ${{ matrix.job.args }} .
+        run: docker buildx build --platform linux/arm64/v8 -t ${{ matrix.job.name}} ${{ matrix.job.args }} -f ${{ matrix.job.file }} .
 
   lint:
     name: Lint
