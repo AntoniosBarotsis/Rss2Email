@@ -28,7 +28,7 @@ pub fn parse_web_feed(xml: &str) -> Result<Blog, String> {
 mod tests {
   use super::parse_web_feed;
   use crate::blog::{Blog, Post};
-  use chrono::{DateTime, FixedOffset};
+  use chrono::{DateTime, Utc};
 
   fn read_file(dir_name: &str, file_name: &str) -> String {
     use std::fs;
@@ -48,17 +48,10 @@ mod tests {
     read_file("atom-feeds", file_name)
   }
 
-  fn post_date(value: &str) -> DateTime<FixedOffset> {
+  fn post_date(value: &str) -> DateTime<Utc> {
     value
-      .parse::<DateTime<FixedOffset>>()
-      .expect(&format!("Invalid date {}", value))
-  }
-
-  #[test]
-  fn test_parse_rss_data() {
-    let content = read_rss("rss.xml");
-    let blog = parse_web_feed(&content).expect("Parsed content");
-    println!("{:?}", blog);
+      .parse::<DateTime<Utc>>()
+      .unwrap_or_else(|_| panic!("Invalid date {}", value))
   }
 
   #[test]
