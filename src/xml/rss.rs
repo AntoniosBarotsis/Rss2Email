@@ -42,8 +42,10 @@ pub struct Channel {
 #[serde(rename_all = "camelCase")]
 #[serde(rename = "item")]
 pub struct RssPost {
-  pub title: String,
-  pub link: String,
+  // Link and title can be omitted, according to spec, provided that there is a description
+  // https://www.rssboard.org/rss-specification#hrelementsOfLtitemgt
+  pub title: Option<String>,
+  pub link: Option<String>,
   pub description: Option<String>,
   pub pub_date: Option<String>,
 }
@@ -68,7 +70,11 @@ impl WebFeed for RssFeed {
         Err(e) => {
           warn!(
             "\"{}\"'s post titled \"{}\" errored with {}",
-            title, x.title, e
+            title,
+            x.title
+              .as_ref()
+              .map_or_else(|| "n/a".to_string(), std::clone::Clone::clone),
+            e
           );
           None
         }
@@ -88,9 +94,22 @@ impl WebFeed for RssFeed {
 
 impl BlogPost for RssPost {
   fn into_post(self) -> Result<Post, String> {
-    let title = self.title;
-    let link = self.link;
+    let link = if let Some(link) = self.link {
+      link
+    } else {
+      return Err("No link in post".to_string());
+    };
+
     let description = self.description;
+    let title = self.title.unwrap_or_else(|| {
+      if let Some(value) = &description {
+        let desc = value.clone();
+        let end = std::cmp::min(20, desc.len());
+        desc[0..end].to_string()
+      } else {
+        link.clone()
+      }
+    });
 
     let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
 
