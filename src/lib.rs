@@ -215,38 +215,30 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
     .header("User-Agent", "Rss2Email");
   let response = response.send().await?;
 
-  let content_type = response.headers().get(reqwest::header::CONTENT_TYPE);
+  let content_type = response
+    .headers()
+    .get(reqwest::header::CONTENT_TYPE)
+    .ok_or_else(|| DownloadError::Custom("No content type header found on request.".to_string()))?
+    .to_str()
+    .map_err(|_e| DownloadError::Custom("Content Type parsing error".to_string()))?
+    .split(';')
+    .collect::<Vec<&str>>()[0]
+    .to_owned();
 
-  match content_type {
-    Some(content_type) => {
-      match content_type.to_str() {
-        Ok(content_type) => {
-          let content_type = content_type.split(';').collect::<Vec<&str>>()[0].to_owned();
-          if !is_supported_content(content_type.as_str()) {
-            return Err(DownloadError::Custom(format!(
-              "Invalid content {} for {}",
-              content_type.as_str(),
-              url
-            )));
-          }
-          let body = response.text().await;
-
-          // let body = response.text().await;
-          match body {
-            Ok(body) => Ok(body),
-            Err(_) => Err(DownloadError::Custom("Body decode error".to_string())),
-          }
-        }
-        Err(_) => Err(DownloadError::Custom(
-          "Content Type parsing error".to_string(),
-        )),
-      }
-    }
-    None => Err(DownloadError::Custom(
-      "No content type header found on request.".to_string(),
-    )),
+  if !is_supported_content(&content_type) {
+    return Err(DownloadError::Custom(format!(
+      "Invalid content {} for {}",
+      content_type.as_str(),
+      url
+    )));
   }
+
+  response
+    .text()
+    .await
+    .map_err(|_e| DownloadError::Custom("Body decode error".to_string()))
 }
+
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
 pub fn time_func<F, O>(f: F, fname: &str) -> O
