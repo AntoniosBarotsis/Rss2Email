@@ -129,4 +129,30 @@ mod tests {
 
   // Ignored:
   // - multiple feeds in a single document
+
+  #[test]
+  fn test_parse_rss_data() {
+    let content = read_rss("self-rss.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    println!("{:?}", blog);
+  }
+  
+  #[test]
+  fn test_parse_rss_0_91() {
+    let content = read_rss("sample-0_91.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+  }
+  
+  #[test]
+  fn test_parse_rss_0_92() {
+    let content = read_rss("sample-0_92.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+  }
+  
+  #[test]
+  fn test_parse_rss_2() {
+    let content = read_rss("sample-2.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+  }
+
 }
