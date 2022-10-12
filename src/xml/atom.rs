@@ -24,7 +24,7 @@ use super::traits::{BlogPost, ResultToBlog, WebFeed};
 pub struct AtomFeed {
   pub title: String,
   #[serde(rename = "entry")]
-  pub entries: Vec<AtomPost>,
+  pub entries: Option<Vec<AtomPost>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
