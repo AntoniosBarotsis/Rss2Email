@@ -10,25 +10,27 @@
 ///     <summary></summary>?
 ///   </entry>
 /// </feed>
-use chrono::DateTime;
+use chrono::{DateTime, Utc};
 use serde_derive::{Deserialize, Serialize};
 use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
 
-use super::traits::{BlogPost, ResultToBlog, XmlFeed};
+use super::traits::{BlogPost, ResultToBlog, WebFeed};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Feed {
+#[serde(rename = "feed")]
+pub struct AtomFeed {
   pub title: String,
   #[serde(rename = "entry")]
-  pub entries: Option<Vec<Entry>>,
+  pub entries: Vec<AtomPost>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Entry {
+#[serde(rename = "entry")]
+pub struct AtomPost {
   pub title: String,
   #[serde(rename = "link")]
   pub links: Vec<Link>,
@@ -41,7 +43,7 @@ pub struct Link {
   href: String,
 }
 
-impl XmlFeed for Feed {
+impl WebFeed for AtomFeed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
     let posts: Vec<Post> = self.entries.map_or_else(std::vec::Vec::new, |entries| {
@@ -68,7 +70,7 @@ impl XmlFeed for Feed {
   }
 }
 
-impl BlogPost for Entry {
+impl BlogPost for AtomPost {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
     // Use the first link for now
@@ -81,14 +83,14 @@ impl BlogPost for Entry {
         title,
         link,
         description,
-        last_build_date,
+        last_build_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(format!("Date error: {}", e)),
     }
   }
 }
 
-impl ResultToBlog<Feed> for Result<Feed, Error> {
+impl ResultToBlog<AtomFeed> for Result<AtomFeed, Error> {
   fn into_blog(self) -> Result<Blog, String> {
     match self {
       Ok(res) => res.into_blog(),

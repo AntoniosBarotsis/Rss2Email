@@ -8,9 +8,12 @@ use rss2email::{download_blogs, map_to_html, time_func};
 mod email;
 
 fn core_main() -> Result<(), String> {
-  env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+  if env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+    .try_init()
+    .is_ok()
+  {};
 
-  let _env = dotenv().ok().ok_or("Failed to load .env file")?;
+  let _env = dotenv();
   let days_default = 7;
 
   let days = match std::env::var("DAYS") {
@@ -70,6 +73,7 @@ mod aws_lambda {
   use lambda_runtime::{run, service_fn, Error, LambdaEvent};
   use serde::Deserialize;
   pub type LambdaErr = Error;
+  use log::warn;
 
   #[derive(Deserialize)]
   struct Request {}
@@ -77,7 +81,7 @@ mod aws_lambda {
   #[allow(clippy::unused_async)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
-    let _res = core_main();
+    let _res = core_main().map_err(|x| warn!("{}", x));
     Ok(())
   }
 
