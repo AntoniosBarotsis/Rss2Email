@@ -200,7 +200,7 @@ mod tests {
           title: "Star City".into(),
           link: "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
           description: Some(
-            "How did it work? >i<Details>/i< >a href=\"http://liftoff.msfc.nasa.gov\"<here>/a<"
+            "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
               .into()
           ),
           last_build_date: post_date("2003-06-03T09:39:21+00:00"),
