@@ -35,7 +35,7 @@ pub struct Channel {
   pub last_build_date: Option<String>,
   pub pub_date: Option<String>,
   #[serde(rename = "item")]
-  pub items: Vec<RssPost>,
+  pub items: Option<Vec<RssPost>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -55,15 +55,14 @@ impl WebFeed for RssFeed {
     let title = self.channel.title;
 
     let site_last_build_date = self.channel.pub_date;
-    let last_post_build_date = self.channel.items.first().and_then(|x| x.clone().pub_date);
+    let items = self.channel.items.unwrap_or_default();
+    let last_post_build_date = items.first().and_then(|x| x.clone().pub_date);
 
     let last_build_date = site_last_build_date
       .or(last_post_build_date)
       .ok_or_else(|| "Date not found.".to_owned())?;
 
-    let posts: Vec<Post> = self
-      .channel
-      .items
+    let posts: Vec<Post> = items
       .iter()
       .filter_map(|x| match x.clone().into_post() {
         Ok(post) => Some(post),
