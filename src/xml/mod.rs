@@ -223,7 +223,7 @@ mod tests {
         title: "Liftoff News".into(),
         last_build_date: post_date("2003-06-10T04:00:00+00:00"),
         posts: vec![Post {
-          title: "Star City".into(),
+            title: "<b>Star</b> City".into(),
           link: "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
           description: Some(
             "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
