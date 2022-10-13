@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+   <channel>
+      <title>Liftoff News</title>
+      <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
+      <item>
+         <title>Star City</title>
+         <link>http://abc.com</link>
+         <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+      </item>
+      <item>
+         <title>Title but No link</title>
+         <description>abc</description>
+         <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+      </item>
+      <item>
+         <title>Planet City</title>
+         <link>http://def.com</link>
+         <description>def</description>
+         <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+      </item>
+   </channel>
+</rss>

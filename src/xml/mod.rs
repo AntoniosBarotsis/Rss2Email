@@ -90,7 +90,8 @@ mod tests {
           description: None,
           last_build_date: post_date("2005-07-31T12:29:29+00:00"),
         }],
-      });
+      }
+    );
   }
 
   #[test]
@@ -113,18 +114,22 @@ mod tests {
       Blog {
         title: "Multi-Entries Feed".into(),
         last_build_date: second_date,
-        posts: vec![Post {
-          title: "First title".into(),
-          link:"http://awesome.com/link1.html".into(),
-          description: Some("First content".into()),
-          last_build_date: first_date,
-        }, Post {
-          title: "Second title".into(),
-          link:"http://com.net/why-not.html".into(),
-          description: None,
-          last_build_date: second_date,
-        }],
-      });
+        posts: vec![
+          Post {
+            title: "First title".into(),
+            link: "http://awesome.com/link1.html".into(),
+            description: Some("First content".into()),
+            last_build_date: first_date,
+          },
+          Post {
+            title: "Second title".into(),
+            link: "http://com.net/why-not.html".into(),
+            description: None,
+            last_build_date: second_date,
+          }
+        ],
+      }
+    );
   }
 
   // Ignored:
@@ -136,23 +141,113 @@ mod tests {
     let blog = parse_web_feed(&content).expect("Parsed content");
     println!("{:?}", blog);
   }
-  
+
   #[test]
   fn test_parse_rss_0_91() {
     let content = read_rss("sample-0_91.xml");
-    let blog = parse_web_feed(&content).expect("Parsed content");
+    let result = parse_web_feed(&content);
+    assert!(result.is_err());
   }
-  
+
   #[test]
   fn test_parse_rss_0_92() {
     let content = read_rss("sample-0_92.xml");
-    let blog = parse_web_feed(&content).expect("Parsed content");
+    let result = parse_web_feed(&content);
+    assert!(result.is_err());
   }
-  
+
   #[test]
   fn test_parse_rss_2() {
     let content = read_rss("sample-2.xml");
     let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+      blog,
+      Blog {
+        title: "Liftoff News".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![Post {
+          title: "Star City".into(),
+          link:"http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
+          description: Some("How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's <a href=\"http://howe.iki.rssi.ru/GCTC/gctc_e.htm\">Star City</a>.".into()),
+          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        },
+        // Sky watchers post ignored as not containing link
+         Post {
+          title: "The Engine That Does More".into(),
+          link:"http://liftoff.msfc.nasa.gov/news/2003/news-VASIMR.asp".into(),
+          description: Some("Before man travels to Mars, NASA hopes to design new engines that will let us fly through the Solar System more quickly.  The proposed VASIMR engine would do that.".into()),
+          last_build_date: post_date("2003-05-27T08:37:32+00:00"),
+        }, 
+         Post {
+          title: "Astronauts' Dirty Laundry".into(),
+          link:"http://liftoff.msfc.nasa.gov/news/2003/news-laundry.asp".into(),
+          description: Some("Compared to earlier spacecraft, the International Space Station has many luxuries, but laundry facilities are not one of them.  Instead, astronauts have other options.".into()),
+          last_build_date: post_date("2003-05-20T08:56:02+00:00"),
+        }],
+      });
   }
 
+  #[test]
+  fn test_parse_rss_text_with_html_tags() {
+    let content = read_rss("v2-with-html.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+      blog,
+      Blog {
+        title: "Liftoff News".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![Post {
+          title: "Star City".into(),
+          link: "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
+          description: Some(
+            "How did it work? >i<Details>/i< >a href=\"http://liftoff.msfc.nasa.gov\"<here>/a<"
+              .into()
+          ),
+          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        }],
+      }
+    );
+  }
+
+  #[test]
+  fn test_parse_atom_text_with_html_tags() {}
+
+  #[test]
+  fn test_parse_rss_without_items() {
+    let content = read_rss("v2-without-items.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+          blog,
+          Blog {
+            title: "NoNews".into(),
+            last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+            posts: vec![]});
+  }
+
+  /// Tests that entries without links are correctly ignored
+  /// Not having a link means that there is no place to redirect to to read the story
+  #[test]
+  fn test_parse_rss_entry_without_link() {
+    let content = read_rss("v2-without-link.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+          blog,
+          Blog {
+            title: "Liftoff News".into(),
+            last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+            posts: vec![Post {
+              title: "Star City".into(),
+              link:"http://abc.com".into(),
+              description: None,
+              last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+            },Post {
+              title: "Planet City".into(),
+              link:"http://def.com".into(),
+              description: Some("def".into()),
+              last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+            }],
+          });
+  }
+
+  fn test_parse_rss_entry_without_title() {}
 }
