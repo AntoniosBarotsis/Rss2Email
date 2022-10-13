@@ -249,5 +249,45 @@ mod tests {
           });
   }
 
-  fn test_parse_rss_entry_without_title() {}
+  #[test]
+  fn test_parse_rss_entry_without_title_and_short_description() {
+    let content = read_rss("v2-without-title-short-desc.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+      blog,
+      Blog {
+        title: "Liftoff News".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![Post {
+          title: "Liftoff at Star City".into(),
+          link: "http://liftoff.msfc.nasa.gov".into(),
+          description: None,
+          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        }],
+      }
+    );
+  }
+
+  #[test]
+  fn test_parse_rss_entry_without_title_and_long_description() {
+    let content = read_rss("v2-without-title-long-desc.xml");
+    let blog = parse_web_feed(&content).expect("Parsed content");
+    assert_eq!(
+      blog,
+      Blog {
+        title: "Liftoff News".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![Post {
+          title: "How do Americans get ready to work with Russians a...".into(),
+          link: "http://liftoff.msfc.nasa.gov".into(),
+          description: Some(
+            "How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's Star City."
+              .into()
+          ),
+          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        }],
+      }
+    );
+  }
+
 }

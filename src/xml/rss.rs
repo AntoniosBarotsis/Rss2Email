@@ -99,16 +99,17 @@ impl BlogPost for RssPost {
       return Err("No link in post".to_string());
     };
 
-    let description = self.description;
-    let title = self.title.unwrap_or_else(|| {
-      if let Some(value) = &description {
-        let desc = value.clone();
-        let end = std::cmp::min(20, desc.len());
-        desc[0..end].to_string()
-      } else {
-        link.clone()
+    let (title, description) = match (self.title, self.description) {
+      (Some(link), description) => (link, description),
+      (None, None) => (link.clone(), None),
+      (None, Some(description)) => {
+        if description.len() > 50 {
+          (format!("{}...", &description[0..50]), Some(description))
+        } else {
+          (description, None)
+        }
       }
-    });
+    };
 
     let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
 
