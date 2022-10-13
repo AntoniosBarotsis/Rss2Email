@@ -143,17 +143,15 @@ mod tests {
       Blog {
         title: "Multi-Entries Feed".into(),
         last_build_date: date,
-        posts: vec![
-          Post {
-            title: "<b>Star</b> City".into(),
-            link: "http://link.com".into(),
+        posts: vec![Post {
+          title: "<b>Star</b> City".into(),
+          link: "http://link.com".into(),
           description: Some(
             "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
               .into()
           ),
-            last_build_date: date,
-          }
-        ],
+          last_build_date: date,
+        }],
       }
     );
   }
@@ -203,7 +201,7 @@ mod tests {
           link:"http://liftoff.msfc.nasa.gov/news/2003/news-VASIMR.asp".into(),
           description: Some("Before man travels to Mars, NASA hopes to design new engines that will let us fly through the Solar System more quickly.  The proposed VASIMR engine would do that.".into()),
           last_build_date: post_date("2003-05-27T08:37:32+00:00"),
-        }, 
+        },
          Post {
           title: "Astronauts' Dirty Laundry".into(),
           link:"http://liftoff.msfc.nasa.gov/news/2003/news-laundry.asp".into(),
@@ -223,7 +221,7 @@ mod tests {
         title: "Liftoff News".into(),
         last_build_date: post_date("2003-06-10T04:00:00+00:00"),
         posts: vec![Post {
-            title: "<b>Star</b> City".into(),
+          title: "<b>Star</b> City".into(),
           link: "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
           description: Some(
             "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
@@ -240,11 +238,13 @@ mod tests {
     let content = read_rss("v2-without-items.xml");
     let blog = parse_web_feed(&content).expect("Parsed content");
     assert_eq!(
-          blog,
-          Blog {
-            title: "NoNews".into(),
-            last_build_date: post_date("2003-06-10T04:00:00+00:00"),
-            posts: vec![]});
+      blog,
+      Blog {
+        title: "NoNews".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![]
+      }
+    );
   }
 
   /// Tests that entries without links are correctly ignored
@@ -254,22 +254,26 @@ mod tests {
     let content = read_rss("v2-without-link.xml");
     let blog = parse_web_feed(&content).expect("Parsed content");
     assert_eq!(
-          blog,
-          Blog {
-            title: "Liftoff News".into(),
-            last_build_date: post_date("2003-06-10T04:00:00+00:00"),
-            posts: vec![Post {
-              title: "Star City".into(),
-              link:"http://abc.com".into(),
-              description: None,
-              last_build_date: post_date("2003-06-03T09:39:21+00:00"),
-            },Post {
-              title: "Planet City".into(),
-              link:"http://def.com".into(),
-              description: Some("def".into()),
-              last_build_date: post_date("2003-06-03T09:39:21+00:00"),
-            }],
-          });
+      blog,
+      Blog {
+        title: "Liftoff News".into(),
+        last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+        posts: vec![
+          Post {
+            title: "Star City".into(),
+            link: "http://abc.com".into(),
+            description: None,
+            last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+          },
+          Post {
+            title: "Planet City".into(),
+            link: "http://def.com".into(),
+            description: Some("def".into()),
+            last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+          }
+        ],
+      }
+    );
   }
 
   #[test]
@@ -312,5 +316,4 @@ mod tests {
       }
     );
   }
-
 }
