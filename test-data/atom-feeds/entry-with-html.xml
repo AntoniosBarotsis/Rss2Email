@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- minimal, only containing the relevant attributes-->
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Multi-Entries Feed</title>
+    <link href="http://example.org/" />
+    <updated>2022-09-13T18:30:02Z</updated>
+    <entry>
+        <title>&lt;b&gt;Star&lt;/b&gt; City</title>
+        <link href="http://link.com"/>
+        <updated>2022-09-18T21:00:00Z</updated>
+        <summary>How did it work? &lt;i&gt;Details&lt;/i&gt; &lt;a href="http://liftoff.msfc.nasa.gov"&gt;here&lt;/a&gt;</summary>
+    </entry>
+</feed>
