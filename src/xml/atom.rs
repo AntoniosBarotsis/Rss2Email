@@ -24,7 +24,7 @@ use super::traits::{BlogPost, ResultToBlog, WebFeed};
 pub struct AtomFeed {
   pub title: String,
   #[serde(rename = "entry")]
-  pub entries: Vec<AtomPost>,
+  pub entries: Option<Vec<AtomPost>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -32,7 +32,8 @@ pub struct AtomFeed {
 #[serde(rename = "entry")]
 pub struct AtomPost {
   pub title: String,
-  pub link: Link,
+  #[serde(rename = "link")]
+  pub links: Vec<Link>,
   pub summary: Option<String>,
   pub updated: String,
 }
@@ -45,11 +46,15 @@ pub struct Link {
 impl WebFeed for AtomFeed {
   fn into_blog(self) -> Result<Blog, String> {
     let title = self.title;
-    let posts: Vec<Post> = self
-      .entries
-      .iter()
-      .filter_map(|x| x.clone().into_post().ok())
-      .collect();
+    let posts: Vec<Post> = self.entries.map_or_else(std::vec::Vec::new, |entries| {
+      entries
+        .iter()
+        .filter_map(|x| x.clone().into_post().ok())
+        .collect()
+    });
+    if posts.is_empty() {
+      return Err(format!("Empty feed: {}", title));
+    }
 
     let last_build_date = posts
       .iter()
@@ -68,7 +73,8 @@ impl WebFeed for AtomFeed {
 impl BlogPost for AtomPost {
   fn into_post(self) -> Result<Post, String> {
     let title = self.title;
-    let link = self.link.href;
+    // Use the first link for now
+    let link = self.links[0].href.clone();
     let description = self.summary;
     let pub_date = self.updated;
 
