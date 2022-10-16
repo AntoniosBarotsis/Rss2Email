@@ -1,7 +1,7 @@
 use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenv::dotenv;
 use env_logger::Env;
-use log::{info, warn};
+use log::{error, info, warn};
 use rss2email::{download_blogs, map_to_html, time_func};
 
 mod email;
@@ -42,7 +42,9 @@ fn core_main() -> Result<(), String> {
     // Only load email related variables if ran on release
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
-    get_email_provider().map(|provider| provider.send_email(&address, &html))?;
+    if let Err(e) = get_email_provider().map(|provider| provider.send_email(&address, &html))? {
+      error!("{}", e);
+    };
   }
 
   Ok(())

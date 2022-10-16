@@ -1,12 +1,12 @@
-use super::mail_cmd::MailCommand;
 use super::sendgrid::SendGrid;
+use super::{mail_cmd::MailCommand, EmailError, EnvLoader};
 use enum_dispatch::enum_dispatch;
 
 /// An email provider abstraction to allow for multiple backends.
 #[enum_dispatch]
 pub trait EmailProvider {
   /// Sends an email to and from the specified address.
-  fn send_email(&self, address: &str, contents: &str);
+  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError>;
 }
 
 /// An enum containing all Email Provider implementations.
@@ -21,15 +21,10 @@ impl TryFrom<String> for EmailProviders {
 
   fn try_from(value: String) -> Result<Self, Self::Error> {
     let client = value.trim().to_uppercase();
+    let env_vars = EnvLoader::new();
+
     match client.as_str() {
-      "SENDGRID" => {
-        let api_key = std::env::var("API_KEY");
-        if let Ok(the_key) = api_key {
-          Ok(Self::SendGrid(SendGrid::new(the_key)))
-        } else {
-          Err("Cannot use SendGrid without API_KEY".to_owned())
-        }
-      }
+      "SENDGRID" => Ok(Self::SendGrid(SendGrid::new(&env_vars))),
       "MAIL_COMMAND" => Ok(Self::MailCommand(MailCommand {})),
       _ => Err("Requested client not found".to_owned()),
     }
@@ -50,19 +45,24 @@ pub fn get_email_provider() -> Result<impl EmailProvider, String> {
 #[cfg(test)]
 mod tests {
 
+  use crate::email::email_provider::EmailProvider;
+
   use super::EmailProviders;
   use std::env;
 
   #[test]
   fn load_sendgrid() {
     env::remove_var("API_KEY");
+
+    let sendgrid = EmailProviders::try_from("SENDGRID".to_owned()).expect("The Sendgrid provider is defined");
+
     assert!(
-      EmailProviders::try_from("SENDGRID".to_owned()).is_err(),
+      sendgrid.send_email("address", "email").is_err(),
       "Mandatory API_KEY should cause an Err()"
     );
     env::set_var("API_KEY", "ASD");
     assert!(
-      EmailProviders::try_from("SENDGRID".to_owned()).is_ok(),
+      sendgrid.send_email("address", "email").is_err(),
       "Failed to load proper Email Provider SendGrid"
     );
     env::remove_var("API_KEY");
