@@ -1,13 +1,12 @@
-use crate::email::email_provider::get_email_provider;
-use crate::email::email_provider::EmailProvider;
+use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenv::dotenv;
 use env_logger::Env;
-use log::{info, warn};
+use log::{error, info, warn};
 use rss2email::{download_blogs, map_to_html, time_func};
 
 mod email;
 
-fn core_main() {
+fn core_main() -> Result<(), String> {
   if env_logger::Builder::from_env(Env::default().default_filter_or("info"))
     .try_init()
     .is_ok()
@@ -19,7 +18,7 @@ fn core_main() {
   let days = std::env::var("DAYS").map_or(days_default, |v| {
     v.parse::<i64>()
       .map_err(|e| {
-        warn!("Invalid number for days, using defaults! error {e}");
+        warn!("Invalid number for days, using defaults! error: {e}");
       })
       .unwrap_or(days_default)
   });
@@ -41,16 +40,22 @@ fn core_main() {
     info!("{}", html);
   } else {
     // Only load email related variables if ran on release
-    let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
-    get_email_provider().send_email(&address, &api_key, &html);
+    get_email_provider()
+      .and_then(|provider| {
+        provider.send_email(&address, &html);
+        Ok(())
+      })
+      .map_err(|p| error!("Failed to load email service, cause {p}"));
   }
+
+  Ok(())
 }
 
 #[cfg(not(feature = "aws-lambda"))]
-fn main() {
-  core_main();
+fn main() -> Result<(), String> {
+  core_main()
 }
 
 #[cfg(feature = "aws-lambda")]
