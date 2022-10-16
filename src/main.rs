@@ -1,7 +1,7 @@
 use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenv::dotenv;
 use env_logger::Env;
-use log::{error, info, warn};
+use log::{info, warn};
 use rss2email::{download_blogs, map_to_html, time_func};
 
 mod email;
@@ -43,11 +43,7 @@ fn core_main() -> Result<(), String> {
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
     get_email_provider()
-      .and_then(|provider| {
-        provider.send_email(&address, &html);
-        Ok(())
-      })
-      .map_err(|p| error!("Failed to load email service, cause {p}"));
+      .map(|provider| provider.send_email(&address, &html))?;
   }
 
   Ok(())
