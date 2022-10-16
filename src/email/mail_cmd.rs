@@ -1,9 +1,7 @@
-/**
- * Implementation for default "mail" command in linux
- */
 use super::email_provider::EmailProvider;
 
 #[derive(Default)]
+/// Implementation for default `mail` command in linux.
 pub struct MailCommand {}
 
 impl EmailProvider for MailCommand {
@@ -12,12 +10,12 @@ impl EmailProvider for MailCommand {
   }
 }
 
-const TEMPORARY_FILE_NAME: &str = "/tmp/rss2-email.txt";
-
 #[cfg(not(target_os = "windows"))]
 fn send_email(address: &str, contents: &str) {
   use log::{info, warn};
   use std::{fs::File, io::Write, process::Command};
+
+  const TEMPORARY_FILE_NAME: &str = "/tmp/rss2-email.txt";
 
   let mut file = File::create(TEMPORARY_FILE_NAME).expect("Can't create temporary file");
   file
@@ -40,7 +38,7 @@ fn send_email(address: &str, contents: &str) {
 }
 
 #[cfg(target_os = "windows")]
-fn send_email(address: &str, contents: &str) {
+fn send_email(_address: &str, _contents: &str) {
   use log::error;
   error!("No known mail/sendmail/smtp command for Windows OS");
 }
