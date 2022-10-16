@@ -42,8 +42,7 @@ fn core_main() -> Result<(), String> {
     // Only load email related variables if ran on release
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
-    get_email_provider()
-      .map(|provider| provider.send_email(&address, &html))?;
+    get_email_provider().map(|provider| provider.send_email(&address, &html))?;
   }
 
   Ok(())
