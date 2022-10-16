@@ -36,19 +36,19 @@ fn core_main() -> Result<(), String> {
 
   let html = map_to_html(&blogs);
 
-  if cfg!(debug_assertions) {
+  /*if cfg!(debug_assertions) {
     info!("{}", html);
-  } else {
-    // Only load email related variables if ran on release
-    let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
+  } else {*/
+  // Only load email related variables if ran on release
+  let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
-    get_email_provider()
-      .and_then(|provider| {
-        provider.send_email(&address, &html);
-        Ok(())
-      })
-      .map_err(|p| error!("Failed to load email service, cause {p}"));
-  }
+  get_email_provider()
+    .and_then(|provider| {
+      provider.send_email(&address, &html);
+      Ok(())
+    })
+    .map_err(|p| error!("Failed to load email service, cause {p}"));
+  //}
 
   Ok(())
 }
