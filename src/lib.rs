@@ -297,7 +297,7 @@ mod tests {
     let url = "https://github.com/AntoniosBarotsis/Rss2Email/raw/cc5b2bee846f9dab8f5787dfcb9a01d963321630/README.md";
     let payload = get_page(url);
     assert!(payload.is_err());
-    let error = payload.unwrap_err();
+    let error = payload.expect_err("Should error");
     if let DownloadError::Custom(message) = error {
       assert!(message.contains("Invalid content"));
       assert!(message.contains(url));
@@ -312,7 +312,7 @@ mod tests {
     let url = "https://github.com/AntoniosBarotsis/Rss2Email/raw/cc5b2bee846f9dab8f5787dfcb9a01d963321630/assets/res.jpg";
     let payload = get_page(url);
     assert!(payload.is_err());
-    let error = payload.unwrap_err();
+    let error = payload.expect_err("Should error");
     if let DownloadError::Custom(message) = error {
       assert!(message.contains("Invalid content"));
       assert!(message.contains(url));

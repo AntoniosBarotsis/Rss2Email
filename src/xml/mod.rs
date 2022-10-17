@@ -1,16 +1,39 @@
+use std::fmt::Display;
+
 use itertools::Itertools;
-use serde_xml_rs::from_str;
+use quick_xml::{de::from_str, DeError};
 
 use crate::blog::Blog;
 
-use self::{atom::AtomFeed, rss::RssFeed, traits::ResultToBlog};
+use self::{atom::AtomFeed, rss::RssFeed, traits::WebFeed};
 
 pub mod atom;
 pub mod rss;
 mod traits;
 
+impl From<DeError> for ParserError {
+    fn from(e: DeError) -> Self {
+        Self::Parse(e.to_string())
+    }
+}
+
+impl Display for ParserError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Parse(e) => write!(f, "Parse error: {}", e),
+            Self::Date(e) => write!(f, "Date error: {}", e),
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+pub enum ParserError {
+  Parse(String),
+  Date(String),
+}
+
 /// Turns an XML feed into a `Blog` if possible.
-pub fn parse_web_feed(xml: &str) -> Result<Blog, String> {
+pub fn parse_web_feed(xml: &str) -> Result<Blog, ParserError> {
   let possible_roots = vec![
     from_str::<RssFeed>(xml).into_blog(),
     from_str::<AtomFeed>(xml).into_blog(),
@@ -21,7 +44,7 @@ pub fn parse_web_feed(xml: &str) -> Result<Blog, String> {
   roots
     .first()
     .cloned()
-    .ok_or_else(|| format!("{:?}", errors.iter().unique().collect::<Vec<_>>()))
+    .ok_or_else(|| ParserError::Parse(format!("{:?}", errors.iter().unique().collect::<Vec<_>>())))
 }
 
 #[cfg(test)]
@@ -99,7 +122,13 @@ mod tests {
     let content = read_atom("no-entries.xml");
     let result = parse_web_feed(&content);
     assert!(result.is_err());
-    assert!(result.unwrap_err().contains("Empty feed"));
+    
+    let is_empty_feed_error = match result.expect_err("Should error") {
+        crate::xml::ParserError::Parse(p) => p.contains("Empty feed"),
+        crate::xml::ParserError::Date(_) => false,
+    };
+
+    assert!(is_empty_feed_error);
   }
 
   #[test]
