@@ -54,7 +54,8 @@ mod tests {
   fn load_sendgrid() {
     env::remove_var("API_KEY");
 
-    let sendgrid = EmailProviders::try_from("SENDGRID".to_owned()).expect("The Sendgrid provider is defined");
+    let sendgrid =
+      EmailProviders::try_from("SENDGRID".to_owned()).expect("The Sendgrid provider is defined");
 
     assert!(
       sendgrid.send_email("address", "email").is_err(),

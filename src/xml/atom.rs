@@ -16,7 +16,10 @@ use serde_derive::{Deserialize, Serialize};
 
 use crate::blog::{Blog, Post};
 
-use super::{traits::{BlogPost, WebFeed}, ParserError};
+use super::{
+  traits::{BlogPost, WebFeed},
+  ParserError,
+};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "camelCase")]
