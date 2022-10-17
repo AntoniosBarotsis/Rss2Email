@@ -192,8 +192,7 @@ fn get_content_type(response: &Response) -> &str {
   response
     .headers()
     .get(reqwest::header::CONTENT_TYPE)
-    .map(|value| value.to_str().unwrap_or(""))
-    .unwrap_or("")
+    .map_or("", |value| value.to_str().unwrap_or(""))
     .split(';')
     .next()
     .unwrap_or("")
