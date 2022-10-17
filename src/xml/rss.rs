@@ -15,12 +15,15 @@
 /// </rss>
 use chrono::{DateTime, Utc};
 use log::warn;
-use serde_derive::{Deserialize, Serialize};
 use quick_xml::DeError;
+use serde_derive::{Deserialize, Serialize};
 
 use crate::blog::{Blog, Post};
 
-use super::{traits::{BlogPost, WebFeed}, ParserError};
+use super::{
+  traits::{BlogPost, WebFeed},
+  ParserError,
+};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename = "rss")]
@@ -53,7 +56,7 @@ pub struct RssPost {
 impl WebFeed for Result<RssFeed, DeError> {
   fn into_blog(self) -> Result<Blog, ParserError> {
     let feed = self?;
-    
+
     let title = feed.channel.title;
 
     let site_last_build_date = feed.channel.pub_date;
@@ -113,7 +116,9 @@ impl BlogPost for RssPost {
       }
     };
 
-    let pub_date = self.pub_date.ok_or_else(|| ParserError::Parse("Date not found.".to_owned()))?;
+    let pub_date = self
+      .pub_date
+      .ok_or_else(|| ParserError::Parse("Date not found.".to_owned()))?;
 
     match DateTime::parse_from_rfc2822(&pub_date) {
       Ok(last_build_date) => Ok(Post {

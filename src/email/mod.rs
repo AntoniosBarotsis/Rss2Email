@@ -25,13 +25,13 @@ impl EnvLoader {
 /// while trying to send an email.
 pub enum EmailError {
   Config(String),
-  Request(Box<ureq::Error>),
+  Request(Box<reqwest::Error>),
   Io(String),
   Other(String),
 }
 
-impl From<ureq::Error> for EmailError {
-  fn from(e: ureq::Error) -> Self {
+impl From<reqwest::Error> for EmailError {
+  fn from(e: reqwest::Error) -> Self {
     Self::Request(Box::new(e))
   }
 }

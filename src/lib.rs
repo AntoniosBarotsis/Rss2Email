@@ -6,7 +6,7 @@ use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
-use reqwest::Client;
+use reqwest::{blocking::Response, Client};
 use std::fmt::Write as _;
 use tokio::runtime::Handle;
 
@@ -17,6 +17,7 @@ mod xml;
 use crate::xml::parse_web_feed;
 
 const CONCURRENT_REQUESTS: usize = 10;
+const DEFAULT_CONTENT_TYPE: &str = "text/plain";
 
 pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
   let client = Client::new();
@@ -143,8 +144,8 @@ fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
 
 #[derive(Debug)]
 pub enum DownloadError {
-  Ureq(Box<ureq::Error>),
   Reqwest(Box<reqwest::Error>),
+  HeaderString(Box<http::header::ToStrError>),
   Io(std::io::Error),
   Custom(String),
 }
@@ -152,8 +153,8 @@ pub enum DownloadError {
 impl Display for DownloadError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match &self {
-      Self::Ureq(e) => write!(f, "{}", e),
       Self::Reqwest(e) => write!(f, "{}", e),
+      Self::HeaderString(e) => write!(f, "{}", e),
       Self::Io(e) => write!(f, "{}", e),
       Self::Custom(e) => write!(f, "{}", e),
     }
@@ -166,15 +167,15 @@ impl From<std::io::Error> for DownloadError {
   }
 }
 
-impl From<ureq::Error> for DownloadError {
-  fn from(error: ureq::Error) -> Self {
-    Self::Ureq(Box::new(error))
-  }
-}
-
 impl From<reqwest::Error> for DownloadError {
   fn from(error: reqwest::Error) -> Self {
     Self::Reqwest(Box::new(error))
+  }
+}
+
+impl From<http::header::ToStrError> for DownloadError {
+  fn from(error: http::header::ToStrError) -> Self {
+    Self::HeaderString(Box::new(error))
   }
 }
 
@@ -188,19 +189,31 @@ fn is_supported_content(content_type: &str) -> bool {
   supported.contains(&content_type)
 }
 
+fn get_content_type(response: &Response) -> &str {
+  response
+    .headers()
+    .get(reqwest::header::CONTENT_TYPE)
+    .map_or(DEFAULT_CONTENT_TYPE, |value| {
+      value.to_str().unwrap_or(DEFAULT_CONTENT_TYPE)
+    })
+    .split(';')
+    .next()
+    .unwrap_or("")
+}
+
 /// Helper function for downloading the contents of a web page.
 pub fn get_page(url: &str) -> Result<String, DownloadError> {
-  let response = ureq::get(url).call()?;
+  let response = reqwest::blocking::get(url)?;
 
-  if !is_supported_content(response.content_type()) {
+  let content_type = get_content_type(&response);
+  if !is_supported_content(content_type) {
     return Err(DownloadError::Custom(format!(
       "Invalid content {} for {}",
-      response.content_type(),
-      url
+      content_type, url
     )));
   }
 
-  let body = response.into_string()?;
+  let body = response.text()?;
   Ok(body)
 }
 
@@ -278,6 +291,7 @@ mod tests {
     assert!(content.ends_with("</rss>"));
   }
 
+  // FIXME
   #[test]
   fn test_download_xml_for_rss() {
     let payload = get_page("https://github.blog/feed");
@@ -321,6 +335,7 @@ mod tests {
     }
   }
 
+  // FIXME
   #[test]
   fn test_download_multiple_pages() {
     // Sanity test to check that the process is not a one-shot operation

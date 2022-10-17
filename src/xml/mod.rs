@@ -12,18 +12,18 @@ pub mod rss;
 mod traits;
 
 impl From<DeError> for ParserError {
-    fn from(e: DeError) -> Self {
-        Self::Parse(e.to_string())
-    }
+  fn from(e: DeError) -> Self {
+    Self::Parse(e.to_string())
+  }
 }
 
 impl Display for ParserError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Parse(e) => write!(f, "Parse error: {}", e),
-            Self::Date(e) => write!(f, "Date error: {}", e),
-        }
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Self::Parse(e) => write!(f, "Parse error: {}", e),
+      Self::Date(e) => write!(f, "Date error: {}", e),
     }
+  }
 }
 
 #[derive(Debug, Eq, PartialEq, Hash)]
@@ -122,10 +122,10 @@ mod tests {
     let content = read_atom("no-entries.xml");
     let result = parse_web_feed(&content);
     assert!(result.is_err());
-    
+
     let is_empty_feed_error = match result.expect_err("Should error") {
-        crate::xml::ParserError::Parse(p) => p.contains("Empty feed"),
-        crate::xml::ParserError::Date(_) => false,
+      crate::xml::ParserError::Parse(p) => p.contains("Empty feed"),
+      crate::xml::ParserError::Date(_) => false,
     };
 
     assert!(is_empty_feed_error);
