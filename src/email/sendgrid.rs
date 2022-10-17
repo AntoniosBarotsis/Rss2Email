@@ -28,17 +28,21 @@ impl EmailProvider for SendGrid {
       r#"{{"personalizations": [{{"to": [{{"email": "{address}"}}]}}],"from": {{"email": "{address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );
 
-    let req = ureq::post("https://api.sendgrid.com/v3/mail/send")
-      .set("Authorization", &format!("Bearer {}", api_key))
-      .set("Content-Type", "application/json")
-      .send_string(&message);
+    let http_client = reqwest::blocking::Client::new();
+    let req = http_client
+      .post("https://api.sendgrid.com/v3/mail/send")
+      .header("Authorization", &format!("Bearer {}", api_key))
+      .header("Content-Type", "application/json")
+      .body(message)
+      .build()?;
+    let response = http_client.execute(req);
 
-    match req {
-      Ok(req) => {
+    match response {
+      Ok(response) => {
         info!(
           "Email request sent with {} {}",
-          req.status(),
-          req.status_text()
+          response.status().as_u16(),
+          response.status().as_str()
         );
         Ok(())
       }
