@@ -1,8 +1,7 @@
-use crate::email::email_provider::get_email_provider;
-use crate::email::email_provider::EmailProvider;
+use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenv::dotenv;
 use env_logger::Env;
-use log::{error, info};
+use log::{error, info, warn};
 use rss2email::{download_blogs, map_to_html, time_func};
 
 mod email;
@@ -14,24 +13,17 @@ fn core_main() -> Result<(), String> {
   {};
 
   let _env = dotenv();
-  let days_default = 7;
+  let days_default: i64 = 7;
 
-  let days = match std::env::var("DAYS") {
-    Ok(txt) => {
-      if let Ok(n) = txt.parse::<i64>() {
-        n
-      } else {
-        error!("Days variable is set to \"{}\" which is not a number.", txt);
-        return Err(format!(
-          "Days variable is set to \"{}\" which is not a number.",
-          txt
-        ));
-      }
-    }
-    Err(_) => days_default,
-  };
+  let days = std::env::var("DAYS").map_or(days_default, |v| {
+    v.parse::<i64>()
+      .map_err(|e| {
+        warn!("Invalid number for days, using defaults! error: {e}");
+      })
+      .unwrap_or(days_default)
+  });
 
-  info!("Days set to {:?}", days);
+  info!("Days set to {days}",);
 
   let blogs = time_func(|| download_blogs(days), "download_blogs");
 
@@ -48,10 +40,11 @@ fn core_main() -> Result<(), String> {
     info!("{}", html);
   } else {
     // Only load email related variables if ran on release
-    let api_key = std::env::var("API_KEY").expect("API_KEY must be set.");
     let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
 
-    get_email_provider().send_email(&address, &api_key, &html);
+    if let Err(e) = get_email_provider().map(|provider| provider.send_email(&address, &html))? {
+      error!("{}", e);
+    };
   }
 
   Ok(())
