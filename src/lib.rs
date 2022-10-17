@@ -17,6 +17,7 @@ mod xml;
 use crate::xml::parse_web_feed;
 
 const CONCURRENT_REQUESTS: usize = 10;
+const DEFAULT_CONTENT_TYPE: &str = "text/plain";
 
 pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
   let client = Client::new();
@@ -192,7 +193,9 @@ fn get_content_type(response: &Response) -> &str {
   response
     .headers()
     .get(reqwest::header::CONTENT_TYPE)
-    .map_or("", |value| value.to_str().unwrap_or(""))
+    .map_or(DEFAULT_CONTENT_TYPE, |value| {
+      value.to_str().unwrap_or(DEFAULT_CONTENT_TYPE)
+    })
     .split(';')
     .next()
     .unwrap_or("")
