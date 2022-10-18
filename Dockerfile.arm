@@ -1,12 +1,3 @@
-# FROM alpine:3.16.2
-
-# RUN apk add --no-cache curl musl-dev
-# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-# RUN chmod +x $HOME/.cargo/env
-# RUN $HOME/.cargo/env
-# RUN cargo build
-
-
 FROM arm64v8/alpine:3.14 as builder
 
 # Read https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#deploying
@@ -15,13 +6,11 @@ FROM arm64v8/alpine:3.14 as builder
 # if you want to build for Lambda
 ARG compile_flag=""
 
-RUN apk add --no-cache curl libgcc libstdc++
+RUN apk add --no-cache curl musl-dev libgcc libstdc++6 alpine-sdk
 
 # RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-
-RUN apk add --no-cache musl-dev
 
 WORKDIR /opt
 RUN rustup target add aarch64-unknown-linux-musl
