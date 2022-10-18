@@ -31,7 +31,7 @@ Check out the [build from source](https://github.com/AntoniosBarotsis/Rss2Email/
 
 ## Configuration
 
-**Rss2email** requires some environment variables in order to work, here listed.
+**Rss2email** requires some environment variables in order to work, here listed.  
 These can be provided with any means, including an `.env` file
 
 ### `EMAIL_ADDRESS`
@@ -49,8 +49,8 @@ _eg:_ `"https://blog.rust-lang.org/feed.xml;https://www.linux.org/articles/index
 
 ### `EMAIL` (optional, defaults to `SENDGRID`)
 
-Which provider 
-Defaults to `SENDGRID`, can contain `EMAIL_COMMAND` as an alternative if you have `mail` or `sendmail` installed in your system  
+Which provider to use in order to send the email.  
+Can be set to `EMAIL_COMMAND` as an alternative if you have `mail` or `sendmail` installed in your system  
 
 ### `API_KEY` (optional)
 
