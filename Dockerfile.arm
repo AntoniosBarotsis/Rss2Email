@@ -25,7 +25,7 @@ RUN apk add --no-cache musl-dev
 
 WORKDIR /opt
 RUN rustup target add aarch64-unknown-linux-musl
-RUN cargo new --bin rss2email --target aarch64-unknown-linux-musl
+RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
