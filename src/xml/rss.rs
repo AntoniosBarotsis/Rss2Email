@@ -15,12 +15,15 @@
 /// </rss>
 use chrono::{DateTime, Utc};
 use log::warn;
+use quick_xml::DeError;
 use serde_derive::{Deserialize, Serialize};
-use serde_xml_rs::Error;
 
 use crate::blog::{Blog, Post};
 
-use super::traits::{BlogPost, ResultToBlog, WebFeed};
+use super::{
+  traits::{BlogPost, WebFeed},
+  ParserError,
+};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename = "rss")]
@@ -50,17 +53,19 @@ pub struct RssPost {
   pub pub_date: Option<String>,
 }
 
-impl WebFeed for RssFeed {
-  fn into_blog(self) -> Result<Blog, String> {
-    let title = self.channel.title;
+impl WebFeed for Result<RssFeed, DeError> {
+  fn into_blog(self) -> Result<Blog, ParserError> {
+    let feed = self?;
 
-    let site_last_build_date = self.channel.pub_date;
-    let items = self.channel.items.unwrap_or_default();
+    let title = feed.channel.title;
+
+    let site_last_build_date = feed.channel.pub_date;
+    let items = feed.channel.items.unwrap_or_default();
     let last_post_build_date = items.first().and_then(|x| x.clone().pub_date);
 
     let last_build_date = site_last_build_date
       .or(last_post_build_date)
-      .ok_or_else(|| "Date not found.".to_owned())?;
+      .ok_or_else(|| ParserError::Parse("Date not found.".to_owned()))?;
 
     let posts: Vec<Post> = items
       .iter()
@@ -86,17 +91,17 @@ impl WebFeed for RssFeed {
         last_build_date: last_build_date.with_timezone(&Utc),
         posts,
       }),
-      Err(e) => Err(format!("Date error: {}", e)),
+      Err(e) => Err(ParserError::Parse(e.to_string())),
     }
   }
 }
 
 impl BlogPost for RssPost {
-  fn into_post(self) -> Result<Post, String> {
+  fn into_post(self) -> Result<Post, ParserError> {
     let link = if let Some(link) = self.link {
       link
     } else {
-      return Err("No link in post".to_string());
+      return Err(ParserError::Parse("No link in post".to_string()));
     };
 
     let (title, description) = match (self.title, self.description) {
@@ -111,7 +116,9 @@ impl BlogPost for RssPost {
       }
     };
 
-    let pub_date = self.pub_date.ok_or_else(|| "Date not found.".to_owned())?;
+    let pub_date = self
+      .pub_date
+      .ok_or_else(|| ParserError::Parse("Date not found.".to_owned()))?;
 
     match DateTime::parse_from_rfc2822(&pub_date) {
       Ok(last_build_date) => Ok(Post {
@@ -120,16 +127,7 @@ impl BlogPost for RssPost {
         description,
         last_build_date: last_build_date.with_timezone(&Utc),
       }),
-      Err(e) => Err(format!("Date error: {}", e)),
-    }
-  }
-}
-
-impl ResultToBlog<RssFeed> for Result<RssFeed, Error> {
-  fn into_blog(self) -> Result<Blog, String> {
-    match self {
-      Ok(res) => res.into_blog(),
-      Err(e) => Err(e.to_string()),
+      Err(e) => Err(ParserError::Date(e.to_string())),
     }
   }
 }

@@ -1,5 +1,5 @@
 use crate::email::email_provider::{get_email_provider, EmailProvider};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use env_logger::Env;
 use log::{error, info, warn};
 use rss2email::{download_blogs, map_to_html, time_func};
