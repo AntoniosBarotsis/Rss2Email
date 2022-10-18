@@ -7,7 +7,7 @@
 # RUN cargo build
 
 
-FROM arm64v8/rust:1.64-alpine as builder
+FROM rust:1.64-alpine as builder
 
 # Read https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#deploying
 #
@@ -15,21 +15,21 @@ FROM arm64v8/rust:1.64-alpine as builder
 # if you want to build for Lambda
 ARG compile_flag=""
 
-# RUN apk add --no-cache musl-dev
-RUN apt install --no-cache musl-dev
+RUN apk add --no-cache musl-dev
 WORKDIR /opt
 RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 ADD ./benches ./benches
-RUN cargo build --release $compile_flag
+RUN rustup target add aarch64-unknown-linux-musl
+RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
 RUN rm ./src/*.rs
 RUN rm ./target/release/deps/rss2email*
 
 ADD ./src ./src
-RUN cargo build --release $compile_flag
+RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
 FROM scratch
 WORKDIR /opt/rss2email
