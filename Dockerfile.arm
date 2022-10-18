@@ -15,7 +15,7 @@ FROM arm64v8/alpine:3.14 as builder
 # if you want to build for Lambda
 ARG compile_flag=""
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl libgcc libstdc++
 
 # RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
