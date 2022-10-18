@@ -119,8 +119,20 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
+      - name: Prep Docker
+        run: |
+          sudo apt-get install -y qemu-user-static
+          qemu-aarch64-static --version
+          sudo apt-get install -y binfmt-support
+          update-binfmts --version
+
+          docker buildx create --name mybuilder
+          docker buildx use mybuilder
+          docker buildx inspect --bootstrap
+          docker buildx ls
       - name: Docker build (${{ matrix.job.name }})
-        run: docker buildx build ${{ matrix.job.args }} -f ${{ matrix.job.file }} .
+        run: |
+          docker buildx build ${{ matrix.job.args }} -f ${{ matrix.job.file }} --platform linux/arm64v8 --progress=plain --load .
 
   lint:
     name: Lint
