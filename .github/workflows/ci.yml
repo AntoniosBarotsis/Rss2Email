@@ -149,7 +149,10 @@ jobs:
           touch feeds.txt
 
       - name: Install dependencies
-        run: sudo apt-get install -y musl-dev gcc-multilib
+        run: |
+          sudo apt-get install -y musl-dev musl-tools gcc-multilib libc6-dev-arm64-cross qemu-user build-essential
+          pip3 install ziglang
+          # cargo install cargo-zigbuild
 
       - name: Build
         run: |
