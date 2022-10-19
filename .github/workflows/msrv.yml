@@ -7,12 +7,16 @@ jobs:
   update_msrv: 
     runs-on: ubuntu-22.04
     steps:
-      - name: Create Awesome Badge
+      - name: Get MSRV
+        run: |
+          cargo install cargo-msrv
+          echo "MSRV=$(cargo msrv --output-format json | tail -n 1 | jq '. | .msrv')" >> $GITHUB_ENV
+      - name: Update badge
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 87883f70db3cf998342786f65fe1b9df
           filename: rss2email_msrv.json
-          label: Hello
-          message: World
-          color: orange
+          label: MSRV
+          message: ${{ env.MSRV }}
+          color: 32ca55
