@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+   <channel>
+      <title>Liftoff News</title>
+      <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
+      <item>
+         <link>http://liftoff.msfc.nasa.gov</link>
+         <!-- Use a long description to see the truncature -->
+         <description>Liftoff at Star City</description>
+         <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
+      </item>
+   </channel>
+</rss>

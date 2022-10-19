@@ -1,11 +1,14 @@
-use std::{fs, time::SystemTime};
+use std::{fmt::Display, fs, time::SystemTime};
 
 use chrono::{DateTime, Utc};
+use futures::{stream, StreamExt};
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
+use reqwest::{blocking::Response, Client};
 use std::fmt::Write as _;
+use tokio::runtime::Handle;
 
 pub use blog::{Blog, Post};
 mod blog;
@@ -13,39 +16,69 @@ mod xml;
 
 use crate::xml::parse_web_feed;
 
+const CONCURRENT_REQUESTS: usize = 10;
+const DEFAULT_CONTENT_TYPE: &str = "text/plain";
+
+pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
+  let client = Client::new();
+  stream::iter(links)
+    .map(|link| {
+      let client = &client;
+      async move {
+        let xml = get_page_async(link.as_str(), client)
+          .await
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
+          .ok()?;
+
+        parse_web_feed(&xml)
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
+          .ok()
+      }
+    })
+    .buffer_unordered(CONCURRENT_REQUESTS)
+    .collect::<Vec<Option<Blog>>>()
+    .await
+}
+
 /// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
-  let contents: Vec<Blog> = links
+  let contents = if let Ok(handle) = Handle::try_current() {
+    std::thread::spawn(move || handle.block_on(get_blogs(links)))
+      .join()
+      .expect("Error spawning blog download")
+  } else {
+    let rt = tokio::runtime::Builder::new_current_thread()
+      .enable_all()
+      .build()
+      .expect("Could not build tokio runtime");
+
+    rt.block_on(get_blogs(links))
+  };
+
+  let contents: Vec<Blog> = contents
     .into_iter()
-    .filter(|link| !link.is_empty())
-    .filter_map(|link| {
-      let xml = get_page(&link)
-        .map_err(|e| warn!("Error in {}\n{:?}", link, e))
-        .ok()?;
+    .filter_map(|x| match x {
+      Some(x) => {
+        if !within_n_days(days, &x.last_build_date) {
+          return None;
+        }
 
-      parse_web_feed(&xml)
-        .map_err(|e| warn!("Error in {}\n{}", link, e))
-        .ok()
-    })
-    .filter_map(|x| {
-      if !within_n_days(days, &x.last_build_date) {
-        return None;
+        let recent_posts: Vec<Post> = x
+          .posts
+          .into_iter()
+          .filter(|x| within_n_days(days, &x.last_build_date))
+          .collect();
+
+        let non_empty = !recent_posts.is_empty();
+
+        non_empty.then_some(Blog {
+          posts: recent_posts,
+          ..x
+        })
       }
-
-      let recent_posts: Vec<Post> = x
-        .posts
-        .into_iter()
-        .filter(|x| within_n_days(days, &x.last_build_date))
-        .collect();
-
-      let non_empty = !recent_posts.is_empty();
-
-      non_empty.then_some(Blog {
-        posts: recent_posts,
-        ..x
-      })
+      None => None,
     })
     .collect();
 
@@ -111,9 +144,21 @@ fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
 
 #[derive(Debug)]
 pub enum DownloadError {
-  Ureq(Box<ureq::Error>),
+  Reqwest(Box<reqwest::Error>),
+  HeaderString(Box<http::header::ToStrError>),
   Io(std::io::Error),
   Custom(String),
+}
+
+impl Display for DownloadError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match &self {
+      Self::Reqwest(e) => write!(f, "{}", e),
+      Self::HeaderString(e) => write!(f, "{}", e),
+      Self::Io(e) => write!(f, "{}", e),
+      Self::Custom(e) => write!(f, "{}", e),
+    }
+  }
 }
 
 impl From<std::io::Error> for DownloadError {
@@ -121,9 +166,16 @@ impl From<std::io::Error> for DownloadError {
     Self::Io(error)
   }
 }
-impl From<ureq::Error> for DownloadError {
-  fn from(error: ureq::Error) -> Self {
-    Self::Ureq(Box::new(error))
+
+impl From<reqwest::Error> for DownloadError {
+  fn from(error: reqwest::Error) -> Self {
+    Self::Reqwest(Box::new(error))
+  }
+}
+
+impl From<http::header::ToStrError> for DownloadError {
+  fn from(error: http::header::ToStrError) -> Self {
+    Self::HeaderString(Box::new(error))
   }
 }
 
@@ -137,20 +189,67 @@ fn is_supported_content(content_type: &str) -> bool {
   supported.contains(&content_type)
 }
 
+fn get_content_type(response: &Response) -> &str {
+  response
+    .headers()
+    .get(reqwest::header::CONTENT_TYPE)
+    .map_or(DEFAULT_CONTENT_TYPE, |value| {
+      value.to_str().unwrap_or(DEFAULT_CONTENT_TYPE)
+    })
+    .split(';')
+    .next()
+    .unwrap_or("")
+}
+
 /// Helper function for downloading the contents of a web page.
 pub fn get_page(url: &str) -> Result<String, DownloadError> {
-  let response = ureq::get(url).call()?;
+  let response = reqwest::blocking::get(url)?;
 
-  if !is_supported_content(response.content_type()) {
+  let content_type = get_content_type(&response);
+  if !is_supported_content(content_type) {
     return Err(DownloadError::Custom(format!(
       "Invalid content {} for {}",
-      response.content_type(),
+      content_type, url
+    )));
+  }
+
+  let body = response.text()?;
+  Ok(body)
+}
+
+/// Helper function for downloading the contents of a web page.
+pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
+  let response = client
+    .get(url)
+    .header(
+      "Accept",
+      "application/xml, text/xml, application/rss+xml, application/atom+xml",
+    )
+    .header("User-Agent", "Rss2Email");
+  let response = response.send().await?;
+
+  let content_type = response
+    .headers()
+    .get(reqwest::header::CONTENT_TYPE)
+    .ok_or_else(|| DownloadError::Custom("No content type header found on request.".to_string()))?
+    .to_str()
+    .map_err(|_e| DownloadError::Custom("Content Type parsing error".to_string()))?
+    .split(';')
+    .collect::<Vec<&str>>()[0]
+    .to_owned();
+
+  if !is_supported_content(&content_type) {
+    return Err(DownloadError::Custom(format!(
+      "Invalid content {} for {}",
+      content_type.as_str(),
       url
     )));
   }
 
-  let body = response.into_string()?;
-  Ok(body)
+  response
+    .text()
+    .await
+    .map_err(|_e| DownloadError::Custom("Body decode error".to_string()))
 }
 
 /// Helper function that times and prints the elapsed execution time
@@ -192,6 +291,7 @@ mod tests {
     assert!(content.ends_with("</rss>"));
   }
 
+  // FIXME
   #[test]
   fn test_download_xml_for_rss() {
     let payload = get_page("https://github.blog/feed");
@@ -211,7 +311,7 @@ mod tests {
     let url = "https://github.com/AntoniosBarotsis/Rss2Email/raw/cc5b2bee846f9dab8f5787dfcb9a01d963321630/README.md";
     let payload = get_page(url);
     assert!(payload.is_err());
-    let error = payload.unwrap_err();
+    let error = payload.expect_err("Should error");
     if let DownloadError::Custom(message) = error {
       assert!(message.contains("Invalid content"));
       assert!(message.contains(url));
@@ -226,7 +326,7 @@ mod tests {
     let url = "https://github.com/AntoniosBarotsis/Rss2Email/raw/cc5b2bee846f9dab8f5787dfcb9a01d963321630/assets/res.jpg";
     let payload = get_page(url);
     assert!(payload.is_err());
-    let error = payload.unwrap_err();
+    let error = payload.expect_err("Should error");
     if let DownloadError::Custom(message) = error {
       assert!(message.contains("Invalid content"));
       assert!(message.contains(url));
@@ -235,6 +335,7 @@ mod tests {
     }
   }
 
+  // FIXME
   #[test]
   fn test_download_multiple_pages() {
     // Sanity test to check that the process is not a one-shot operation

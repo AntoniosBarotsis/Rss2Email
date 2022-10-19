@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- minimal, only containing the relevant attributes-->
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Multi-Entries Feed</title>
+    <link href="http://example.org/" />
+    <updated>2022-09-13T18:30:02Z</updated>
+    <entry>
+        <title>First title</title>
+        <link href="http://awesome.com/link1.html"/>
+        <updated>2022-09-18T21:00:00Z</updated>
+        <summary>First content</summary>
+    </entry>
+    <entry>
+        <title>Second title</title>
+        <link href="http://com.net/why-not.html"/>
+        <updated>2022-10-21T21:10:00Z</updated>
+    </entry>
+</feed>
