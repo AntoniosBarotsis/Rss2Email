@@ -150,8 +150,8 @@ jobs:
 
       - name: Build
         run: |
-          compile_flag=$(echo ${{ matrix.job.args }} | grep -Po '"\K[^"]+(?=["])')
-          echo $compile_flag
+          args=${{ matrix.job.args }}
+          compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
           cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
       - name: Prep Docker 
