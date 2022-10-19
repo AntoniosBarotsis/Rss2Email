@@ -150,7 +150,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # sudo apt-get install -y musl-dev musl-tools gcc-multilib libc6-dev-arm64-cross qemu-user build-essential libstdc++6 gcc-multilib
+          sudo apt-get install -y musl-dev musl-tools gcc-multilib libc6-dev-arm64-cross qemu-user build-essential libstdc++6 gcc-multilib
           pip3 install ziglang
           cargo install cargo-zigbuild
 
@@ -158,7 +158,7 @@ jobs:
         run: |
           args='${{ matrix.job.args }}'
           compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
-          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+          cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
       - name: Prep Docker 
         run: |
@@ -169,7 +169,6 @@ jobs:
 
       - name: Docker build (${{ matrix.job.name }})
         run: |
-          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
           docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
 
   lint:
