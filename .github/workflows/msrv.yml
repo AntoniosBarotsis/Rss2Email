@@ -7,10 +7,17 @@ jobs:
   update_msrv: 
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+
       - name: Get MSRV
         run: |
           cargo install cargo-msrv
           echo "MSRV=$(cargo msrv --output-format json | tail -n 1 | jq '. | .msrv')" >> $GITHUB_ENV
+
       - name: Update badge
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:

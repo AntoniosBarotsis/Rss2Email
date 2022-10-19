@@ -119,12 +119,9 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
-      - name: Prep Docker
+      - name: Prep Docker 
         run: |
-          sudo apt-get install -y qemu-user-static
-          qemu-aarch64-static --version
-          sudo apt-get install -y binfmt-support
-          update-binfmts --version
+          sudo apt-get install -y qemu-user-static binfmt-support
 
           docker buildx create --name mybuilder
           docker buildx use mybuilder
