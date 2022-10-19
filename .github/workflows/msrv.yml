@@ -28,3 +28,4 @@ jobs:
           label: MSRV
           message: ${{ env.MSRV }}
           color: 32ca55
+          labelColor: 353d46
