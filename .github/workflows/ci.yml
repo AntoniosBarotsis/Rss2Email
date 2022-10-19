@@ -148,6 +148,9 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
+      - name: Install dependencies
+        run: sudo apt-get install -y musl-dev gcc-multilib
+
       - name: Build
         run: |
           args='${{ matrix.job.args }}'
