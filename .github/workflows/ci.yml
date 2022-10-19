@@ -96,8 +96,30 @@ jobs:
 
       - name: Benchmark
         run: hyperfine 'cargo run' -r 5
+  
+  docker_build_x86:
+    name: Docker build (${{ matrix.job.name }})
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { name: rss2email-base-x86, args: '' }
+          - { name: rss2email-aws-x86 , args: --build-arg compile_flag="--features aws-lambda" }
 
-  docker_build:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create required files
+        run: |
+          cp .env.example .env
+          touch feeds.txt
+      
+      - name: Docker build
+        run: docker build -f Dockerfile.x86 .
+
+  docker_build_arm:
     name: Docker build (${{ matrix.job.name }})
     runs-on: ubuntu-20.04
 
@@ -105,10 +127,8 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: rss2email-base-x86, file: Dockerfile.x86, args: '' }
-          - { name: rss2email-base-arm, file: Dockerfile.arm, args: '' }
-          - { name: rss2email-aws-x86 , file: Dockerfile.x86, args: --build-arg compile_flag="--features aws-lambda" }
-          - { name: rss2email-aws-arm , file: Dockerfile.arm, args: --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-base-arm, args: '' }
+          - { name: rss2email-aws-arm , args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
@@ -125,11 +145,9 @@ jobs:
 
           docker buildx create --name mybuilder
           docker buildx use mybuilder
-          docker buildx inspect --bootstrap
-          docker buildx ls
+
       - name: Docker build (${{ matrix.job.name }})
-        run: |
-          docker buildx build ${{ matrix.job.args }} -f ${{ matrix.job.file }} --platform linux/arm64v8 --progress=plain --load .
+        run: docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
 
   lint:
     name: Lint
