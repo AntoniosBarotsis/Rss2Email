@@ -2,6 +2,8 @@ name: Update MSRV
 
 on:
   push: 
+    branches:
+      - "master"
 
 jobs:
   update_msrv: 
