@@ -134,10 +134,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set up rustup target
+        run: rustup target add aarch64-unknown-linux-musl
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
+
       - name: Create required files
         run: |
           cp .env.example .env
           touch feeds.txt
+
+      - name: Build
+        run: |
+          compile_flag=$(echo ${{ matrix.job.args }} | grep -Po '"\K[^"]+(?=["])')
+          echo $compile_flag
+          cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
       - name: Prep Docker 
         run: |
