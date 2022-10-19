@@ -1,5 +1,10 @@
 # add the below section to `.cargo/config.toml`
 
+[target.aarch64-unknown-linux-musl]
+rustflags = [
+    "-C", "link-arg=-fuse-ld=lld",
+]
+
 [target.'cfg(all())']
 rustflags = [
     # BEGIN - Embark standard lints v6 for Rust 1.55+
