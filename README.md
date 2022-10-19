@@ -27,7 +27,7 @@ cargo build --release
 
 Alternatively, you can build a Docker image that you can either run yourself or publish to AWS Lambda.
 
-Check out the [build from [source](https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#building-from-source)
+Check out the [build from source](https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#building-from-source)
 section of the wiki for more information.
 
 ## Configuration
