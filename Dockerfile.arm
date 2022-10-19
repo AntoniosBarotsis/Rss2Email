@@ -12,6 +12,8 @@ RUN apk add --no-cache curl musl-dev libgcc libstdc++6 alpine-sdk
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+COPY *target target
+
 WORKDIR /opt
 RUN rustup target add aarch64-unknown-linux-musl
 RUN cargo new --bin rss2email
