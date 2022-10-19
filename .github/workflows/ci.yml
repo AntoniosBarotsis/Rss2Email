@@ -168,7 +168,9 @@ jobs:
           docker buildx use mybuilder
 
       - name: Docker build (${{ matrix.job.name }})
-        run: docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
+        run: |
+          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+          docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
 
   lint:
     name: Lint
