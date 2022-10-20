@@ -99,9 +99,12 @@ jobs:
           export DAYS="60"
 
           sudo apt-get install mailutils -y
+          systemctl reload postfix
+
           cargo run --release
           sleep 5
           cat /var/mail/mail
+        if: contains(${{ matrix.job.os }}, 'linux')
 
       - name: Install Hyperfine
         run: cargo install hyperfine
