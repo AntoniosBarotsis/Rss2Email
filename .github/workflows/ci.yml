@@ -90,7 +90,7 @@ jobs:
       # this is supposed to function like an integration test
       - name: Run
         run: cargo run --verbose
-      
+
       - name: Run mail
         run: |
           export EMAIL="MAIL_COMMAND"
@@ -104,14 +104,14 @@ jobs:
           cargo run --release
           sleep 10
           cat /var/mail/mail
-        if: ${{ contains(matrix.job.os, 'linux') }}
+        if: contains(${{matrix.job.os}}, 'linux')
 
       - name: Install Hyperfine
         run: cargo install hyperfine
 
       - name: Benchmark
         run: hyperfine 'cargo run' -r 5
-  
+
   docker_build_x86:
     name: Docker build (${{ matrix.job.name }})
     runs-on: ubuntu-22.04
@@ -130,7 +130,7 @@ jobs:
         run: |
           touch .env
           touch feeds.txt
-      
+
       - name: Docker build
         run: docker build -f Dockerfile.x86 .
 
