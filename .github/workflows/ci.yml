@@ -93,10 +93,10 @@ jobs:
       
       - name: Run mail
         run: |
-          EMAIL="MAIL_COMMAND"
-          EMAIL_ADDRESS="root@localhost"
-          FEEDS="https://blog.rust-lang.org/feed.xml;"
-          DAYS="60"
+          export EMAIL="MAIL_COMMAND"
+          export EMAIL_ADDRESS="root@localhost"
+          export FEEDS="https://blog.rust-lang.org/feed.xml;"
+          export DAYS="60"
 
           cargo run --release
           sleep 5
