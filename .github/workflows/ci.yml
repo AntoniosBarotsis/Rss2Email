@@ -93,17 +93,20 @@ jobs:
 
       - name: Run mail
         run: |
-          export EMAIL="MAIL_COMMAND"
-          export EMAIL_ADDRESS="root@localhost"
-          export FEEDS="https://blog.rust-lang.org/feed.xml;"
-          export DAYS="60"
+          # export EMAIL="MAIL_COMMAND"
+          # export EMAIL_ADDRESS="root@localhost"
+          # export FEEDS="https://blog.rust-lang.org/feed.xml;"
+          # export DAYS="60"
 
-          sudo apt-get install mailutils -y
-          sudo systemctl reload postfix
+          # sudo apt-get install mailutils -y
+          # sudo systemctl reload postfix
 
-          cargo run --release
-          sleep 10
-          cat /var/mail/mail
+          # cargo run --release
+          # sleep 10
+          # cat /var/mail/mail
+          cd test-docker
+          chmod +x build.sh
+          ./build.sh
         if: ${{ contains(matrix.job.target, 'linux') }}
 
       - name: Install Hyperfine
