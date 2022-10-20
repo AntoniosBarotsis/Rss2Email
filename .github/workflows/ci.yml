@@ -145,11 +145,11 @@ jobs:
           cargo install cargo-zigbuild
 
       - name: Build
-        run: echo '' | grep -Pqo '"\K[^"]+(?=["])'
-          # args='${{ matrix.job.args }}'
-          # compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
-          # echo "cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl"
-          # cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+        run: |
+          args='${{ matrix.job.args }}'
+          compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])') || true
+          echo "cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl"
+          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
 
       # - name: Prep Docker 
       #   run: |
