@@ -90,6 +90,12 @@ jobs:
       # this is supposed to function like an integration test
       - name: Run
         run: cargo run --verbose
+      
+      - name: Run mail
+        run: |
+          cd test-docker
+          chmod +x build.sh
+          ./build.sh
 
       - name: Install Hyperfine
         run: cargo install hyperfine
