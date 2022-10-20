@@ -93,9 +93,6 @@ jobs:
       
       - name: Run mail
         run: |
-          # cd test-docker
-          # chmod +x build.sh
-          # ./build.sh
           EMAIL="MAIL_COMMAND"
           EMAIL_ADDRESS="root@localhost"
           FEEDS="https://blog.rust-lang.org/feed.xml;"
@@ -103,7 +100,7 @@ jobs:
 
           cargo run --release
           sleep 5
-          cat /var/mail/mails
+          cat /var/mail/mail
 
       - name: Install Hyperfine
         run: cargo install hyperfine
