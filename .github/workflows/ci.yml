@@ -110,6 +110,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Create needed files
+        run: |
+          touch .env
+          touch feeds.txt
       
       - name: Docker build
         run: docker build -f Dockerfile.x86 .
