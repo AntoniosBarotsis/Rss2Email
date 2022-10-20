@@ -145,7 +145,7 @@ jobs:
           cargo install cargo-zigbuild
 
       - name: Build
-        run: compile_flag=$(echo '' | grep -Po '"\K[^"]+(?=["])')
+        run: echo '' | grep -Po '"\K[^"]+(?=["])'
           # args='${{ matrix.job.args }}'
           # compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
           # echo "cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl"
