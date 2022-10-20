@@ -104,7 +104,7 @@ jobs:
           cargo run --release
           sleep 10
           cat /var/mail/mail
-        if: ${{ contains(${{ matrix.job.target }}, 'linux') }}
+        if: contains(${{matrix.job.target}}, 'linux')
 
       - name: Install Hyperfine
         run: cargo install hyperfine
