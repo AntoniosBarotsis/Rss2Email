@@ -127,7 +127,7 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: rss2email-base-arm, args: ' ' }
+          - { name: rss2email-base-arm, args: '' }
           - { name: rss2email-aws-arm , args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
@@ -158,7 +158,8 @@ jobs:
         run: |
           args='${{ matrix.job.args }}'
           compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
-          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+          echo "cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl"
+          # cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
 
       # - name: Prep Docker 
       #   run: |
