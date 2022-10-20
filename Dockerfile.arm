@@ -16,7 +16,6 @@ WORKDIR /opt
 RUN rustup target add aarch64-unknown-linux-musl
 RUN cargo new --bin rss2email
 WORKDIR /opt/rss2email
-COPY ./target ./target
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 ADD ./benches ./benches

@@ -148,17 +148,17 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get install musl-tools clang llvm gcc-multilib -y
-          pip3 install ziglang
-          cargo install cargo-zigbuild
+      # - name: Install dependencies
+      #   run: |
+      #     sudo apt-get install musl-tools clang llvm gcc-multilib -y
+      #     pip3 install ziglang
+      #     cargo install cargo-zigbuild
 
-      - name: Build
-        run: |
-          args='${{ matrix.job.args }}'
-          compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
-          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+      # - name: Build
+      #   run: |
+      #     args='${{ matrix.job.args }}'
+      #     compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
+      #     cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
 
       - name: Prep Docker 
         run: |
