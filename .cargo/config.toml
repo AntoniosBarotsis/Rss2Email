@@ -2,7 +2,8 @@
 
 [target.aarch64-unknown-linux-musl]
 rustflags = [
-    "-C", "link-arg=-fuse-ld=lld",
+    "-C", "link-arg=-undefined",
+    "-C", "link-arg=dynamic_lookup",
 ]
 
 [target.'cfg(all())']
