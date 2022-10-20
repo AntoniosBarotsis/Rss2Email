@@ -127,7 +127,7 @@ jobs:
       fail-fast: false
       matrix:
         job:
-          - { name: rss2email-base-arm, args: '' }
+          - { name: rss2email-base-arm, args: ' ' }
           - { name: rss2email-aws-arm , args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
@@ -148,28 +148,28 @@ jobs:
           cp .env.example .env
           touch feeds.txt
 
-      # - name: Install dependencies
-      #   run: |
-      #     sudo apt-get install musl-tools clang llvm gcc-multilib -y
-      #     pip3 install ziglang
-      #     cargo install cargo-zigbuild
-
-      # - name: Build
-      #   run: |
-      #     args='${{ matrix.job.args }}'
-      #     compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
-      #     cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
-
-      - name: Prep Docker 
+      - name: Install dependencies
         run: |
-          sudo apt-get install -y qemu-user-static binfmt-support
+          sudo apt-get install musl-tools clang llvm gcc-multilib -y
+          pip3 install ziglang
+          cargo install cargo-zigbuild
 
-          docker buildx create --name mybuilder
-          docker buildx use mybuilder
-
-      - name: Docker build (${{ matrix.job.name }})
+      - name: Build
         run: |
-          docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
+          args='${{ matrix.job.args }}'
+          compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])')
+          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+
+      # - name: Prep Docker 
+      #   run: |
+      #     sudo apt-get install -y qemu-user-static binfmt-support
+
+      #     docker buildx create --name mybuilder
+      #     docker buildx use mybuilder
+
+      # - name: Docker build (${{ matrix.job.name }})
+      #   run: |
+      #     docker buildx build ${{ matrix.job.args }} -f Dockerfile.arm --platform linux/arm64v8 --progress=plain --load .
 
   lint:
     name: Lint
