@@ -99,7 +99,7 @@ jobs:
           export DAYS="60"
 
           sudo apt-get install mailutils -y
-          systemctl reload postfix
+          sudo systemctl reload postfix
 
           cargo run --release
           sleep 5
