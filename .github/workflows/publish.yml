@@ -16,8 +16,6 @@ jobs:
 
       - name: Use cached dependencies
         uses: Swatinem/rust-cache@v2
-        with:
-          cache-directories: "~/.cargo/bin/"
 
       - name: Prepare
         run: |
