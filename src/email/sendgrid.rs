@@ -40,8 +40,7 @@ impl EmailProvider for SendGrid {
     match response {
       Ok(response) => {
         info!(
-          "Email request sent with {} {}",
-          response.status().as_u16(),
+          "Email request sent with {}",
           response.status().as_str()
         );
         Ok(())
