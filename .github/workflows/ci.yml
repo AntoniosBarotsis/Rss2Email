@@ -124,7 +124,7 @@ jobs:
           touch feeds.txt
 
       - name: Docker build
-        run: docker build -f Dockerfile.x86 .
+        run: docker build -f Dockerfile.x86 ${{ matrix.job.args }} .
 
   docker_build_arm:
     name: Docker build (${{ matrix.job.name }})
@@ -135,7 +135,7 @@ jobs:
       matrix:
         job:
           - { name: rss2email-base-arm, args: '' }
-          - { name: rss2email-aws-arm , args: --build-arg compile_flag="--features aws-lambda" }
+          - { name: rss2email-aws-arm , args: --features aws-lambda }
 
     steps:
       - name: Checkout
@@ -152,16 +152,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # sudo apt-get install musl-tools clang llvm gcc-multilib -y
           pip3 install ziglang
           cargo install cargo-zigbuild
 
       - name: Build
-        run: |
-          args='${{ matrix.job.args }}'
-          compile_flag=$(echo $args | grep -Po '"\K[^"]+(?=["])') || true
-          echo "cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl"
-          cargo zigbuild --release $compile_flag --target aarch64-unknown-linux-musl
+        run: cargo zigbuild --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
 
       - name: Docker build
         run: |
