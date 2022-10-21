@@ -160,7 +160,7 @@ jobs:
 
       - name: Docker build
         run: |
-          docker build -f Dockerfile.scratch .
+          docker build -f Dockerfile.scratch --build-arg path="./target/aarch64-unknown-linux-musl/release/rss2email" .
 
   lint:
     name: Lint

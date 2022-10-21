@@ -11,5 +11,6 @@
 # can take a look at the CI file where this is used.
 
 FROM scratch
-COPY ./target/aarch64-unknown-linux-musl/release/rss2email rss2email
+ARG path="./target/release/rss2email"
+COPY $path rss2email
 CMD ["./rss2email"]
