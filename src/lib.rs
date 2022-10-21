@@ -4,7 +4,6 @@ use chrono::{DateTime, Utc};
 use futures::{stream, StreamExt};
 use itertools::Itertools;
 use lazy_static::lazy_static;
-use log::{info, warn};
 use regex::Regex;
 use reqwest::{blocking::Response, Client};
 use std::fmt::Write as _;
@@ -12,6 +11,7 @@ use tokio::runtime::Handle;
 
 pub use blog::{Blog, Post};
 mod blog;
+pub mod logger;
 mod xml;
 
 use crate::xml::parse_web_feed;

@@ -1,6 +1,9 @@
 [package]
 name = "rss2email"
-version = "0.1.0"
+description = "An RSS feed aggregator that notifies you of new posts via email."
+license = "GPL-3.0"
+repository = "https://github.com/AntoniosBarotsis/Rss2Email"
+version = "1.0.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -1,0 +1,33 @@
+name: Update MSRV
+
+on:
+  push: 
+    branches:
+      - "master"
+
+jobs:
+  update_msrv: 
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Download cargo-msrv
+        run: cargo install cargo-msrv
+
+      - name: Get MSRV
+        run: echo "MSRV=$(cargo msrv --output-format json | tail -n 1 | jq '. | .msrv' --raw-output)" >> $GITHUB_ENV
+
+      - name: Update badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 87883f70db3cf998342786f65fe1b9df
+          filename: rss2email_msrv.json
+          label: MSRV
+          message: ${{ env.MSRV }}
+          color: 32ca55
+          labelColor: 353d46

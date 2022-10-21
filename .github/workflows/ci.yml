@@ -9,7 +9,7 @@ env:
 
 jobs:
   build_test_run:
-    name: Build, test and run on ${{ matrix.job.os }} (${{ matrix.job.target }})
+    name: Build and test on ${{ matrix.job.os }} (${{ matrix.job.target }})
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
@@ -79,6 +79,7 @@ jobs:
         with:
           key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
 
       - name: Build
         run: cargo build --verbose
@@ -91,38 +92,77 @@ jobs:
       - name: Run
         run: cargo run --verbose
 
+      - name: Run mail
+        run: |
+          cd test-docker
+          chmod +x build.sh
+          ./build.sh
+        if: ${{ contains(matrix.job.target, 'linux') }}
+
       - name: Install Hyperfine
         run: cargo install hyperfine
 
       - name: Benchmark
         run: hyperfine 'cargo run' -r 5
 
-  # This is more of a sanity check, these 2 should always
-  # succeed so long as the first 2 succeed
-  docker_build:
-    name: Docker build (${{ matrix.name }})
+  docker_build_x86:
+    name: Docker build (${{ matrix.job.name }})
     runs-on: ubuntu-22.04
-
     strategy:
       fail-fast: false
       matrix:
-        name: [ 'base' ]
-        args: [ '-t rss2email-base' ]
-        include:
-          - name: 'AWS Lambda'
-            args: '-t rss2email-aws --build-arg compile_flag="--features aws-lambda"'
+        job:
+          - { name: rss2email-base-x86, args: '' }
+          - { name: rss2email-aws-x86 , args: --build-arg compile_flag="--features aws-lambda" }
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Create required files
+      - name: Create needed files
         run: |
-          cp .env.example .env
+          touch .env
           touch feeds.txt
 
-      - name: Docker build (${{ matrix.name }})
-        run: docker build ${{ matrix.args }} .
+      - name: Docker build
+        run: docker build -f Dockerfile.x86 ${{ matrix.job.args }} .
+
+  docker_build_arm:
+    name: Docker build (${{ matrix.job.name }})
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { name: rss2email-base-arm, args: '' }
+          - { name: rss2email-aws-arm , args: --features aws-lambda }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up rustup target
+        run: rustup target add aarch64-unknown-linux-musl
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
+
+      - name: Install dependencies
+        run: |
+          pip3 install ziglang
+          cargo install cargo-zigbuild
+
+      - name: Build
+        run: cargo zigbuild --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
+
+      - name: Docker build
+        run: |
+          docker build -f Dockerfile.scratch --build-arg path="./target/aarch64-unknown-linux-musl/release/rss2email" .
 
   lint:
     name: Lint
@@ -140,6 +180,7 @@ jobs:
         with:
           key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
