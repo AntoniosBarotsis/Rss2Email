@@ -79,6 +79,7 @@ jobs:
         with:
           key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
 
       - name: Build
         run: cargo build --verbose
@@ -149,6 +150,7 @@ jobs:
         with:
           key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
 
       - name: Install dependencies
         run: |
@@ -178,6 +180,7 @@ jobs:
         with:
           key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
+          cache-directories: "~/.cargo/bin/"
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
