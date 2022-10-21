@@ -29,7 +29,10 @@ jobs:
           pip3 install ziglang
           cargo install cargo-zigbuild
           rustup target add aarch64-unknown-linux-musl
-        
+
+      - name: Login to Crates.io
+        run: cargo login ${{ secrets.CRATESIO_TOKEN }}
+
       - name: Crates.io
         run: cargo release publish --execute --no-confirm
 
