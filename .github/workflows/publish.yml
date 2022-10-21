@@ -1,6 +1,5 @@
 name: Create a release
 on:
-  push:
   workflow_dispatch:
     inputs:
       version:
@@ -40,4 +39,4 @@ jobs:
       - name: Docker - x86
         run: |
           docker build -t rss2email:${{ inputs.version }} --build-arg compile_flag="--features aws-lambda" -f Dockerfile.x86 .
-          docker push docker push antoniosbarotsis/rss2email:${{ inputs.version }}
+          docker push antoniosbarotsis/rss2email:${{ inputs.version }}
