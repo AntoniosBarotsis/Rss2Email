@@ -66,9 +66,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Print CI
-        run: echo $CI
-
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
