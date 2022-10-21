@@ -36,5 +36,5 @@ jobs:
       - name: Docker - x86
         run: |
           cargo build -r -F aws-lambda
-          docker build -t rss2email:${{ inputs.version }} --build-arg path="./target/release/rss2email" -f Dockerfile.scratch .
+          docker build -t antoniosbarotsis/rss2email:${{ inputs.version }} --build-arg path="./target/release/rss2email" -f Dockerfile.scratch .
           docker push antoniosbarotsis/rss2email:${{ inputs.version }}
