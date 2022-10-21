@@ -9,7 +9,7 @@ env:
 
 jobs:
   build_test_run:
-    name: Build, test and run on ${{ matrix.job.os }} (${{ matrix.job.target }})
+    name: Build and test on ${{ matrix.job.os }} (${{ matrix.job.target }})
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
