@@ -22,7 +22,7 @@ jobs:
 
     env:
       FEEDS: |
-        https://antoniosbarotsis.github.io/index.xml
+        https://antoniosbarotsis.github.io/index.xml;
         https://www.youtube.com/feeds/videos.xml?channel_id=UCiSIL42pQRpc-8JNiYDFyzQ
         https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA
         https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw
