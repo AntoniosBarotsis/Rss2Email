@@ -152,7 +152,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install musl-tools clang llvm gcc-multilib -y
+          # sudo apt-get install musl-tools clang llvm gcc-multilib -y
           pip3 install ziglang
           cargo install cargo-zigbuild
 
