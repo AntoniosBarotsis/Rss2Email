@@ -194,7 +194,7 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
 /// # Usage
 /// 
 /// ```
-/// use lib::*;
+/// use rss2email_lib::*;
 /// let blogs: Vec<Blog> = time_func(|| download_blogs(7), "download_blogs");
 /// ```
 pub fn time_func<F, O>(f: F, fname: &str) -> O
