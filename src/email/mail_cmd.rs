@@ -1,7 +1,7 @@
 use super::{email_provider::EmailProvider, EmailError};
 
-#[derive(Default)]
 /// Implementation for default `mail` command in linux.
+#[derive(Default, Debug, Clone, Copy)]
 pub struct MailCommand {}
 
 impl EmailProvider for MailCommand {

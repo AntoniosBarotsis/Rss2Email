@@ -5,7 +5,7 @@ use dotenvy::dotenv;
 use env_logger::Env;
 use rss2email::{download_blogs, map_to_html, time_func};
 
-mod email;
+pub mod email;
 
 fn core_main() -> Result<(), String> {
   if env_logger::Builder::from_env(Env::default().default_filter_or("info"))

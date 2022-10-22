@@ -10,8 +10,9 @@ pub trait EmailProvider {
 }
 
 /// An enum containing all Email Provider implementations.
+#[derive(Debug)]
 #[enum_dispatch(EmailProvider)]
-enum EmailProviders {
+pub enum EmailProviders {
   SendGrid(SendGrid),
   MailCommand(MailCommand),
 }
@@ -40,32 +41,4 @@ pub fn get_email_provider() -> Result<impl EmailProvider, String> {
     .unwrap_or_else(|| "SENDGRID".to_owned());
 
   EmailProviders::try_from(env_var)
-}
-
-#[cfg(test)]
-mod tests {
-
-  use crate::email::email_provider::EmailProvider;
-
-  use super::EmailProviders;
-  use std::env;
-
-  #[test]
-  fn load_sendgrid() {
-    env::remove_var("API_KEY");
-
-    let sendgrid =
-      EmailProviders::try_from("SENDGRID".to_owned()).expect("The Sendgrid provider is defined");
-
-    assert!(
-      sendgrid.send_email("address", "email").is_err(),
-      "Mandatory API_KEY should cause an Err()"
-    );
-    env::set_var("API_KEY", "ASD");
-    assert!(
-      sendgrid.send_email("address", "email").is_err(),
-      "Failed to load proper Email Provider SendGrid"
-    );
-    env::remove_var("API_KEY");
-  }
 }

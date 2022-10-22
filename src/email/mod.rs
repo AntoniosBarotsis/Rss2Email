@@ -1,13 +1,14 @@
 use std::fmt::Display;
 
-#[allow(clippy::module_name_repetitions)]
 #[allow(clippy::use_self)]
+#[allow(clippy::module_name_repetitions)]
 pub mod email_provider;
 pub mod mail_cmd;
 pub mod sendgrid;
 
 /// Holds all environment variables that are required
 /// by any email provider.
+#[derive(Debug)]
 pub struct EnvLoader {
   pub(crate) api_key: Option<String>,
 }
@@ -20,9 +21,10 @@ impl EnvLoader {
   }
 }
 
-#[allow(dead_code)]
 /// Represents all things that could go wrong
 /// while trying to send an email.
+#[derive(Debug)]
+#[allow(dead_code)]
 pub enum EmailError {
   Config(String),
   Request(Box<reqwest::Error>),

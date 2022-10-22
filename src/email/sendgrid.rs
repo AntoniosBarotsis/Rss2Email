@@ -2,8 +2,8 @@ use log::info;
 
 use super::{email_provider::EmailProvider, EmailError, EnvLoader};
 
-#[derive(Default)]
 /// `EmailProvider` implementation using [`SendGrid`](https://sendgrid.com/).
+#[derive(Default, Debug)]
 pub struct SendGrid {
   api_key: Option<String>,
 }
@@ -39,10 +39,7 @@ impl EmailProvider for SendGrid {
 
     match response {
       Ok(response) => {
-        info!(
-          "Email request sent with {}",
-          response.status().as_str()
-        );
+        info!("Email request sent with {}", response.status().as_str());
         Ok(())
       }
       Err(e) => Err(e.into()),
