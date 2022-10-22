@@ -11,11 +11,3 @@ pub trait WebFeed {
 pub trait BlogPost {
   fn into_post(self) -> Result<Post, ParserError>;
 }
-
-/// Helper wrapper for `Result<T, String>` where `T: XmlFeed`,
-pub trait ResultToBlog<T>
-where
-  T: WebFeed,
-{
-  fn into_blog(self) -> Result<Blog, ParserError>;
-}

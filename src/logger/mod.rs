@@ -9,7 +9,7 @@ macro_rules! info {
 macro_rules! warn {
   ( $($arg:tt)+ ) => {{
     lazy_static::lazy_static!{
-      static ref IS_CI: bool = std::env::var("CI").ok().map_or_else(|| "FALSE".to_owned(), |x| x.to_uppercase()) == *"TRUE";
+      static ref IS_CI: bool = std::env::var("CI").ok().map_or_else(|| "FALSE".to_owned(), |x| x.to_uppercase()) == "TRUE";
     }
 
     if *IS_CI {

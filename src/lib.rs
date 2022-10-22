@@ -5,7 +5,7 @@ use futures::{stream, StreamExt};
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
-use reqwest::{blocking::Response, Client};
+use reqwest::Client;
 use std::fmt::Write as _;
 use tokio::runtime::Handle;
 
@@ -18,7 +18,6 @@ pub mod xml;
 use crate::xml::parse_web_feed;
 
 const CONCURRENT_REQUESTS: usize = 10;
-const DEFAULT_CONTENT_TYPE: &str = "text/plain";
 
 pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
   let client = Client::new();
@@ -162,24 +161,6 @@ impl Display for DownloadError {
   }
 }
 
-impl From<std::io::Error> for DownloadError {
-  fn from(error: std::io::Error) -> Self {
-    Self::Io(error)
-  }
-}
-
-impl From<reqwest::Error> for DownloadError {
-  fn from(error: reqwest::Error) -> Self {
-    Self::Reqwest(Box::new(error))
-  }
-}
-
-impl From<http::header::ToStrError> for DownloadError {
-  fn from(error: http::header::ToStrError) -> Self {
-    Self::HeaderString(Box::new(error))
-  }
-}
-
 fn is_supported_content(content_type: &str) -> bool {
   let supported = vec![
     "application/xml",
@@ -188,34 +169,6 @@ fn is_supported_content(content_type: &str) -> bool {
     "application/atom+xml",
   ];
   supported.contains(&content_type)
-}
-
-fn get_content_type(response: &Response) -> &str {
-  response
-    .headers()
-    .get(reqwest::header::CONTENT_TYPE)
-    .map_or(DEFAULT_CONTENT_TYPE, |value| {
-      value.to_str().unwrap_or(DEFAULT_CONTENT_TYPE)
-    })
-    .split(';')
-    .next()
-    .unwrap_or("")
-}
-
-/// Helper function for downloading the contents of a web page.
-pub fn get_page(url: &str) -> Result<String, DownloadError> {
-  let response = reqwest::blocking::get(url)?;
-
-  let content_type = get_content_type(&response);
-  if !is_supported_content(content_type) {
-    return Err(DownloadError::Custom(format!(
-      "Invalid content {} for {}",
-      content_type, url
-    )));
-  }
-
-  let body = response.text()?;
-  Ok(body)
 }
 
 /// Helper function for downloading the contents of a web page.
@@ -277,4 +230,22 @@ where
   }
 
   res
+}
+
+impl From<std::io::Error> for DownloadError {
+  fn from(error: std::io::Error) -> Self {
+    Self::Io(error)
+  }
+}
+
+impl From<reqwest::Error> for DownloadError {
+  fn from(error: reqwest::Error) -> Self {
+    Self::Reqwest(Box::new(error))
+  }
+}
+
+impl From<http::header::ToStrError> for DownloadError {
+  fn from(error: http::header::ToStrError) -> Self {
+    Self::HeaderString(Box::new(error))
+  }
 }

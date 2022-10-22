@@ -17,6 +17,17 @@ pub enum EmailProviders {
   MailCommand(MailCommand),
 }
 
+/// Abstracts away the email backend.
+///
+/// By default, this will return the `SendGrid` implementation.
+pub fn get_email_provider() -> Result<impl EmailProvider, String> {
+  let env_var = std::env::var("EMAIL")
+    .ok()
+    .unwrap_or_else(|| "SENDGRID".to_owned());
+
+  EmailProviders::try_from(env_var)
+}
+
 impl TryFrom<String> for EmailProviders {
   type Error = String;
 
@@ -30,15 +41,4 @@ impl TryFrom<String> for EmailProviders {
       _ => Err("Requested client not found".to_owned()),
     }
   }
-}
-
-/// Abstracts away the email backend.
-///
-/// By default, this will return the `SendGrid` implementation.
-pub fn get_email_provider() -> Result<impl EmailProvider, String> {
-  let env_var = std::env::var("EMAIL")
-    .ok()
-    .unwrap_or_else(|| "SENDGRID".to_owned());
-
-  EmailProviders::try_from(env_var)
 }

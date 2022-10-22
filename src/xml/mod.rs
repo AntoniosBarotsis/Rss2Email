@@ -11,21 +11,6 @@ pub mod atom;
 pub mod rss;
 mod traits;
 
-impl From<DeError> for ParserError {
-  fn from(e: DeError) -> Self {
-    Self::Parse(e.to_string())
-  }
-}
-
-impl Display for ParserError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      Self::Parse(e) => write!(f, "Parse error: {}", e),
-      Self::Date(e) => write!(f, "Date error: {}", e),
-    }
-  }
-}
-
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ParserError {
   Parse(String),
@@ -45,4 +30,19 @@ pub fn parse_web_feed(xml: &str) -> Result<Blog, ParserError> {
     .first()
     .cloned()
     .ok_or_else(|| ParserError::Parse(format!("{:?}", errors.iter().unique().collect::<Vec<_>>())))
+}
+
+impl From<DeError> for ParserError {
+  fn from(e: DeError) -> Self {
+    Self::Parse(e.to_string())
+  }
+}
+
+impl Display for ParserError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Self::Parse(e) => write!(f, "Parse error: {}", e),
+      Self::Date(e) => write!(f, "Date error: {}", e),
+    }
+  }
 }

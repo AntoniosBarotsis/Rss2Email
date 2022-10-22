@@ -2,7 +2,8 @@ use std::time::Duration;
 
 use criterion::{criterion_group, BenchmarkId, Criterion, SamplingMode};
 use regex::Regex;
-use rss2email::{get_page, read_feeds};
+use reqwest::Client;
+use rss2email::{get_page_async, read_feeds};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
   let mut group = c.benchmark_group("get page");
@@ -17,14 +18,17 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     .expect("Invalid regex");
 
   for feed in feeds {
+    let client = Client::new();
     let captures = seperator.captures(&feed).unwrap();
     let p1 = captures.get(1).map_or("Regex failed", |m| m.as_str());
     let p2 = captures.get(2).map_or("", |m| m.as_str());
     let p3 = captures.get(3).map_or("", |m| m.as_str());
     let name = p1.to_owned() + "/" + p2 + "/" + p3;
 
+    // This is meant to be for each feed individually so blocking
+    // is fine.
     group.bench_with_input(BenchmarkId::from_parameter(&name), &feed, |b, feed| {
-      b.iter(|| get_page(feed));
+      b.iter(|| async { get_page_async(feed, &client).await });
     });
   }
 
