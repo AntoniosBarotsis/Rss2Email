@@ -20,3 +20,6 @@ feeds.txt
 
 .env
 Deploy.ps1
+
+.vscode
+.idea
