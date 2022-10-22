@@ -3,7 +3,7 @@ use std::time::Duration;
 use criterion::{criterion_group, BenchmarkId, Criterion, SamplingMode};
 use regex::Regex;
 use reqwest::Client;
-use lib::{get_page_async, read_feeds};
+use rss2email_lib::{get_page_async, read_feeds};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
   let mut group = c.benchmark_group("get page");

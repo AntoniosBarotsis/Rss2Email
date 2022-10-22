@@ -19,6 +19,7 @@ WORKDIR /opt/rss2email
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 ADD ./benches ./benches
+RUN touch src/lib.rs
 RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
 RUN rm ./src/*.rs

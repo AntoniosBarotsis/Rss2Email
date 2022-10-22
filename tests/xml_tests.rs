@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use lib::{
+use rss2email_lib::{
   xml::{parse_web_feed, ParserError},
   Blog, Post,
 };
