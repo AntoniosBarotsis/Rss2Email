@@ -18,6 +18,9 @@ pub enum EmailProviders {
 }
 
 /// Abstracts away the email backend.
+/// 
+/// The email provider is picked by inspecting the
+/// `EMAIL` environment variable.
 ///
 /// By default, this will return the `SendGrid` implementation.
 pub fn get_email_provider() -> Result<impl EmailProvider, String> {

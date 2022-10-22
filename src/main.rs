@@ -3,7 +3,7 @@ mod logger;
 use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenvy::dotenv;
 use env_logger::Env;
-use rss2email::{download_blogs, map_to_html, time_func};
+use lib::{download_blogs, map_to_html, time_func};
 
 pub mod email;
 

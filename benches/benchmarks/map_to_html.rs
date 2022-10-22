@@ -1,6 +1,6 @@
 use chrono::{FixedOffset, TimeZone, Utc};
 use criterion::{criterion_group, Criterion};
-use rss2email::{map_to_html, Blog, Post};
+use lib::{map_to_html, Blog, Post};
 
 fn mock_blog() -> Vec<Blog> {
   let date_time = FixedOffset::east(1000)

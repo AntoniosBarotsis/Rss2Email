@@ -1,4 +1,4 @@
-use rss2email::{get_page_async, DownloadError};
+use lib::{get_page_async, DownloadError};
 use tokio::test;
 
 use crate::common::create_client;

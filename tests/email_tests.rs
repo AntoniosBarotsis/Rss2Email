@@ -1,6 +1,6 @@
 use std::env;
 
-use rss2email::email::email_provider::{EmailProvider, EmailProviders};
+use lib::email::email_provider::{EmailProvider, EmailProviders};
 
 #[test]
 fn load_sendgrid() {

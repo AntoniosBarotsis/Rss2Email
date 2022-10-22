@@ -14,6 +14,8 @@ pub struct EnvLoader {
 }
 
 impl EnvLoader {
+  /// Creates a new `EnvLoader` by loading the
+  /// `API_KEY` environment variable.
   pub(crate) fn new() -> Self {
     Self {
       api_key: std::env::var("API_KEY").ok(),

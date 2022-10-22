@@ -1,3 +1,7 @@
+/// This file contains wrapper macros for the `env_logger` crate.
+/// I specifically wanted to wrap around `warn` as I wanted all warnings
+/// to panic if they occured in the Github Actions workflow
+
 #[macro_export]
 macro_rules! info {
   ( $($arg:tt)+ ) => {{

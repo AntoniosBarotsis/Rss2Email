@@ -19,28 +19,7 @@ use crate::xml::parse_web_feed;
 
 const CONCURRENT_REQUESTS: usize = 10;
 
-pub async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
-  let client = Client::new();
-  stream::iter(links)
-    .map(|link| {
-      let client = &client;
-      async move {
-        let xml = get_page_async(link.as_str(), client)
-          .await
-          .map_err(|e| warn!("Error in {}\n{}", link, e))
-          .ok()?;
-
-        parse_web_feed(&xml)
-          .map_err(|e| warn!("Error in {}\n{}", link, e))
-          .ok()
-      }
-    })
-    .buffer_unordered(CONCURRENT_REQUESTS)
-    .collect::<Vec<Option<Blog>>>()
-    .await
-}
-
-/// Downloads all the RSS feeds specified in `feeds.txt` and converts them to `Blog`s.
+/// Downloads all the web feeds specified in `feeds.txt` and converts them to `Blog`s.
 pub fn download_blogs(days: i64) -> Vec<Blog> {
   let links = read_feeds();
 
@@ -83,6 +62,28 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
     .collect();
 
   contents
+}
+
+/// Helper method for [download_blogs](download_blogs).
+async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
+  let client = Client::new();
+  stream::iter(links)
+    .map(|link| {
+      let client = &client;
+      async move {
+        let xml = get_page_async(link.as_str(), client)
+          .await
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
+          .ok()?;
+
+        parse_web_feed(&xml)
+          .map_err(|e| warn!("Error in {}\n{}", link, e))
+          .ok()
+      }
+    })
+    .buffer_unordered(CONCURRENT_REQUESTS)
+    .collect::<Vec<Option<Blog>>>()
+    .await
 }
 
 /// Parses links from `feeds.txt`.
@@ -142,25 +143,6 @@ fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
   (today - date).num_days() <= n
 }
 
-#[derive(Debug)]
-pub enum DownloadError {
-  Reqwest(Box<reqwest::Error>),
-  HeaderString(Box<http::header::ToStrError>),
-  Io(std::io::Error),
-  Custom(String),
-}
-
-impl Display for DownloadError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match &self {
-      Self::Reqwest(e) => write!(f, "{}", e),
-      Self::HeaderString(e) => write!(f, "{}", e),
-      Self::Io(e) => write!(f, "{}", e),
-      Self::Custom(e) => write!(f, "{}", e),
-    }
-  }
-}
-
 fn is_supported_content(content_type: &str) -> bool {
   let supported = vec![
     "application/xml",
@@ -208,6 +190,13 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
 
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
+/// 
+/// # Usage
+/// 
+/// ```
+/// use lib::*;
+/// let blogs: Vec<Blog> = time_func(|| download_blogs(7), "download_blogs");
+/// ```
 pub fn time_func<F, O>(f: F, fname: &str) -> O
 where
   F: Fn() -> O,
@@ -230,6 +219,25 @@ where
   }
 
   res
+}
+
+#[derive(Debug)]
+pub enum DownloadError {
+  Reqwest(Box<reqwest::Error>),
+  HeaderString(Box<http::header::ToStrError>),
+  Io(std::io::Error),
+  Custom(String),
+}
+
+impl Display for DownloadError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match &self {
+      Self::Reqwest(e) => write!(f, "{}", e),
+      Self::HeaderString(e) => write!(f, "{}", e),
+      Self::Io(e) => write!(f, "{}", e),
+      Self::Custom(e) => write!(f, "{}", e),
+    }
+  }
 }
 
 impl From<std::io::Error> for DownloadError {
