@@ -24,6 +24,7 @@ RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
 
 RUN rm ./src/*.rs
 RUN rm ./target/aarch64-unknown-linux-musl/release/deps/rss2email*
+RUN rm ./target/aarch64-unknown-linux-musl/release/deps/lib*
 
 ADD ./src ./src
 RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
