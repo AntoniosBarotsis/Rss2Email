@@ -190,9 +190,9 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
 
 /// Helper function that times and prints the elapsed execution time
 /// of `F` if ran in debug mode.
-/// 
+///
 /// # Usage
-/// 
+///
 /// ```
 /// use rss2email_lib::*;
 /// let blogs: Vec<Blog> = time_func(|| download_blogs(7), "download_blogs");

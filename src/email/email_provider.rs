@@ -18,7 +18,7 @@ pub enum EmailProviders {
 }
 
 /// Abstracts away the email backend.
-/// 
+///
 /// The email provider is picked by inspecting the
 /// `EMAIL` environment variable.
 ///
