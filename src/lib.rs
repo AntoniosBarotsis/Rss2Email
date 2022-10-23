@@ -91,8 +91,8 @@ async fn get_blogs(links: Vec<String>) -> Vec<Option<Blog>> {
 /// Assumed one link per line. Any text between a `#` and a line end
 /// is considered a comment.
 pub fn read_feeds() -> Vec<String> {
-  let links = std::env::var("FEEDS")
-    .or_else(|_| fs::read_to_string("feeds.txt"))
+  let links = fs::read_to_string("feeds.txt")
+    .or_else(|_| std::env::var("FEEDS"))
     .expect("Error in reading the feeds");
 
   // Not really necessary but yes
