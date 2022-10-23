@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 //! [Specification](https://www.rssboard.org/rss-specification)
 //!
 //! ```xml
@@ -16,8 +15,11 @@ use chrono::{DateTime, Utc};
 //!   </channel>
 //! </rss>
 //! ```
+
+use chrono::{DateTime, FixedOffset, TimeZone, Utc};
 use log::warn;
 use quick_xml::DeError;
+use regex::Regex;
 use serde_derive::{Deserialize, Serialize};
 
 use crate::blog::{Blog, Post};
@@ -87,14 +89,13 @@ impl WebFeed for Result<RssFeed, DeError> {
       })
       .collect();
 
-    match DateTime::parse_from_rfc2822(&last_build_date) {
-      Ok(last_build_date) => Ok(Blog {
-        title,
-        last_build_date: last_build_date.with_timezone(&Utc),
-        posts,
-      }),
-      Err(e) => Err(ParserError::Parse(e.to_string())),
-    }
+    let last_build_date = parse_date_helper(&last_build_date)?;
+
+    Ok(Blog {
+      title,
+      last_build_date: last_build_date.with_timezone(&Utc),
+      posts,
+    })
   }
 }
 
@@ -122,14 +123,52 @@ impl BlogPost for RssPost {
       .pub_date
       .ok_or_else(|| ParserError::Parse("Date not found.".to_owned()))?;
 
-    match DateTime::parse_from_rfc2822(&pub_date) {
-      Ok(last_build_date) => Ok(Post {
-        title,
-        link,
-        description,
-        last_build_date: last_build_date.with_timezone(&Utc),
-      }),
-      Err(e) => Err(ParserError::Date(e.to_string())),
-    }
+    let last_build_date = parse_date_helper(&pub_date)?;
+
+    Ok(Post {
+      title,
+      link,
+      description,
+      last_build_date: last_build_date.with_timezone(&Utc),
+    })
+  }
+}
+
+/// Helper method that first tries to parse a date using [`DateTime::parse_from_rfc2822`]
+/// and if that fails, it tries with [`parse_from_rfc822`].
+fn parse_date_helper(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
+  DateTime::parse_from_rfc2822(date).or_else(|_| parse_from_rfc822(date))
+}
+
+/// Tries to parse [`RFC822`](https://www.w3.org/Protocols/rfc822/#z28). This is a much not
+/// *complete* solution since very few timezones are currently supported (see [`tz_to_offset`])
+/// but it works for now and it is not used frequently. I will be updating it whenever I find
+/// feeds that break it.
+fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
+  let format_str = "%d %b %y %H:%M";
+  let regex = Regex::new(r"\s?([a-zA-Z]+$)").expect("Invalid regex");
+
+  let cap = regex
+    .captures(date)
+    .and_then(|x| x.get(1))
+    .ok_or_else(|| ParserError::Date("Timezone not found".to_string()))?
+    .as_str();
+
+  let date = regex.replace_all(date, "").to_string();
+
+  let tz = tz_to_offset(cap)?;
+
+  tz.datetime_from_str(&date, format_str)
+    .map_err(|_e| ParserError::Date(format!("Date \"{}\" could not be parsed.", date)))
+}
+
+/// Maps timezones from Strings to [`FixedOffset`]s
+fn tz_to_offset(tz: &str) -> Result<FixedOffset, ParserError> {
+  match tz {
+    "UTC" => Ok(FixedOffset::east(0)),
+    _ => Err(ParserError::Date(format!(
+      "Unknown timezone {}, please open an issue!",
+      tz
+    ))),
   }
 }
