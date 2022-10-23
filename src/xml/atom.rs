@@ -1,15 +1,18 @@
-/// [Specification](https://www.rfc-editor.org/rfc/rfc4287)
-///
-/// <feed>
-///   <title></title>
-///   <updated>ISO.8601</updated>
-///   <entry>
-///     <title></title>
-///     <link href=""/>
-///     <updated>ISO.8601</updated>
-///     <summary></summary>?
-///   </entry>
-/// </feed>
+//! [Specification](https://www.rfc-editor.org/rfc/rfc4287)
+//!
+//! ```xml
+//! <feed>
+//!   <title></title>
+//!   <updated>ISO.8601</updated>
+//!   <entry>
+//!     <title></title>
+//!     <link href=""/>
+//!     <updated>ISO.8601</updated>
+//!     <summary></summary>?
+//!   </entry>
+//! </feed>
+//! ```
+
 use chrono::{DateTime, Utc};
 use quick_xml::DeError;
 use serde_derive::{Deserialize, Serialize};

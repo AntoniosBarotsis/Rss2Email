@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 
+/// Internal representation of a web feed.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Blog {
   pub title: String,
@@ -7,6 +8,7 @@ pub struct Blog {
   pub posts: Vec<Post>,
 }
 
+/// Internal representation of a web feed post.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Post {
   pub title: String,

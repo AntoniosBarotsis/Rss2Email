@@ -1,19 +1,21 @@
-/// [Specification](https://www.rssboard.org/rss-specification)
-///
-/// <rss>
-///   <channel>
-///     <title></title>
-///     <lastBuildDate>RFC 2822</lastBuildDate>
-///     <pubDate>RFC 2822</pubDate>
-///     <item>
-///       <title></title>
-///       <link></link>
-///       <pubDate>RFC 2822</pubDate>
-///       <description></description>?
-///     </item>
-///   </channel>
-/// </rss>
 use chrono::{DateTime, Utc};
+//! [Specification](https://www.rssboard.org/rss-specification)
+//!
+//! ```xml
+//! <rss>
+//!   <channel>
+//!     <title></title>
+//!     <lastBuildDate>RFC 2822</lastBuildDate>
+//!     <pubDate>RFC 2822</pubDate>
+//!     <item>
+//!       <title></title>
+//!       <link></link>
+//!       <pubDate>RFC 2822</pubDate>
+//!       <description></description>?
+//!     </item>
+//!   </channel>
+//! </rss>
+//! ```
 use log::warn;
 use quick_xml::DeError;
 use serde_derive::{Deserialize, Serialize};

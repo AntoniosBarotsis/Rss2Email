@@ -221,8 +221,10 @@ where
   res
 }
 
+/// Represents anything that could go wrong when downloading the web feeds.
 #[derive(Debug)]
 pub enum DownloadError {
+  /// Wrapper for [reqwest::Error].
   Reqwest(Box<reqwest::Error>),
   HeaderString(Box<http::header::ToStrError>),
   Io(std::io::Error),

@@ -1,8 +1,9 @@
+//! An email provider abstraction to allow for multiple backends.
+
 use super::sendgrid::SendGrid;
 use super::{mail_cmd::MailCommand, EmailError, EnvLoader};
 use enum_dispatch::enum_dispatch;
 
-/// An email provider abstraction to allow for multiple backends.
 #[enum_dispatch]
 pub trait EmailProvider {
   /// Sends an email to and from the specified address.

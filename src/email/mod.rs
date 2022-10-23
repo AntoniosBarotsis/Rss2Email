@@ -1,3 +1,5 @@
+//! Constructs and sends emails from different providers.
+
 use std::fmt::Display;
 
 #[allow(clippy::use_self)]

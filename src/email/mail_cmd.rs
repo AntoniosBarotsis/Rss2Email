@@ -1,6 +1,7 @@
+//! Implementation for default `mail` command in linux.
+
 use super::{email_provider::EmailProvider, EmailError};
 
-/// Implementation for default `mail` command in linux.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct MailCommand {}
 

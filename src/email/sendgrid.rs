@@ -1,8 +1,9 @@
+//! [`EmailProvider`] implementation using [`SendGrid`](https://sendgrid.com/).
+
 use log::info;
 
 use super::{email_provider::EmailProvider, EmailError, EnvLoader};
 
-/// `EmailProvider` implementation using [`SendGrid`](https://sendgrid.com/).
 #[derive(Default, Debug)]
 pub struct SendGrid {
   api_key: Option<String>,

@@ -1,3 +1,6 @@
+//! Parses web feeds according to the RSS and Atom specifications and constructs
+//! [`Blog`]s and [`Post`](crate::blog::Post)s.
+
 use std::fmt::Display;
 
 use itertools::Itertools;
@@ -11,9 +14,13 @@ pub mod atom;
 pub mod rss;
 mod traits;
 
+/// Represents possible issues that may arise when trying to parse web feeds.
+/// If this occurs then a web feed is considered invalid.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub enum ParserError {
+  /// Generic parsing error.
   Parse(String),
+  /// Date format error.
   Date(String),
 }
 
