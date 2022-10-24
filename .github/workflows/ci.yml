@@ -78,7 +78,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
-          shared-key: "shared"
 
       - name: Build
         run: cargo build --verbose
@@ -152,7 +151,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
-          shared-key: "shared"
 
       - name: Install dependencies
         run: |
@@ -181,7 +179,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
-          shared-key: "shared"
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
