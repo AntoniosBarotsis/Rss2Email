@@ -143,8 +143,7 @@ fn test_parse_atom_text_with_html_tags() {
 #[test]
 fn test_parse_rss_data() {
   let content = read_rss("self-rss.xml");
-  let blog = parse_web_feed(&content).expect("Parsed content");
-  println!("{:?}", blog);
+  let _blog = parse_web_feed(&content).expect("Parsed content");
 }
 
 #[test]
