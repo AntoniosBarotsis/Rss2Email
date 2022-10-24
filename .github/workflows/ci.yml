@@ -103,10 +103,10 @@ jobs:
         if: ${{ contains(matrix.job.target, 'linux') }}
 
       - name: Install Hyperfine
-        run: cargo install hyperfine --target-dir target
+        run: cargo install hyperfine --root target
 
       - name: Benchmark
-        run: hyperfine 'cargo run' -r 5
+        run: target/bin/hyperfine 'cargo run' -r 5
 
   docker_build_x86:
     name: Docker build (${{ matrix.job.name }})
@@ -157,10 +157,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip3 install ziglang
-          cargo install cargo-zigbuild --target-dir target
+          cargo install cargo-zigbuild --root target
 
       - name: Build
-        run: cargo zigbuild --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
+        run: target/bin/cargo-zigbuild build --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
 
       - name: Docker build
         run: |
