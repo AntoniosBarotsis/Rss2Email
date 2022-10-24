@@ -3,7 +3,6 @@
 
 use std::fmt::Display;
 
-use itertools::Itertools;
 use quick_xml::{de::from_str, DeError};
 
 use crate::blog::Blog;
@@ -25,18 +24,16 @@ pub enum ParserError {
 }
 
 /// Turns an XML feed into a `Blog` if possible.
+/// 
+/// First tries to parse it into an [`RssFeed`]. If that fails,
+/// it then tries to parse it into an [`AtomFeed`]. If both fail,
+/// the error is set to `Error1. Error2`.
 pub fn parse_web_feed(xml: &str) -> Result<Blog, ParserError> {
-  let possible_roots = vec![
-    from_str::<RssFeed>(xml).into_blog(),
-    from_str::<AtomFeed>(xml).into_blog(),
-  ];
-
-  let (roots, errors): (Vec<_>, Vec<_>) = possible_roots.into_iter().partition_result();
-
-  roots
-    .first()
-    .cloned()
-    .ok_or_else(|| ParserError::Parse(format!("{:?}", errors.iter().unique().collect::<Vec<_>>())))
+  from_str::<RssFeed>(xml).into_blog().or_else(|e1| {
+    from_str::<AtomFeed>(xml)
+      .into_blog()
+      .map_err(|e2| ParserError::Parse(format!("{} {}", e1, e2)))
+  })
 }
 
 impl From<DeError> for ParserError {
