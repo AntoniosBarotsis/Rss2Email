@@ -13,7 +13,7 @@ impl EmailProvider for MailCommand {
 
 #[cfg(not(target_os = "windows"))]
 fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
-  use log::info;
+  use crate::info;
   use std::{fs::File, io::Write, process::Command};
 
   const TEMPORARY_FILE_NAME: &str = "/tmp/rss2-email.txt";

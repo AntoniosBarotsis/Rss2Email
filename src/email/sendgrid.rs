@@ -1,6 +1,6 @@
 //! [`EmailProvider`] implementation using [`SendGrid`](https://sendgrid.com/).
 
-use log::info;
+use crate::info;
 
 use super::{email_provider::EmailProvider, EmailError, EnvLoader};
 

@@ -69,9 +69,9 @@ fn main() -> Result<(), aws_lambda::LambdaErr> {
 mod aws_lambda {
   use crate::core_main;
   use lambda_runtime::{run, service_fn, Error, LambdaEvent};
+  use rss2email_lib::warn;
   use serde::Deserialize;
   pub type LambdaErr = Error;
-  use log::warn;
 
   #[derive(Deserialize)]
   struct Request {}

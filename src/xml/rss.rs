@@ -17,12 +17,14 @@
 //! ```
 
 use chrono::{DateTime, FixedOffset, TimeZone, Utc};
-use log::warn;
 use quick_xml::DeError;
 use regex::Regex;
 use serde_derive::{Deserialize, Serialize};
 
-use crate::blog::{Blog, Post};
+use crate::{
+  blog::{Blog, Post},
+  warn,
+};
 
 use super::{
   traits::{BlogPost, WebFeed},
