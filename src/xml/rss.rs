@@ -146,9 +146,16 @@ fn parse_date_helper(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
 /// *complete* solution since very few timezones are currently supported (see [`tz_to_offset`])
 /// but it works for now and it is not used frequently. I will be updating it whenever I find
 /// feeds that break it.
+///
+/// See [issue](https://github.com/AntoniosBarotsis/Rss2Email/issues/34).
 fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
   let format_str = "%d %b %y %H:%M";
-  let regex = Regex::new(r"\s?([a-zA-Z]+$)").expect("Invalid regex");
+
+  // See https://regex101.com/r/hHU76d/1 and https://www.w3.org/Protocols/rfc822/#z28
+  // (military timezones are not supported by this regular expression).
+  // Idea is to have a digit followed by an optional space
+  // followed by a 2 or 3 letter time zone.
+  let regex = Regex::new(r"\d\s?([a-zA-Z]{2,3}$)").expect("Invalid regex");
 
   let cap = regex
     .captures(date)
