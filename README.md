@@ -16,7 +16,8 @@ newsletter or similar service.
 
 ## Dependencies
 
-You'll need [Rust](https://rust-lang.org/) installed to compile this software.
+You'll need [Rust](https://rust-lang.org/) or [Docker](https://www.docker.com/) installed to
+compile this software.
 
 ## Installation
 
