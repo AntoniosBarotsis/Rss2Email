@@ -85,3 +85,9 @@ cargo run --release
 Thanks for considering contributing!
 
 Read [this](./CONTRIBUTING.md).
+
+## Thanks to all Contributors!
+
+<a href="https://github.com/AntoniosBarotsis/Rss2Email/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AntoniosBarotsis/Rss2Email" />
+</a>
