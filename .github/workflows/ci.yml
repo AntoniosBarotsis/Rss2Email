@@ -79,18 +79,16 @@ jobs:
         with:
           key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
-          cache-directories: "~/.cargo/bin/"
 
       - name: Build
         run: cargo build --verbose
 
       - name: Test
-        run: |
-          # Set SI to false so warnings don't panic
-          # as some tests are supposed to throw warnings
-          export CI=false
-          cargo test --verbose
-          export CI=true
+        run: cargo test --verbose
+        # Set SI to false so warnings don't panic
+        # as some tests are supposed to throw warnings
+        env:
+          CI: false
 
       # These are the web feeds I am using at the moment, 
       # this is supposed to function like an integration test
@@ -155,7 +153,6 @@ jobs:
         with:
           key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
-          cache-directories: "~/.cargo/bin/"
 
       - name: Install dependencies
         run: |
@@ -185,7 +182,6 @@ jobs:
         with:
           key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
           shared-key: "shared"
-          cache-directories: "~/.cargo/bin/"
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
