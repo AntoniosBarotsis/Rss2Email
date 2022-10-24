@@ -85,7 +85,12 @@ jobs:
         run: cargo build --verbose
 
       - name: Test
-        run: cargo test --verbose
+        run: |
+          # Set SI to false so warnings don't panic
+          # as some tests are supposed to throw warnings
+          export CI=false
+          cargo test --verbose
+          export CI=true
 
       # These are the web feeds I am using at the moment, 
       # this is supposed to function like an integration test
