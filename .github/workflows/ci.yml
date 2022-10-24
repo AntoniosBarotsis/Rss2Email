@@ -85,7 +85,7 @@ jobs:
 
       - name: Test
         run: cargo test --verbose
-        # Set SI to false so warnings don't panic
+        # Set CI to false so warnings don't panic
         # as some tests are supposed to throw warnings
         env:
           CI: false
