@@ -1,41 +1,48 @@
-use super::sendgrid::SendGrid;
-use enum_dispatch::enum_dispatch;
-use log::warn;
+//! An email provider abstraction to allow for multiple backends.
 
-/// An email provider abstraction to allow for multiple backends.
+use super::sendgrid::SendGrid;
+use super::{mail_cmd::MailCommand, EmailError, EnvLoader};
+use enum_dispatch::enum_dispatch;
+
 #[enum_dispatch]
 pub trait EmailProvider {
   /// Sends an email to and from the specified address.
-  fn send_email(&self, address: &str, api_key: &str, contents: &str);
+  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError>;
 }
 
 /// An enum containing all Email Provider implementations.
+#[derive(Debug)]
 #[enum_dispatch(EmailProvider)]
-enum EmailProviders {
+pub enum EmailProviders {
   SendGrid(SendGrid),
-}
-
-impl From<String> for EmailProviders {
-  fn from(input: String) -> Self {
-    // Note that the input is trimmed and converted
-    // to upper case for the sake of consistency
-    match input.trim().to_uppercase().as_str() {
-      "SENDGRID" => Self::SendGrid(SendGrid::new()),
-      e => {
-        warn!("Invalid Email provider: {}, defaulting to SendGrid.", e);
-        Self::SendGrid(SendGrid::new())
-      }
-    }
-  }
+  MailCommand(MailCommand),
 }
 
 /// Abstracts away the email backend.
 ///
+/// The email provider is picked by inspecting the
+/// `EMAIL` environment variable.
+///
 /// By default, this will return the `SendGrid` implementation.
-pub fn get_email_provider() -> impl EmailProvider {
+pub fn get_email_provider() -> Result<impl EmailProvider, String> {
   let env_var = std::env::var("EMAIL")
     .ok()
     .unwrap_or_else(|| "SENDGRID".to_owned());
 
-  EmailProviders::from(env_var)
+  EmailProviders::try_from(env_var)
+}
+
+impl TryFrom<String> for EmailProviders {
+  type Error = String;
+
+  fn try_from(value: String) -> Result<Self, Self::Error> {
+    let client = value.trim().to_uppercase();
+    let env_vars = EnvLoader::new();
+
+    match client.as_str() {
+      "SENDGRID" => Ok(Self::SendGrid(SendGrid::new(&env_vars))),
+      "MAIL_COMMAND" => Ok(Self::MailCommand(MailCommand {})),
+      _ => Err("Requested client not found".to_owned()),
+    }
+  }
 }

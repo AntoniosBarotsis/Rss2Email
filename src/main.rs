@@ -1,94 +1,33 @@
-#![warn(
-  rust_2018_idioms,
-  clippy::pedantic,
-  clippy::unwrap_used,
-  clippy::nursery,
-  absolute_paths_not_starting_with_crate,
-  elided_lifetimes_in_paths,
-  explicit_outlives_requirements,
-  keyword_idents,
-  macro_use_extern_crate,
-  meta_variable_misuse,
-  missing_abi,
-  missing_copy_implementations,
-  missing_debug_implementations,
-  non_ascii_idents,
-  noop_method_call,
-  pointer_structural_match,
-  rust_2021_incompatible_closure_captures,
-  rust_2021_incompatible_or_patterns,
-  rust_2021_prefixes_incompatible_syntax,
-  rust_2021_prelude_collisions,
-  single_use_lifetimes,
-  trivial_casts,
-  trivial_numeric_casts,
-  unsafe_code,
-  unsafe_op_in_unsafe_fn,
-  unstable_features,
-  unused_crate_dependencies,
-  unused_extern_crates,
-  unused_import_braces,
-  unused_lifetimes,
-  unused_macro_rules,
-  unused_qualifications,
-  unused_results,
-  variant_size_differences
-)]
-
-use crate::email::email_provider::get_email_provider;
-use crate::email::email_provider::EmailProvider;
-use crate::util::{download_blogs, map_to_html};
-use dotenv::dotenv;
-use env_logger::Env;
-use log::{error, info};
-use std::env;
-
-use crate::util::time_func;
-
-mod blog;
 mod email;
-mod util;
-mod xml;
+mod logger;
 
+use crate::email::email_provider::{get_email_provider, EmailProvider};
+use dotenvy::dotenv;
+use env_logger::Env;
+use rss2email_lib::{download_blogs, map_to_html, time_func};
+
+/// The core logic of the main function. This should be called regardless of where
+/// you are running the project at.
 fn core_main() -> Result<(), String> {
-  env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+  if env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+    .try_init()
+    .is_ok()
+  {};
 
-  let _env = dotenv().ok().ok_or("Failed to load .env file")?;
+  let _env = dotenv();
+  let days_default: i64 = 7;
 
-  // Check if using env variable or not -- must delimit using ':', semicolon does not work
-  let args: Vec<String> = env::args().collect();    
-  let parsed_args: std::str::Split<'_, &str>;
-  let mut arg_links: Vec<&str> = Vec::new();
-  let mut feed_flag = args.len();
-  // check if env vars are present
-  if args.len() > 1 {
-    parsed_args = args[1].split("*");
-    arg_links = parsed_args.collect::<Vec<&str>>(); // contains all feed links
-    feed_flag = args.len();
-  }
+  let days = std::env::var("DAYS").map_or(days_default, |v| {
+    v.parse::<i64>()
+      .map_err(|e| {
+        warn!("Invalid number for days, using defaults! error: {e}");
+      })
+      .unwrap_or(days_default)
+  });
 
-  let sendgrid_api_key = std::env::var("SENDGRID_API_KEY").expect("SENDGRID_API_KEY must be set.");
-  let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
-  let days_default = 7;
+  info!("Days set to {days}",);
 
-  let days = match std::env::var("DAYS") {
-    Ok(txt) => {
-      if let Ok(n) = txt.parse::<i64>() {
-        n
-      } else {
-        error!("Days variable is set to \"{}\" which is not a number.", txt);
-        return Err(format!(
-          "Days variable is set to \"{}\" which is not a number.",
-          txt
-        ));
-      }
-    }
-    Err(_) => days_default,
-  };
-
-  info!("Days set to {:?}", days);
-
-  let blogs = time_func(|| download_blogs(days, feed_flag, arg_links.clone()), "download_blogs");
+  let blogs = time_func(|| download_blogs(days), "download_blogs");
 
   let posts_amt = blogs.iter().flat_map(|x| &x.posts).count();
   info!(
@@ -102,26 +41,35 @@ fn core_main() -> Result<(), String> {
   if cfg!(debug_assertions) {
     info!("{}", html);
   } else {
-    get_email_provider().send_email(&address, &sendgrid_api_key, &html);
+    // Only load email related variables if ran on release
+    let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
+
+    if let Err(e) = get_email_provider().map(|provider| provider.send_email(&address, &html))? {
+      error!("{}", e);
+    };
   }
 
   Ok(())
 }
 
+/// Calls [`core_main`].
 #[cfg(not(feature = "aws-lambda"))]
 fn main() -> Result<(), String> {
   core_main()
 }
 
+/// Calls [`aws_lambda::lambda_wrapper()`].
 #[cfg(feature = "aws-lambda")]
 fn main() -> Result<(), aws_lambda::LambdaErr> {
   aws_lambda::lambda_wrapper()
 }
 
+/// Contains necessary boiler-plate that allows the project to run on AWS Lambda.
 #[cfg(feature = "aws-lambda")]
 mod aws_lambda {
   use crate::core_main;
   use lambda_runtime::{run, service_fn, Error, LambdaEvent};
+  use rss2email_lib::warn;
   use serde::Deserialize;
   pub type LambdaErr = Error;
 
@@ -131,7 +79,7 @@ mod aws_lambda {
   #[allow(clippy::unused_async)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
-    let _res = core_main();
+    let _res = core_main().map_err(|x| warn!("{}", x));
     Ok(())
   }
 

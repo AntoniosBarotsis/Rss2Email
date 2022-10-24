@@ -1,0 +1,187 @@
+name: Build & Tests
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_test_run:
+    name: Build and test on ${{ matrix.job.os }} (${{ matrix.job.target }})
+    runs-on: ${{ matrix.job.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { target: aarch64-unknown-linux-gnu , os: ubuntu-22.04 }
+          - { target: x86_64-unknown-linux-gnu  , os: ubuntu-22.04 }
+          - { target: x86_64-apple-darwin       , os: macos-12     }
+          - { target: x86_64-pc-windows-msvc    , os: windows-2022 }
+
+    env:
+      FEEDS: |
+        https://antoniosbarotsis.github.io/index.xml
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCiSIL42pQRpc-8JNiYDFyzQ
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCUMwY9iS8oMyWDYIe6_RmoA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw
+        https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA
+        https://www.youtube.com/feeds/videos.xml?channel_id=UC2Xd-TjJByJyK2w1zNwY0zQ
+        https://blog.rust-lang.org/feed.xml
+        https://blog.rust-lang.org/inside-rust/feed.xml
+        https://this-week-in-rust.org/rss.xml
+        https://rust.libhunt.com/newsletter/feed
+        https://rustsec.org/feed.xml
+        https://console.dev/tools/rss.xml
+        https://console.dev/betas/rss.xml
+        https://console.dev/articles/rss.xml
+        https://console.dev/interviews/rss.xml
+        https://console.dev/profiles/rss.xml
+        https://blog.console.dev/rss/
+        https://blog.jetbrains.com/feed/
+        https://github.blog/feed/
+        https://stackoverflow.blog/feed/
+        https://dusted.codes/feed/rss
+        https://vladmihalcea.com/blog/feed/
+        https://arraying.de/index.xml
+        https://ossinsight.io/blog/rss.xml
+        https://www.smartercode.io/feed
+        https://fasterthanli.me/index.xml
+        https://raphlinus.github.io/feed.xml
+        https://www.huy.rocks/rss.xml
+        https://gideonwolfe.com/index.xml
+        https://blog.m-ou.se/index.xml
+        https://liam.rs/index.xml
+        https://qristin.wordpress.com/feed/
+        https://wakatime.com/blog/all.atom
+        https://developerlife.com/feed.xml
+        https://grafana.com/blog/index.xml
+        https://www.elastic.co/blog/feed
+        https://redis.com/blog/feed
+        https://www.stephanboyer.com/rss
+        https://medium.com/feed/@clockwork-labs
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
+
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Test
+        run: cargo test --verbose
+        # Set CI to false so warnings don't panic
+        # as some tests are supposed to throw warnings
+        env:
+          CI: false
+
+      # These are the web feeds I am using at the moment, 
+      # this is supposed to function like an integration test
+      - name: Run
+        run: cargo run --verbose
+
+      - name: Run mail
+        run: |
+          cd test-docker
+          chmod +x build.sh
+          ./build.sh
+        if: ${{ contains(matrix.job.target, 'linux') }}
+
+      - name: Install Hyperfine
+        run: cargo install hyperfine
+
+      - name: Benchmark
+        run: hyperfine 'cargo run' -r 5
+
+  docker_build_x86:
+    name: Docker build (${{ matrix.job.name }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { name: rss2email-base-x86, args: '' }
+          - { name: rss2email-aws-x86 , args: --build-arg compile_flag="--features aws-lambda" }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create needed files
+        run: |
+          touch .env
+          touch feeds.txt
+
+      - name: Docker build
+        run: docker build -f Dockerfile.x86 ${{ matrix.job.args }} .
+
+  docker_build_arm:
+    name: Docker build (${{ matrix.job.name }})
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { name: rss2email-base-arm, args: '' }
+          - { name: rss2email-aws-arm , args: --features aws-lambda }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up rustup target
+        run: rustup target add aarch64-unknown-linux-musl
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
+
+      - name: Install dependencies
+        run: |
+          pip3 install ziglang
+          cargo install cargo-zigbuild
+
+      - name: Build
+        run: cargo zigbuild --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
+
+      - name: Docker build
+        run: |
+          docker build -f Dockerfile.scratch --build-arg path="./target/aarch64-unknown-linux-musl/release/rss2email" .
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install clippy
+        run: rustup component add clippy
+
+      - name: Use cached dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
+
+      - name: Run clippy
+        run: cargo clippy -- -Dwarnings

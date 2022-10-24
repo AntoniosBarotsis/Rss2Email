@@ -1,0 +1,16 @@
+# A from scratch image to be used for Arm builds.
+#
+# Arm builds are ridiculously slow on both my machine
+# and the github actions runners so instead I ended up
+# making the build native and then just importing the
+# binary in this image.
+#
+# I won't be explaining how to build this locally
+# because it is very ugly and I also did it in
+# a very weird way. If you really want to, you
+# can take a look at the CI file where this is used.
+
+FROM scratch
+ARG path="./target/release/rss2email"
+COPY $path rss2email
+CMD ["./rss2email"]

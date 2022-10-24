@@ -1,36 +1,49 @@
-use log::{error, info};
+//! [`EmailProvider`] implementation using [`SendGrid`](https://sendgrid.com/).
 
-use super::email_provider::EmailProvider;
+use crate::info;
 
-#[derive(Default)]
-/// `EmailProvider` implementation using [`SendGrid`](https://sendgrid.com/).
-pub struct SendGrid {}
+use super::{email_provider::EmailProvider, EmailError, EnvLoader};
+
+#[derive(Default, Debug)]
+pub struct SendGrid {
+  api_key: Option<String>,
+}
 
 impl SendGrid {
-  pub(crate) fn new() -> Self {
-    Self::default()
+  pub(crate) fn new(env_loader: &EnvLoader) -> Self {
+    Self {
+      api_key: env_loader.api_key.clone(),
+    }
   }
 }
 
 impl EmailProvider for SendGrid {
-  fn send_email(&self, address: &str, api_key: &str, contents: &str) {
+  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError> {
+    let api_key = self
+      .api_key
+      .as_ref()
+      .ok_or_else(|| EmailError::Config("Cannot use SendGrid without API_KEY".to_owned()))?;
+
     let contents = contents.replace('\"', "\\\"");
     let message = format!(
       r#"{{"personalizations": [{{"to": [{{"email": "{address}"}}]}}],"from": {{"email": "{address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );
 
-    let req = ureq::post("https://api.sendgrid.com/v3/mail/send")
-      .set("Authorization", &format!("Bearer {}", &api_key))
-      .set("Content-Type", "application/json")
-      .send_string(&message);
+    let http_client = reqwest::blocking::Client::new();
+    let req = http_client
+      .post("https://api.sendgrid.com/v3/mail/send")
+      .header("Authorization", &format!("Bearer {}", api_key))
+      .header("Content-Type", "application/json")
+      .body(message)
+      .build()?;
+    let response = http_client.execute(req);
 
-    match req {
-      Ok(req) => info!(
-        "Email request sent with {} {}",
-        req.status(),
-        req.status_text()
-      ),
-      Err(e) => error!("{}", e),
+    match response {
+      Ok(response) => {
+        info!("Email request sent with {}", response.status().as_str());
+        Ok(())
+      }
+      Err(e) => Err(e.into()),
     }
   }
 }

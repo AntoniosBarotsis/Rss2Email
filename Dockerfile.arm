@@ -1,0 +1,37 @@
+FROM arm64v8/alpine:3.14 as builder
+
+# Read https://github.com/AntoniosBarotsis/Rss2Email/wiki/1.-Home#deploying
+#
+# TLDR; run docker build with `--build-arg compile_flag="--features aws-lambda"`
+# if you want to build for Lambda
+ARG compile_flag=""
+
+RUN apk add --no-cache curl musl-dev libgcc libstdc++6 alpine-sdk
+
+# RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /opt
+RUN rustup target add aarch64-unknown-linux-musl
+RUN cargo new --bin rss2email
+WORKDIR /opt/rss2email
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
+ADD ./benches ./benches
+RUN touch src/lib.rs
+RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
+
+RUN rm ./src/*.rs
+RUN rm ./target/aarch64-unknown-linux-musl/release/deps/rss2email*
+RUN rm ./target/aarch64-unknown-linux-musl/release/deps/lib*
+
+ADD ./src ./src
+RUN cargo build --release $compile_flag --target aarch64-unknown-linux-musl
+
+FROM scratch
+WORKDIR /opt/rss2email
+COPY --from=builder /opt/rss2email/target/aarch64-unknown-linux-musl/release/rss2email .
+COPY .env .
+COPY feeds.txt .
+CMD ["./rss2email"]
