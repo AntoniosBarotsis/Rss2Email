@@ -78,6 +78,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "${{ matrix.job.os }}-${{ matrix.job.target }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
 
       - name: Build
         run: cargo build --verbose
@@ -102,10 +103,10 @@ jobs:
         if: ${{ contains(matrix.job.target, 'linux') }}
 
       - name: Install Hyperfine
-        run: cargo install hyperfine --root target
+        run: cargo install hyperfine
 
       - name: Benchmark
-        run: target/bin/hyperfine 'cargo run' -r 5
+        run: hyperfine 'cargo run' -r 5
 
   docker_build_x86:
     name: Docker build (${{ matrix.job.name }})
@@ -151,14 +152,15 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "docker_build_arm-${{ matrix.job.name }}-${{ startsWith('--build-arg', '${{ matrix.job.args }}') }}-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
 
       - name: Install dependencies
         run: |
           pip3 install ziglang
-          cargo install cargo-zigbuild --root target
+          cargo install cargo-zigbuild
 
       - name: Build
-        run: target/bin/cargo-zigbuild build --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
+        run: cargo zigbuild --release ${{ matrix.job.args }} --target aarch64-unknown-linux-musl
 
       - name: Docker build
         run: |
@@ -179,6 +181,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: "ubuntu-22.04-x86_64-unknown-linux-gnu-${{ hashFiles('**/Cargo.lock') }}"
+          shared-key: "shared"
 
       - name: Run clippy
         run: cargo clippy -- -Dwarnings
