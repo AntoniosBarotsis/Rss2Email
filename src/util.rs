@@ -134,7 +134,7 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
   res2.push_str(&styling_part2);
 
   res2
-  //res
+  //res 
 }
 
 /// Returns true if the passed date is within `n` days from the current date.
