@@ -122,7 +122,7 @@ const fn feeds_splitter(c: char) -> bool {
 
 /// Generates the HTML contents corresponding to the given Blog collection.
 pub fn map_to_html(blogs: &Vec<Blog>) -> String {
-  let styling_part1 = format!("
+  let styling_part1 = "
   <!DOCTYPE html>
   <html lang=\"en\">
       <head>
@@ -136,20 +136,20 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
           </nav>
           <div class=\"container\">
               <div class=\"text-left mt-5\">
-");
+".to_string();
 
-let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
+  let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
 
-for blog in blogs {
-  let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
-  for post in &blog.posts {
-    let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
+  for blog in blogs {
+    let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
+    for post in &blog.posts {
+      let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
+    }
+    tmp.push_str("</ul>");
+    res.push_str(&tmp);
   }
-  tmp.push_str("</ul>");
-  res.push_str(&tmp);
-}
 
-let styling_part2: String = format!("
+  let styling_part2: String = "
     </div>
     </div>
     
@@ -157,14 +157,14 @@ let styling_part2: String = format!("
     <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js\"></script>
   </body>
   </html>
-");
+".to_string();
 
-let mut res2: String = format!("");
-res2.push_str(&styling_part1);
-res2.push_str(&res);
-res2.push_str(&styling_part2);
+  let mut res2: String = String::new();
+  res2.push_str(&styling_part1);
+  res2.push_str(&res);
+  res2.push_str(&styling_part2);
 
-res2
+  res2
 }
 
 /// Returns true if the passed date is within `n` days from the current date.
