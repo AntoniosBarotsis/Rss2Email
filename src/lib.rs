@@ -122,18 +122,49 @@ const fn feeds_splitter(c: char) -> bool {
 
 /// Generates the HTML contents corresponding to the given Blog collection.
 pub fn map_to_html(blogs: &Vec<Blog>) -> String {
-  let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
+  let styling_part1 = format!("
+  <!DOCTYPE html>
+  <html lang=\"en\">
+      <head>
+          <meta charset=\"utf-8\" />
+          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />
+          <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">
+      </head>
+      <body>
+          <nav class=\"navbar navbar-expand-lg navbar-dark bg-dark text-light\">
+            <a class=\"navbar-brand\">Rss2Email Feed</a>
+          </nav>
+          <div class=\"container\">
+              <div class=\"text-left mt-5\">
+");
 
-  for blog in blogs {
-    let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
-    for post in &blog.posts {
-      let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
-    }
-    tmp.push_str("</ul>");
-    res.push_str(&tmp);
+let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
+
+for blog in blogs {
+  let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
+  for post in &blog.posts {
+    let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
   }
+  tmp.push_str("</ul>");
+  res.push_str(&tmp);
+}
 
-  res
+let styling_part2: String = format!("
+    </div>
+    </div>
+    
+    <!-- Bootstrap core JS-->
+    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js\"></script>
+  </body>
+  </html>
+");
+
+let mut res2: String = format!("");
+res2.push_str(&styling_part1);
+res2.push_str(&res);
+res2.push_str(&styling_part2);
+
+res2
 }
 
 /// Returns true if the passed date is within `n` days from the current date.
