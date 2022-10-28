@@ -24,7 +24,7 @@ pub enum ParserError {
 }
 
 /// Turns an XML feed into a `Blog` if possible.
-/// 
+///
 /// First tries to parse it into an [`RssFeed`]. If that fails,
 /// it then tries to parse it into an [`AtomFeed`]. If both fail,
 /// the error is set to `Error1. Error2`.
