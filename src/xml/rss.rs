@@ -79,7 +79,7 @@ impl WebFeed for Result<RssFeed, DeError> {
         Ok(post) => Some(post),
         Err(e) => {
           warn!(
-            "\"{}\"'s post titled \"{}\" errored with {}",
+            "\"{}\"'s post titled \"{}\" errored with '{}'",
             title,
             x.title
               .as_ref()
@@ -139,6 +139,10 @@ impl BlogPost for RssPost {
 /// Helper method that first tries to parse a date using [`DateTime::parse_from_rfc2822`]
 /// and if that fails, it tries with [`parse_from_rfc822`].
 fn parse_date_helper(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
+  if date.is_empty() {
+    return Err(ParserError::empty_date_error());
+  }
+
   DateTime::parse_from_rfc2822(date).or_else(|_| parse_from_rfc822(date))
 }
 
@@ -160,7 +164,7 @@ fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
   let cap = regex
     .captures(date)
     .and_then(|x| x.get(1))
-    .ok_or_else(|| ParserError::Date("Timezone not found".to_string()))?
+    .ok_or_else(|| ParserError::timezone_date_error("Timezone not found".to_owned()))?
     .as_str();
 
   let date = regex.replace_all(date, "").to_string();
@@ -168,14 +172,14 @@ fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
   let tz = tz_to_offset(cap)?;
 
   tz.datetime_from_str(&date, format_str)
-    .map_err(|_e| ParserError::Date(format!("Date \"{}\" could not be parsed.", date)))
+    .map_err(|e| ParserError::generic_date_error(format!("Error parsing date '{}' ({})", date, e)))
 }
 
 /// Maps timezones from Strings to [`FixedOffset`]s
 fn tz_to_offset(tz: &str) -> Result<FixedOffset, ParserError> {
   match tz {
     "UTC" => Ok(FixedOffset::east(0)),
-    _ => Err(ParserError::Date(format!(
+    _ => Err(ParserError::timezone_date_error(format!(
       "Unknown timezone {}, please open an issue!",
       tz
     ))),

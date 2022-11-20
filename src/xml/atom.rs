@@ -113,6 +113,10 @@ impl BlogPost for AtomPost {
     let description = self.summary;
     let pub_date = self.updated;
 
+    if pub_date.is_empty() {
+      return Err(ParserError::empty_date_error());
+    }
+
     match DateTime::parse_from_rfc3339(&pub_date) {
       Ok(last_build_date) => Ok(Post {
         title,
@@ -120,7 +124,10 @@ impl BlogPost for AtomPost {
         description,
         last_build_date: last_build_date.with_timezone(&Utc),
       }),
-      Err(e) => Err(ParserError::Date(e.to_string())),
+      Err(e) => Err(ParserError::generic_date_error(format!(
+        "Error parsing date '{}' ({})",
+        pub_date, e
+      ))),
     }
   }
 }
