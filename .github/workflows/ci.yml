@@ -59,7 +59,7 @@ jobs:
         https://grafana.com/blog/index.xml
         https://www.elastic.co/blog/feed
         https://redis.com/blog/feed
-        https://www.stephanboyer.com/rss
+        # https://www.stephanboyer.com/rss Going through an outage
         https://medium.com/feed/@clockwork-labs
 
     steps:
