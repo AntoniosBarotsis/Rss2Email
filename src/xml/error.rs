@@ -46,8 +46,8 @@ impl From<DeError> for ParserError {
 impl Display for ParserError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
-      Self::Parse(e) => write!(f, "Parse error: {}", e),
-      Self::Date(e) => write!(f, "{}", e),
+      Self::Parse(e) => write!(f, "Parse error: {e}"),
+      Self::Date(e) => write!(f, "{e}"),
     }
   }
 }
@@ -55,8 +55,8 @@ impl Display for ParserError {
 impl Display for DateError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
-      Self::Generic(e) => write!(f, "Date error: {}", e),
-      Self::TimeZoneError(e) => write!(f, "Timezone error: {}", e),
+      Self::Generic(e) => write!(f, "Date error: {e}"),
+      Self::TimeZoneError(e) => write!(f, "Timezone error: {e}"),
       Self::Empty => write!(f, "Date was empty"),
     }
   }

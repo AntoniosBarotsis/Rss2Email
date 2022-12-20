@@ -45,7 +45,7 @@ async fn test_download_with_text() {
     assert!(message.contains("Invalid content"));
     assert!(message.contains(url));
   } else {
-    panic!("Unexpected error {:?}", error);
+    panic!("Unexpected error {error:?}");
   }
 }
 
@@ -60,7 +60,7 @@ async fn test_download_with_an_image() {
     assert!(message.contains("Invalid content"));
     assert!(message.contains(url));
   } else {
-    panic!("Unexpected error {:?}", error);
+    panic!("Unexpected error {error:?}");
   }
 }
 
@@ -73,6 +73,6 @@ async fn test_download_multiple_pages() {
   ];
   for url in urls {
     let result = get_page_async(url, &create_client()).await;
-    assert!(result.is_ok(), "Error for {}: {:?}", url, result);
+    assert!(result.is_ok(), "Error for {url}: {result:?}");
   }
 }

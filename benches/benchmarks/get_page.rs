@@ -27,7 +27,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
     // This is meant to be for each feed individually so blocking
     // is fine.
-    group.bench_with_input(BenchmarkId::from_parameter(&name), &feed, |b, feed| {
+    group.bench_with_input(BenchmarkId::from_parameter(name), &feed, |b, feed| {
       b.iter(|| async { get_page_async(feed, &client).await });
     });
   }

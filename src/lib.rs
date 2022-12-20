@@ -13,9 +13,9 @@ use tokio::runtime::Handle;
 pub use blog::{Blog, Post};
 mod blog;
 pub mod email;
+mod error;
 pub mod logger;
 pub mod xml;
-mod error;
 
 use crate::xml::parse_web_feed;
 
@@ -226,10 +226,10 @@ where
 impl Display for Error {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match &self {
-      Self::Reqwest(e) => write!(f, "{}", e),
-      Self::HeaderString(e) => write!(f, "{}", e),
-      Self::Io(e) => write!(f, "{}", e),
-      Self::Generic(e) => write!(f, "{}", e),
+      Self::Reqwest(e) => write!(f, "{e}"),
+      Self::HeaderString(e) => write!(f, "{e}"),
+      Self::Io(e) => write!(f, "{e}"),
+      Self::Generic(e) => write!(f, "{e}"),
     }
   }
 }

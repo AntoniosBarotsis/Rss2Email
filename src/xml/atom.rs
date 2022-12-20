@@ -61,7 +61,7 @@ impl WebFeed for Result<AtomFeed, DeError> {
         .collect()
     });
     if posts.is_empty() {
-      return Err(ParserError::Parse(format!("Empty feed: {}", title)));
+      return Err(ParserError::Parse(format!("Empty feed: {title}")));
     }
 
     let last_build_date = posts
@@ -88,7 +88,7 @@ impl WebFeed for AtomFeed {
         .collect()
     });
     if posts.is_empty() {
-      return Err(ParserError::Parse(format!("Empty feed: {}", title)));
+      return Err(ParserError::Parse(format!("Empty feed: {title}")));
     }
 
     let last_build_date = posts

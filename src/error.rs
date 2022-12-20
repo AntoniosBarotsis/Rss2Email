@@ -7,6 +7,6 @@ pub enum Error {
   HeaderString(Box<http::header::ToStrError>),
   /// Wrapper for [std::io::Error].
   Io(std::io::Error),
-  /// 
+  ///
   Generic(String),
 }

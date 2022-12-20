@@ -2,7 +2,7 @@
 
 use crate::info;
 
-use super::{email_provider::EmailProvider, EnvLoader, error::EmailError};
+use super::{email_provider::EmailProvider, error::EmailError, EnvLoader};
 
 #[derive(Default, Debug)]
 pub struct SendGrid {
@@ -32,7 +32,7 @@ impl EmailProvider for SendGrid {
     let http_client = reqwest::blocking::Client::new();
     let req = http_client
       .post("https://api.sendgrid.com/v3/mail/send")
-      .header("Authorization", &format!("Bearer {}", api_key))
+      .header("Authorization", &format!("Bearer {api_key}"))
       .header("Content-Type", "application/json")
       .body(message)
       .build()?;

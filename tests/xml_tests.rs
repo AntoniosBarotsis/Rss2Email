@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use rss2email_lib::{
-  xml::{parse_web_feed, error::ParserError},
+  xml::{error::ParserError, parse_web_feed},
   Blog, Post,
 };
 
@@ -25,7 +25,7 @@ fn read_atom(file_name: &str) -> String {
 fn post_date(value: &str) -> DateTime<Utc> {
   value
     .parse::<DateTime<Utc>>()
-    .unwrap_or_else(|_| panic!("Invalid date {}", value))
+    .unwrap_or_else(|_| panic!("Invalid date {value}"))
 }
 
 #[test]

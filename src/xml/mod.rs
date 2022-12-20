@@ -5,12 +5,12 @@ use quick_xml::de::from_str;
 
 use crate::blog::Blog;
 
-use self::{atom::AtomFeed, rss::RssFeed, traits::WebFeed, error::ParserError};
+use self::{atom::AtomFeed, error::ParserError, rss::RssFeed, traits::WebFeed};
 
 pub mod atom;
+pub mod error;
 pub mod rss;
 mod traits;
-pub mod error;
 
 /// Turns an XML feed into a `Blog` if possible.
 ///
@@ -21,6 +21,6 @@ pub fn parse_web_feed(xml: &str) -> Result<Blog, ParserError> {
   from_str::<RssFeed>(xml).into_blog().or_else(|e1| {
     from_str::<AtomFeed>(xml)
       .into_blog()
-      .map_err(|e2| ParserError::Parse(format!("{}\n{}", e1, e2)))
+      .map_err(|e2| ParserError::Parse(format!("{e1}\n{e2}")))
   })
 }

@@ -20,8 +20,8 @@ impl From<reqwest::Error> for EmailError {
 impl Display for EmailError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match &self {
-      Self::Request(e) => write!(f, "{}", e),
-      Self::Config(e) | Self::Io(e) | Self::Other(e) => write!(f, "{}", e),
+      Self::Request(e) => write!(f, "{e}"),
+      Self::Config(e) | Self::Io(e) | Self::Other(e) => write!(f, "{e}"),
     }
   }
 }

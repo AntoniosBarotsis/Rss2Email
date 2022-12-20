@@ -3,9 +3,9 @@
 #[allow(clippy::use_self)]
 #[allow(clippy::module_name_repetitions)]
 pub mod email_provider;
+pub mod error;
 pub mod mail_cmd;
 pub mod sendgrid;
-pub mod error;
 
 /// Holds all environment variables that are required
 /// by any email provider.

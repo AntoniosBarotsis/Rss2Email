@@ -172,7 +172,7 @@ fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
   let tz = tz_to_offset(cap)?;
 
   tz.datetime_from_str(&date, format_str)
-    .map_err(|e| ParserError::generic_date_error(format!("Error parsing date '{}' ({})", date, e)))
+    .map_err(|e| ParserError::generic_date_error(format!("Error parsing date '{date}' ({e})")))
 }
 
 /// Maps timezones from Strings to [`FixedOffset`]s
