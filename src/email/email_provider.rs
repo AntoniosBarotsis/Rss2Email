@@ -1,7 +1,7 @@
 //! An email provider abstraction to allow for multiple backends.
 
-use super::sendgrid::SendGrid;
-use super::{mail_cmd::MailCommand, EmailError, EnvLoader};
+use super::{sendgrid::SendGrid, error::EmailError};
+use super::{mail_cmd::MailCommand, EnvLoader};
 use enum_dispatch::enum_dispatch;
 
 #[enum_dispatch]

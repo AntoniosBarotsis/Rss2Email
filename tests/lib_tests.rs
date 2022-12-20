@@ -1,4 +1,4 @@
-use rss2email_lib::{get_page_async, DownloadError};
+use rss2email_lib::{get_page_async, Error};
 use tokio::test;
 
 use crate::common::create_client;
@@ -41,7 +41,7 @@ async fn test_download_with_text() {
   let payload = get_page_async(url, &create_client()).await;
   assert!(payload.is_err());
   let error = payload.expect_err("Should error");
-  if let DownloadError::Custom(message) = error {
+  if let Error::Generic(message) = error {
     assert!(message.contains("Invalid content"));
     assert!(message.contains(url));
   } else {
@@ -56,7 +56,7 @@ async fn test_download_with_an_image() {
   let payload = get_page_async(url, &create_client()).await;
   assert!(payload.is_err());
   let error = payload.expect_err("Should error");
-  if let DownloadError::Custom(message) = error {
+  if let Error::Generic(message) = error {
     assert!(message.contains("Invalid content"));
     assert!(message.contains(url));
   } else {

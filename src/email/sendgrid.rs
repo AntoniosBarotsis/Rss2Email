@@ -2,7 +2,7 @@
 
 use crate::info;
 
-use super::{email_provider::EmailProvider, EmailError, EnvLoader};
+use super::{email_provider::EmailProvider, EnvLoader, error::EmailError};
 
 #[derive(Default, Debug)]
 pub struct SendGrid {

@@ -1,6 +1,7 @@
 use std::{fmt::Display, fs, time::SystemTime};
 
 use chrono::{DateTime, Utc};
+pub use error::Error;
 use futures::{stream, StreamExt};
 use itertools::Itertools;
 use lazy_static::lazy_static;
@@ -14,6 +15,7 @@ mod blog;
 pub mod email;
 pub mod logger;
 pub mod xml;
+mod error;
 
 use crate::xml::parse_web_feed;
 
@@ -154,7 +156,7 @@ fn is_supported_content(content_type: &str) -> bool {
 }
 
 /// Helper function for downloading the contents of a web page.
-pub async fn get_page_async(url: &str, client: &Client) -> Result<String, DownloadError> {
+pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Error> {
   let response = client
     .get(url)
     .header(
@@ -167,15 +169,15 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
   let content_type = response
     .headers()
     .get(reqwest::header::CONTENT_TYPE)
-    .ok_or_else(|| DownloadError::Custom("No content type header found on request.".to_string()))?
+    .ok_or_else(|| Error::Generic("No content type header found on request.".to_string()))?
     .to_str()
-    .map_err(|_e| DownloadError::Custom("Content Type parsing error".to_string()))?
+    .map_err(|_e| Error::Generic("Content Type parsing error".to_string()))?
     .split(';')
     .collect::<Vec<&str>>()[0]
     .to_owned();
 
   if !is_supported_content(&content_type) {
-    return Err(DownloadError::Custom(format!(
+    return Err(Error::Generic(format!(
       "Invalid content {} for {}",
       content_type.as_str(),
       url
@@ -185,7 +187,7 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Downlo
   response
     .text()
     .await
-    .map_err(|_e| DownloadError::Custom("Body decode error".to_string()))
+    .map_err(|_e| Error::Generic("Body decode error".to_string()))
 }
 
 /// Helper function that times and prints the elapsed execution time
@@ -221,40 +223,30 @@ where
   res
 }
 
-/// Represents anything that could go wrong when downloading the web feeds.
-#[derive(Debug)]
-pub enum DownloadError {
-  /// Wrapper for [reqwest::Error].
-  Reqwest(Box<reqwest::Error>),
-  HeaderString(Box<http::header::ToStrError>),
-  Io(std::io::Error),
-  Custom(String),
-}
-
-impl Display for DownloadError {
+impl Display for Error {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match &self {
       Self::Reqwest(e) => write!(f, "{}", e),
       Self::HeaderString(e) => write!(f, "{}", e),
       Self::Io(e) => write!(f, "{}", e),
-      Self::Custom(e) => write!(f, "{}", e),
+      Self::Generic(e) => write!(f, "{}", e),
     }
   }
 }
 
-impl From<std::io::Error> for DownloadError {
+impl From<std::io::Error> for Error {
   fn from(error: std::io::Error) -> Self {
     Self::Io(error)
   }
 }
 
-impl From<reqwest::Error> for DownloadError {
+impl From<reqwest::Error> for Error {
   fn from(error: reqwest::Error) -> Self {
     Self::Reqwest(Box::new(error))
   }
 }
 
-impl From<http::header::ToStrError> for DownloadError {
+impl From<http::header::ToStrError> for Error {
   fn from(error: http::header::ToStrError) -> Self {
     Self::HeaderString(Box::new(error))
   }
