@@ -14,6 +14,7 @@
 //! ```
 
 use chrono::{DateTime, Utc};
+use log::warn;
 use quick_xml::DeError;
 use serde_derive::{Deserialize, Serialize};
 
@@ -57,9 +58,22 @@ impl WebFeed for Result<AtomFeed, DeError> {
     let posts: Vec<Post> = feed.entries.map_or_else(std::vec::Vec::new, |entries| {
       entries
         .iter()
-        .filter_map(|x| x.clone().into_post().ok())
+        // TODO Turn this into a method
+        .filter_map(|x| match x.clone().into_post() {
+          Ok(post) => Some(post),
+          Err(e) => {
+            warn!(
+              "\"{}\"'s post titled \"{}\" errored with '{}'",
+              title,
+              x.title,
+              e
+            );
+            None
+          }
+        })
         .collect()
     });
+
     if posts.is_empty() {
       return Err(ParserError::Parse(format!("Empty feed: {title}")));
     }
@@ -84,7 +98,19 @@ impl WebFeed for AtomFeed {
     let posts: Vec<Post> = self.entries.map_or_else(std::vec::Vec::new, |entries| {
       entries
         .iter()
-        .filter_map(|x| x.clone().into_post().ok())
+        // TODO Turn this into a method
+        .filter_map(|x| match x.clone().into_post() {
+          Ok(post) => Some(post),
+          Err(e) => {
+            warn!(
+              "\"{}\"'s post titled \"{}\" errored with '{}'",
+              title,
+              x.title,
+              e
+            );
+            None
+          }
+        })
         .collect()
     });
     if posts.is_empty() {

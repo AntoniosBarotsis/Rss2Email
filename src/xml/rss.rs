@@ -75,6 +75,7 @@ impl WebFeed for Result<RssFeed, DeError> {
 
     let posts: Vec<Post> = items
       .iter()
+      // TODO Turn this into a method
       .filter_map(|x| match x.clone().into_post() {
         Ok(post) => Some(post),
         Err(e) => {

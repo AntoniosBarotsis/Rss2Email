@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Explore the idea of letting the user inject their own CSS through environment variables and predefined "themes".
 
+- Error reporting now includes details on which post errored and what the error was specifically.
+
 ## [1.0.0] - 2022-12-06
 
 Initial release 🎉
