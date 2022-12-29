@@ -62,9 +62,7 @@ pub struct RssPost {
 impl WebFeed for Result<RssFeed, DeError> {
   fn into_blog(self) -> Result<Blog, ParserError> {
     let feed = self?;
-
     let title = feed.channel.title;
-
     let site_last_build_date = feed.channel.pub_date;
     let items = feed.channel.items;
     let last_post_build_date = items.first().and_then(|x| x.clone().pub_date);
@@ -110,6 +108,7 @@ impl BlogPost for RssPost {
       return Err(ParserError::Parse("No link in post".to_string()));
     };
 
+    // TODO Extract this and include it in the AtomPost creation as well.
     let (title, description) = match (self.title, self.description) {
       (Some(link), description) => (link, description),
       (None, None) => (link.clone(), None),
@@ -147,8 +146,8 @@ fn parse_date_helper(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
   DateTime::parse_from_rfc2822(date).or_else(|_| parse_from_rfc822(date))
 }
 
-/// Tries to parse [`RFC822`](https://www.w3.org/Protocols/rfc822/#z28). This is a much not
-/// *complete* solution since very few timezones are currently supported (see [`tz_to_offset`])
+/// Tries to parse [`RFC822`](https://www.w3.org/Protocols/rfc822/#z28). This is a very much *not*
+/// complete solution since very few timezones are currently supported (see [`tz_to_offset`])
 /// but it works for now and it is not used frequently. I will be updating it whenever I find
 /// feeds that break it.
 ///
