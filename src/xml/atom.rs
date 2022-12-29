@@ -55,47 +55,9 @@ pub struct Link {
 impl WebFeed for Result<AtomFeed, DeError> {
   fn into_blog(self) -> Result<Blog, ParserError> {
     let feed = self?;
-
     let title = feed.title;
+
     let posts: Vec<Post> = feed
-      .entries
-      .iter()
-      // TODO Turn this into a method
-      .filter_map(|x| match x.clone().into_post() {
-        Ok(post) => Some(post),
-        Err(e) => {
-          warn!(
-            "\"{}\"'s post titled \"{}\" errored with '{}'",
-            title, x.title, e
-          );
-          None
-        }
-      })
-      .collect::<Vec<_>>();
-
-    if posts.is_empty() {
-      return Err(ParserError::Parse(format!("Empty feed: {title}")));
-    }
-
-    let last_build_date = posts
-      .iter()
-      .map(|x| x.last_build_date)
-      .max()
-      .ok_or_else(|| ParserError::Parse("Date error.".to_owned()))?;
-
-    Ok(Blog {
-      title,
-      last_build_date,
-      posts,
-    })
-  }
-}
-
-impl WebFeed for AtomFeed {
-  fn into_blog(self) -> Result<Blog, ParserError> {
-    let title = self.title;
-
-    let posts: Vec<Post> = self
       .entries
       .iter()
       // TODO Turn this into a method
