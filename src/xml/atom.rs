@@ -30,8 +30,8 @@ use super::{
 #[serde(rename = "feed")]
 pub struct AtomFeed {
   pub title: String,
-  #[serde(rename = "entry")]
-  pub entries: Option<Vec<AtomPost>>,
+  #[serde(rename = "entry", default)]
+  pub entries: Vec<AtomPost>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -47,6 +47,8 @@ pub struct AtomPost {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Link {
+  // See https://github.com/tafia/quick-xml/issues/534
+  #[serde(rename = "@href")]
   href: String,
 }
 
@@ -55,24 +57,21 @@ impl WebFeed for Result<AtomFeed, DeError> {
     let feed = self?;
 
     let title = feed.title;
-    let posts: Vec<Post> = feed.entries.map_or_else(std::vec::Vec::new, |entries| {
-      entries
-        .iter()
-        // TODO Turn this into a method
-        .filter_map(|x| match x.clone().into_post() {
-          Ok(post) => Some(post),
-          Err(e) => {
-            warn!(
-              "\"{}\"'s post titled \"{}\" errored with '{}'",
-              title,
-              x.title,
-              e
-            );
-            None
-          }
-        })
-        .collect()
-    });
+    let posts: Vec<Post> = feed
+      .entries
+      .iter()
+      // TODO Turn this into a method
+      .filter_map(|x| match x.clone().into_post() {
+        Ok(post) => Some(post),
+        Err(e) => {
+          warn!(
+            "\"{}\"'s post titled \"{}\" errored with '{}'",
+            title, x.title, e
+          );
+          None
+        }
+      })
+      .collect::<Vec<_>>();
 
     if posts.is_empty() {
       return Err(ParserError::Parse(format!("Empty feed: {title}")));
@@ -95,24 +94,23 @@ impl WebFeed for Result<AtomFeed, DeError> {
 impl WebFeed for AtomFeed {
   fn into_blog(self) -> Result<Blog, ParserError> {
     let title = self.title;
-    let posts: Vec<Post> = self.entries.map_or_else(std::vec::Vec::new, |entries| {
-      entries
-        .iter()
-        // TODO Turn this into a method
-        .filter_map(|x| match x.clone().into_post() {
-          Ok(post) => Some(post),
-          Err(e) => {
-            warn!(
-              "\"{}\"'s post titled \"{}\" errored with '{}'",
-              title,
-              x.title,
-              e
-            );
-            None
-          }
-        })
-        .collect()
-    });
+
+    let posts: Vec<Post> = self
+      .entries
+      .iter()
+      // TODO Turn this into a method
+      .filter_map(|x| match x.clone().into_post() {
+        Ok(post) => Some(post),
+        Err(e) => {
+          warn!(
+            "\"{}\"'s post titled \"{}\" errored with '{}'",
+            title, x.title, e
+          );
+          None
+        }
+      })
+      .collect::<Vec<_>>();
+
     if posts.is_empty() {
       return Err(ParserError::Parse(format!("Empty feed: {title}")));
     }

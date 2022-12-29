@@ -43,8 +43,8 @@ pub struct Channel {
   pub title: String,
   pub last_build_date: Option<String>,
   pub pub_date: Option<String>,
-  #[serde(rename = "item")]
-  pub items: Option<Vec<RssPost>>,
+  #[serde(rename = "item", default)]
+  pub items: Vec<RssPost>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -66,7 +66,7 @@ impl WebFeed for Result<RssFeed, DeError> {
     let title = feed.channel.title;
 
     let site_last_build_date = feed.channel.pub_date;
-    let items = feed.channel.items.unwrap_or_default();
+    let items = feed.channel.items;
     let last_post_build_date = items.first().and_then(|x| x.clone().pub_date);
 
     let last_build_date = site_last_build_date
