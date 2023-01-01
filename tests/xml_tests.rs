@@ -58,12 +58,12 @@ fn test_parse_complex_single_entry_atom() {
     blog,
     Blog {
       title: "dive into mark".into(),
-      last_build_date: post_date("2005-07-31T12:29:29+00:00"),
+      last_build_date: post_date("2003-12-13T08:29:29-04:00"),
       posts: vec![Post {
         title: "Atom draft-07 snapshot".into(),
         link: "http://example.org/2005/04/02/atom".into(),
         description: None,
-        last_build_date: post_date("2005-07-31T12:29:29+00:00"),
+        last_build_date: post_date("2003-12-13T08:29:29-04:00"),
       }],
     }
   );
