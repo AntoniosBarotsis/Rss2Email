@@ -37,12 +37,12 @@ fn test_parse_brief_single_entry_atom() {
     blog,
     Blog {
       title: "Example Feed".into(),
-      last_build_date: post_date("2003-12-13T18:30:02+00:00"),
+      most_recent_pub_date: post_date("2003-12-13T18:30:02+00:00"),
       posts: vec![Post {
         title: "Atom-Powered Robots Run Amok".into(),
         link: "http://example.org/2003/12/13/atom03".into(),
         description: Some("Some text.".into()),
-        last_build_date: post_date("2003-12-13T18:30:02+00:00"),
+        pub_date: post_date("2003-12-13T18:30:02+00:00"),
       }],
     }
   );
@@ -58,12 +58,12 @@ fn test_parse_complex_single_entry_atom() {
     blog,
     Blog {
       title: "dive into mark".into(),
-      last_build_date: post_date("2003-12-13T08:29:29-04:00"),
+      most_recent_pub_date: post_date("2003-12-13T08:29:29-04:00"),
       posts: vec![Post {
         title: "Atom draft-07 snapshot".into(),
         link: "http://example.org/2005/04/02/atom".into(),
         description: None,
-        last_build_date: post_date("2003-12-13T08:29:29-04:00"),
+        pub_date: post_date("2003-12-13T08:29:29-04:00"),
       }],
     }
   );
@@ -94,19 +94,19 @@ fn test_parse_atom_with_many_entries() {
     blog,
     Blog {
       title: "Multi-Entries Feed".into(),
-      last_build_date: second_date,
+      most_recent_pub_date: second_date,
       posts: vec![
         Post {
           title: "First title".into(),
           link: "http://awesome.com/link1.html".into(),
           description: Some("First content".into()),
-          last_build_date: first_date,
+          pub_date: first_date,
         },
         Post {
           title: "Second title".into(),
           link: "http://com.net/why-not.html".into(),
           description: None,
-          last_build_date: second_date,
+          pub_date: second_date,
         }
       ],
     }
@@ -123,7 +123,7 @@ fn test_parse_atom_text_with_html_tags() {
     blog,
     Blog {
       title: "Multi-Entries Feed".into(),
-      last_build_date: date,
+      most_recent_pub_date: date,
       posts: vec![Post {
         title: "<b>Star</b> City".into(),
         link: "http://link.com".into(),
@@ -131,7 +131,7 @@ fn test_parse_atom_text_with_html_tags() {
           "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
             .into()
         ),
-        last_build_date: date,
+        pub_date: date,
       }],
     }
   );
@@ -168,25 +168,25 @@ fn test_parse_rss_2() {
     blog,
     Blog {
       title: "Liftoff News".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![Post {
         title: "Star City".into(),
         link:"http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
         description: Some("How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's <a href=\"http://howe.iki.rssi.ru/GCTC/gctc_e.htm\">Star City</a>.".into()),
-        last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        pub_date: post_date("2003-06-03T09:39:21+00:00"),
       },
       // Sky watchers post ignored as not containing link
        Post {
         title: "The Engine That Does More".into(),
         link:"http://liftoff.msfc.nasa.gov/news/2003/news-VASIMR.asp".into(),
         description: Some("Before man travels to Mars, NASA hopes to design new engines that will let us fly through the Solar System more quickly.  The proposed VASIMR engine would do that.".into()),
-        last_build_date: post_date("2003-05-27T08:37:32+00:00"),
+        pub_date: post_date("2003-05-27T08:37:32+00:00"),
       },
        Post {
         title: "Astronauts' Dirty Laundry".into(),
         link:"http://liftoff.msfc.nasa.gov/news/2003/news-laundry.asp".into(),
         description: Some("Compared to earlier spacecraft, the International Space Station has many luxuries, but laundry facilities are not one of them.  Instead, astronauts have other options.".into()),
-        last_build_date: post_date("2003-05-20T08:56:02+00:00"),
+        pub_date: post_date("2003-05-20T08:56:02+00:00"),
       }],
     });
 }
@@ -199,7 +199,7 @@ fn test_parse_rss_text_with_html_tags() {
     blog,
     Blog {
       title: "Liftoff News".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![Post {
         title: "<b>Star</b> City".into(),
         link: "http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
@@ -207,7 +207,7 @@ fn test_parse_rss_text_with_html_tags() {
           "How did it work? <i>Details</i> <a href=\"http://liftoff.msfc.nasa.gov\">here</a>"
             .into()
         ),
-        last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        pub_date: post_date("2003-06-03T09:39:21+00:00"),
       }],
     }
   );
@@ -221,7 +221,7 @@ fn test_parse_rss_without_items() {
     blog,
     Blog {
       title: "NoNews".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![]
     }
   );
@@ -237,19 +237,19 @@ fn test_parse_rss_entry_without_link() {
     blog,
     Blog {
       title: "Liftoff News".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![
         Post {
           title: "Star City".into(),
           link: "http://abc.com".into(),
           description: None,
-          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+          pub_date: post_date("2003-06-03T09:39:21+00:00"),
         },
         Post {
           title: "Planet City".into(),
           link: "http://def.com".into(),
           description: Some("def".into()),
-          last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+          pub_date: post_date("2003-06-03T09:39:21+00:00"),
         }
       ],
     }
@@ -264,12 +264,12 @@ fn test_parse_rss_entry_without_title_and_short_description() {
     blog,
     Blog {
       title: "Liftoff News".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![Post {
         title: "Liftoff at Star City".into(),
         link: "http://liftoff.msfc.nasa.gov".into(),
         description: None,
-        last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        pub_date: post_date("2003-06-03T09:39:21+00:00"),
       }],
     }
   );
@@ -283,7 +283,7 @@ fn test_parse_rss_entry_without_title_and_long_description() {
     blog,
     Blog {
       title: "Liftoff News".into(),
-      last_build_date: post_date("2003-06-10T04:00:00+00:00"),
+      most_recent_pub_date: post_date("2003-06-10T04:00:00+00:00"),
       posts: vec![Post {
         title: "How do Americans get ready to work with Russians a...".into(),
         link: "http://liftoff.msfc.nasa.gov".into(),
@@ -291,7 +291,7 @@ fn test_parse_rss_entry_without_title_and_long_description() {
           "How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's Star City."
             .into()
         ),
-        last_build_date: post_date("2003-06-03T09:39:21+00:00"),
+        pub_date: post_date("2003-06-03T09:39:21+00:00"),
       }],
     }
   );

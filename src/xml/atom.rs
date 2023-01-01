@@ -81,13 +81,13 @@ impl WebFeed for Result<AtomFeed, DeError> {
 
     let last_build_date = posts
       .iter()
-      .map(|x| x.last_build_date)
+      .map(|x| x.pub_date)
       .max()
       .ok_or_else(|| ParserError::Parse("Date error.".to_owned()))?;
 
     Ok(Blog {
       title,
-      last_build_date,
+      most_recent_pub_date: last_build_date,
       posts,
     })
   }
@@ -111,7 +111,7 @@ impl BlogPost for AtomPost {
         title,
         link,
         description,
-        last_build_date: last_build_date.with_timezone(&Utc),
+        pub_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(ParserError::generic_date_error(format!(
         "Error parsing date '{}' ({})",

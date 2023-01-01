@@ -94,7 +94,7 @@ impl WebFeed for Result<RssFeed, DeError> {
 
     Ok(Blog {
       title,
-      last_build_date: last_build_date.with_timezone(&Utc),
+      most_recent_pub_date: last_build_date.with_timezone(&Utc),
       posts,
     })
   }
@@ -131,7 +131,7 @@ impl BlogPost for RssPost {
       title,
       link,
       description,
-      last_build_date: last_build_date.with_timezone(&Utc),
+      pub_date: last_build_date.with_timezone(&Utc),
     })
   }
 }

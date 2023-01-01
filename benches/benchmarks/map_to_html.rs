@@ -13,12 +13,12 @@ fn mock_blog() -> Vec<Blog> {
     title: dummy_str.to_string(),
     link: dummy_str.to_string(),
     description: Some(dummy_str.to_string()),
-    last_build_date: date_time,
+    pub_date: date_time,
   };
 
   vec![Blog {
     title: dummy_str.to_string(),
-    last_build_date: date_time,
+    most_recent_pub_date: date_time,
     posts: vec![p],
   }]
 }

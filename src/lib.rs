@@ -42,14 +42,14 @@ pub fn download_blogs(days: i64) -> Vec<Blog> {
     .into_iter()
     .filter_map(|x| match x {
       Some(x) => {
-        if !within_n_days(days, &x.last_build_date) {
+        if !within_n_days(days, &x.most_recent_pub_date) {
           return None;
         }
 
         let recent_posts: Vec<Post> = x
           .posts
           .into_iter()
-          .filter(|x| within_n_days(days, &x.last_build_date))
+          .filter(|x| within_n_days(days, &x.pub_date))
           .collect();
 
         let non_empty = !recent_posts.is_empty();
