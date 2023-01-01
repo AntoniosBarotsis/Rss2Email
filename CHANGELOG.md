@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Error reporting now includes details on which post errored and what the error was specifically.
+- Post's date now defaults to publication date and fallbacks to the update date
 
 ### In Progress
 
