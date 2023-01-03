@@ -28,7 +28,7 @@ use crate::{
 
 use super::{
   traits::{BlogPost, WebFeed},
-  ParserError,
+  ParserError, limit_description,
 };
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -109,12 +109,12 @@ impl BlogPost for RssPost {
     };
 
     // TODO Extract this and include it in the AtomPost creation as well.
-    let (title, description) = match (self.title, self.description) {
+    let (title, description) = match (self.title, self.description.map(|desc| limit_description(&desc, 200))) {
       (Some(link), description) => (link, description),
       (None, None) => (link.clone(), None),
       (None, Some(description)) => {
         if description.len() > 50 {
-          (format!("{}...", &description[0..50]), Some(description))
+          (limit_description(&description, 50), Some(description))
         } else {
           (description, None)
         }

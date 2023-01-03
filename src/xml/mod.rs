@@ -24,3 +24,15 @@ pub fn parse_web_feed(xml: &str) -> Result<Blog, ParserError> {
       .map_err(|e2| ParserError::Parse(format!("{e1}\n{e2}")))
   })
 }
+
+/// Limits the description to the amount of specified characters
+/// and postpends `...`.
+fn limit_description(desc: &str, limit: usize) -> String {
+  let mut res = desc.chars().take(limit).collect::<String>();
+
+  if desc.chars().count() >= limit {
+    res += "...";
+  }
+
+  res
+}

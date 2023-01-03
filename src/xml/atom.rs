@@ -23,7 +23,7 @@ use crate::blog::{Blog, Post};
 
 use super::{
   traits::{BlogPost, WebFeed},
-  ParserError,
+  ParserError, limit_description,
 };
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -98,7 +98,7 @@ impl BlogPost for AtomPost {
     let title = self.title;
     // Use the first link for now
     let link = self.links[0].href.clone();
-    let description = self.summary;
+    let description = self.summary.map(|desc| limit_description(&desc, 200));
     // Use publish date if exists otherwise fallback to updated
     let pub_date = self.published.unwrap_or(self.updated);
 
