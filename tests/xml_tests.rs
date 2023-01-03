@@ -4,6 +4,8 @@ use rss2email_lib::{
   Blog, Post,
 };
 
+use pretty_assertions::assert_eq;
+
 fn read_file(dir_name: &str, file_name: &str) -> String {
   use std::fs;
   use std::path::PathBuf;
@@ -172,7 +174,7 @@ fn test_parse_rss_2() {
       posts: vec![Post {
         title: "Star City".into(),
         link:"http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp".into(),
-        description: Some("How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's <a href=\"http://howe.iki.rssi.ru/GCTC/gctc_e.htm\">Star City</a>.".into()),
+        description: Some("How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's <a href=\"http://howe.iki.rssi.ru/GCTC/gc...".into()),
         pub_date: post_date("2003-06-03T09:39:21+00:00"),
       },
       // Sky watchers post ignored as not containing link
