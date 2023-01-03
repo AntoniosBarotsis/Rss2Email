@@ -10,6 +10,7 @@
 //!     <updated>ISO.8601</updated>
 //!     <published>ISO.8601</published>?
 //!     <summary></summary>?
+//!     <description></description>?
 //!   </entry>
 //! </feed>
 //! ```
@@ -44,6 +45,7 @@ pub struct AtomPost {
   #[serde(rename = "link")]
   pub links: Vec<Link>,
   pub summary: Option<String>,
+  pub description: Option<String>,
   pub published: Option<String>,
   pub updated: String,
 }
@@ -99,7 +101,7 @@ impl BlogPost for AtomPost {
     let title = self.title;
     // Use the first link for now
     let link = self.links[0].href.clone();
-    let description = self.summary.map(|desc| limit_description(&desc, 200));
+    let description = self.summary.or(self.description).map(|desc| limit_description(&desc, 200));
     // Use publish date if exists otherwise fallback to updated
     let pub_date = self.published.unwrap_or(self.updated);
 
