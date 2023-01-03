@@ -131,9 +131,10 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
     for post in &blog.posts {
       let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
 
-      if let Some(desc) = &post.description {
-        tmp.push_str(&format!("<p>{}</p>", desc));
-      }
+      // Removed for now, see https://github.com/AntoniosBarotsis/Rss2Email/issues/38
+      // if let Some(desc) = &post.description {
+      //   tmp.push_str(&format!("<p>{}</p>", desc));
+      // }
     }
     tmp.push_str("</ul>");
     res.push_str(&tmp);
