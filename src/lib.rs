@@ -130,6 +130,10 @@ pub fn map_to_html(blogs: &Vec<Blog>) -> String {
     let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
     for post in &blog.posts {
       let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
+
+      if let Some(desc) = &post.description {
+        tmp.push_str(&format!("<p>{}</p>", desc));
+      }
     }
     tmp.push_str("</ul>");
     res.push_str(&tmp);
