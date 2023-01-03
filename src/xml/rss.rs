@@ -109,7 +109,6 @@ impl BlogPost for RssPost {
       return Err(ParserError::Parse("No link in post".to_string()));
     };
 
-    // TODO Extract this and include it in the AtomPost creation as well.
     let (title, description) = match (
       self.title,
       self.description.map(|desc| limit_description(&desc, 200)),
