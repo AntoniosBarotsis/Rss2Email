@@ -22,8 +22,9 @@ use serde_derive::{Deserialize, Serialize};
 use crate::blog::{Blog, Post};
 
 use super::{
+  limit_description,
   traits::{BlogPost, WebFeed},
-  ParserError, limit_description,
+  ParserError,
 };
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]

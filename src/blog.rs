@@ -9,7 +9,7 @@ pub struct Blog {
 }
 
 /// Internal representation of a web feed post.
-/// 
+///
 /// The `pub_date` field will prefer the publication date
 /// and fallback to the last update date.
 #[derive(Debug, Clone, PartialEq, Eq)]
