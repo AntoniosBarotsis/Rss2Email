@@ -188,10 +188,10 @@ jobs:
           shared-key: "shared"
 
       - name: Run clippy (base)
-        run: cargo clippy -- -Dwarnings
+        run: cargo clippy --all-targets -- -Dwarnings
 
       - name: Run clippy (AWS Lambda)
-        run: cargo clippy -F aws-lambda -- -Dwarnings
+        run: cargo clippy --all-targets -F aws-lambda -- -Dwarnings
 
       - name: Run fmt
         run: cargo fmt --check
