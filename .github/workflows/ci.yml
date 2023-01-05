@@ -176,8 +176,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install clippy
-        run: rustup component add clippy
+      - name: Install clippy and rustfmt
+        run: |
+          rustup component add clippy
+          rustup component add rustfmt
 
       - name: Use cached dependencies
         uses: Swatinem/rust-cache@v2
@@ -190,3 +192,6 @@ jobs:
 
       - name: Run clippy (AWS Lambda)
         run: cargo clippy -F aws-lambda -- -Dwarnings
+
+      - name: Run fmt
+        run: cargo fmt --check
