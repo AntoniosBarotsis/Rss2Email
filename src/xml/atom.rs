@@ -101,7 +101,11 @@ impl BlogPost for AtomPost {
     let title = self.title;
     // Use the first link for now
     let link = self.links[0].href.clone();
-    let description = self.summary.or(self.description).map(|desc| limit_description(&desc, 200));
+    let description = self
+      .summary
+      .or(self.description)
+      .map(|desc| limit_description(&desc, 200));
+
     // Use publish date if exists otherwise fallback to updated
     let pub_date = self.published.unwrap_or(self.updated);
 
