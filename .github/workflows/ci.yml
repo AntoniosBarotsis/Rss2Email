@@ -99,7 +99,7 @@ jobs:
         if: ${{ contains(matrix.job.target, 'linux') }}
 
       - name: Install Hyperfine
-        run: cargo install hyperfine
+        run: cargo install hyperfine --locked
 
       - name: Benchmark
         run: hyperfine 'cargo run' -r 5
