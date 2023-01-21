@@ -6,6 +6,7 @@
 ![Minimum Supported Rust Version](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/AntoniosBarotsis/87883f70db3cf998342786f65fe1b9df/raw/rss2email_msrv.json)
 [![dependency status](https://deps.rs/repo/github/AntoniosBarotsis/Rss2Email/status.svg?path=.)](https://deps.rs/repo/github/AntoniosBarotsis/Rss2Email?path=.)
 [![Docker Images](https://img.shields.io/badge/Docker-Images-0092e6?logo=docker)](https://hub.docker.com/search?q=antoniosbarotsis%2Frss2email)
+[![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
 <!-- [![GitHub milestone](https://img.shields.io/github/milestones/progress/AntoniosBarotsis/rss2email/1?color=32ca55&label=Progress%20towards%20v1.0&labelColor=353d46)](https://github.com/users/AntoniosBarotsis/projects/2/views/1?query=is%3Aopen+sort%3Aupdated-desc&filterQuery=milestone%3A%22v1.0%22) -->
 
 A small program capable of aggregating content from multiple RSS/Atom feeds and mailing them to you
