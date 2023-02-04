@@ -121,8 +121,7 @@ impl BlogPost for AtomPost {
         pub_date: last_build_date.with_timezone(&Utc),
       }),
       Err(e) => Err(ParserError::generic_date_error(format!(
-        "Error parsing date '{}' ({})",
-        pub_date, e
+        "Error parsing date '{pub_date}' ({e})"
       ))),
     }
   }
