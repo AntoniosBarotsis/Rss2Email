@@ -103,11 +103,9 @@ impl WebFeed for Result<RssFeed, DeError> {
 
 impl BlogPost for RssPost {
   fn into_post(self) -> Result<Post, ParserError> {
-    let link = if let Some(link) = self.link {
-      link
-    } else {
+    let Some(link) = self.link else {
       return Err(ParserError::Parse("No link in post".to_string()));
-    };
+      };
 
     let (title, description) = match (
       self.title,
@@ -183,8 +181,7 @@ fn tz_to_offset(tz: &str) -> Result<FixedOffset, ParserError> {
   match tz {
     "UTC" => Ok(FixedOffset::east(0)),
     _ => Err(ParserError::timezone_date_error(format!(
-      "Unknown timezone {}, please open an issue!",
-      tz
+      "Unknown timezone {tz}, please open an issue!"
     ))),
   }
 }
