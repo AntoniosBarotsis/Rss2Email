@@ -124,7 +124,7 @@ const fn feeds_splitter(c: char) -> bool {
 
 /// Generates the HTML contents corresponding to the given Blog collection.
 pub fn map_to_html(blogs: &Vec<Blog>) -> String {
-  let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date());
+  let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date_naive());
 
   for blog in blogs {
     let mut tmp = format!("<h2>{}</h2><ul>", blog.title);

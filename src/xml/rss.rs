@@ -179,7 +179,7 @@ fn parse_from_rfc822(date: &str) -> Result<DateTime<FixedOffset>, ParserError> {
 /// Maps timezones from Strings to [`FixedOffset`]s
 fn tz_to_offset(tz: &str) -> Result<FixedOffset, ParserError> {
   match tz {
-    "UTC" => Ok(FixedOffset::east(0)),
+    "UTC" => Ok(FixedOffset::east_opt(0).expect("FixedOffset::east out of bounds")),
     _ => Err(ParserError::timezone_date_error(format!(
       "Unknown timezone {tz}, please open an issue!"
     ))),
