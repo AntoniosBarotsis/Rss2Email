@@ -37,7 +37,7 @@ async fn test_download_invalid_page() {
 #[test]
 async fn test_download_with_text() {
   // Text should not be confused with xml: here, we received html for a markdown
-  let url = "https://github.com/AntoniosBarotsis/Rss2Email/raw/cc5b2bee846f9dab8f5787dfcb9a01d963321630/README.md";
+  let url = "https://raw.githubusercontent.com/AntoniosBarotsis/Rss2Email/cc5b2bee846f9dab8f5787dfcb9a01d963321630/README.md";
   let payload = get_page_async(url, &create_client()).await;
   assert!(payload.is_err());
   let error = payload.expect_err("Should error");
