@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [dependencies]
 log = "0.4.17"
-quick-xml = { version = "0.27.1", features = ["serialize"] }
+quick-xml = { version = "0.28", features = ["serialize"] }
 serde = { version = "1.0.144", features = ["derive"] }
 serde_derive = "1.0.144"
 chrono = { version = "0.4.23", default-features = false, features = ["clock"] }
