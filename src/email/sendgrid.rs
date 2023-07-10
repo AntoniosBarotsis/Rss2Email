@@ -24,7 +24,6 @@ impl EmailProvider for SendGrid {
       .as_ref()
       .ok_or_else(|| EmailError::Config("Cannot use SendGrid without API_KEY".to_owned()))?;
 
-    let contents = contents.replace('\"', "\\\"");
     let message = format!(
       r#"{{"personalizations": [{{"to": [{{"email": "{address}"}}]}}],"from": {{"email": "{address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );

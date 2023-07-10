@@ -37,6 +37,7 @@ fn core_main() -> Result<(), String> {
   );
 
   let html = map_to_html(&blogs);
+  let html = html.replace('\"', "\\\"");
 
   if cfg!(debug_assertions) {
     info!("{}", html);
