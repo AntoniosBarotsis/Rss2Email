@@ -156,6 +156,7 @@ fn is_supported_content(content_type: &str) -> bool {
     "text/xml",
     "application/rss+xml",
     "application/atom+xml",
+    "text/html",
   ];
   supported.contains(&content_type)
 }
