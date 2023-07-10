@@ -150,6 +150,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install libssl-dev -y
           pip3 install ziglang
           cargo install cargo-zigbuild
 
