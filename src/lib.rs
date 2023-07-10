@@ -190,6 +190,10 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Error>
     )));
   }
 
+  if !response.status().is_success() {
+    return Err(Error::Generic(response.text().await?))
+  }
+
   response
     .text()
     .await
