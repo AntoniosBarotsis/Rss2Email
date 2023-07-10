@@ -35,10 +35,8 @@ jobs:
         https://rustsec.org/feed.xml
         https://console.dev/tools/rss.xml
         https://console.dev/betas/rss.xml
-        https://console.dev/articles/rss.xml
         https://console.dev/interviews/rss.xml
         https://console.dev/profiles/rss.xml
-        https://blog.console.dev/rss/
         https://blog.jetbrains.com/feed/
         https://github.blog/feed/
         https://stackoverflow.blog/feed/
@@ -152,6 +150,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install libssl-dev -y
           pip3 install ziglang
           cargo install cargo-zigbuild
 

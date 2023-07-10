@@ -156,6 +156,7 @@ fn is_supported_content(content_type: &str) -> bool {
     "text/xml",
     "application/rss+xml",
     "application/atom+xml",
+    "text/html",
   ];
   supported.contains(&content_type)
 }
@@ -187,6 +188,10 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Error>
       content_type.as_str(),
       url
     )));
+  }
+
+  if !response.status().is_success() {
+    return Err(Error::Generic(response.text().await?));
   }
 
   response
