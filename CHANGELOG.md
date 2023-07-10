@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add post descriptions](https://github.com/AntoniosBarotsis/Rss2Email/issues/38)
 
+## [1.1.0] - 2023-07-10
+
+### Added
+
+- Added support for [Resend](https://resend.com/)
+
 ## [1.0.1] - 2023-01-03
 
 ### Added
@@ -28,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release 🎉
 
-[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.0
 [1.0.1]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.0.1
 [1.0.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.0.0
