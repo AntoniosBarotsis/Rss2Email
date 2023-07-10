@@ -5,6 +5,7 @@
 pub mod email_provider;
 pub mod error;
 pub mod mail_cmd;
+pub mod resend;
 pub mod sendgrid;
 
 /// Holds all environment variables that are required

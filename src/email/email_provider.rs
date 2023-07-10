@@ -1,6 +1,6 @@
 //! An email provider abstraction to allow for multiple backends.
 
-use super::{error::EmailError, sendgrid::SendGrid};
+use super::{error::EmailError, resend::Resend, sendgrid::SendGrid};
 use super::{mail_cmd::MailCommand, EnvLoader};
 use enum_dispatch::enum_dispatch;
 
@@ -15,6 +15,7 @@ pub trait EmailProvider {
 #[enum_dispatch(EmailProvider)]
 pub enum EmailProviders {
   SendGrid(SendGrid),
+  Resend(Resend),
   MailCommand(MailCommand),
 }
 
@@ -41,6 +42,7 @@ impl TryFrom<String> for EmailProviders {
 
     match client.as_str() {
       "SENDGRID" => Ok(Self::SendGrid(SendGrid::new(&env_vars))),
+      "RESEND" => Ok(Self::Resend(Resend::new(&env_vars))),
       "MAIL_COMMAND" => Ok(Self::MailCommand(MailCommand {})),
       _ => Err("Requested client not found".to_owned()),
     }

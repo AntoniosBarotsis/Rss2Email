@@ -17,6 +17,15 @@ impl From<reqwest::Error> for EmailError {
   }
 }
 
+impl From<resend_rs::error::Error> for EmailError {
+  fn from(value: resend_rs::error::Error) -> Self {
+    match value {
+      resend_rs::error::Error::ReqwestError(e) => Self::from(e),
+      resend_rs::error::Error::ResendError(e) => Self::Other(e),
+    }
+  }
+}
+
 impl Display for EmailError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match &self {
