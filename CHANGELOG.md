@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed a bug where parsing would break if a feed would end on a newline
 
+### Changed
+
+- Feeds are now first read from the env variable and if that does not exist, the file is checked
+
 ## [1.1.0] - 2023-07-10
 
 ### Added
