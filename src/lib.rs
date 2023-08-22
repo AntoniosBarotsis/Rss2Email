@@ -197,6 +197,7 @@ pub async fn get_page_async(url: &str, client: &Client) -> Result<String, Error>
   response
     .text()
     .await
+    .map(|text| text.trim().to_string())
     .map_err(|_e| Error::Generic("Body decode error".to_string()))
 }
 

@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add post descriptions](https://github.com/AntoniosBarotsis/Rss2Email/issues/38)
 
+## [1.1.1] - 2023-08-23
+
+### Fixed
+
+- Fixed a bug where parsing would break if a feed would end on a newline
+
 ## [1.1.0] - 2023-07-10
 
 ### Added
@@ -34,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release 🎉
 
-[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.1
 [1.1.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.0
 [1.0.1]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.0.1
 [1.0.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.0.0
