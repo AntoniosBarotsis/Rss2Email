@@ -38,7 +38,7 @@ impl EmailProvider for SendGrid {
       .join(",");
 
     let message = format!(
-      r#"{{"personalizations": [{personalizations}],"from": {{"email": "{from_address}"}},"subject": {subject},"content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
+      r#"{{"personalizations": [{personalizations}],"from": {{"email": "{from_address}"}},"subject": "{subject}","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );
 
     let http_client = reqwest::blocking::Client::new();
