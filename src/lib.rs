@@ -126,22 +126,10 @@ const fn feeds_splitter(c: char) -> bool {
 pub fn map_to_html(blogs: &Vec<Blog>) -> String {
   let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date_naive());
 
-  let from = std::env::var("FIND")
-    .or_else(|_| Ok::<String, VarError>(String::from("")))
-    .unwrap();
-  let to = std::env::var("REPLACE")
-    .or_else(|_| Ok::<String, VarError>(String::from("")))
-    .unwrap();
-
   for blog in blogs {
     let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
     for post in &blog.posts {
-      let _ = write!(
-        tmp,
-        "<li><a href=\"{}\">{}</a></li>",
-        post.link.replace(&from, &to),
-        post.title
-      );
+      let _ = write!(tmp, "<li><a href=\"{}\">{}</a></li>", post.link, post.title);
 
       // Removed for now, see https://github.com/AntoniosBarotsis/Rss2Email/issues/38
       // if let Some(desc) = &post.description {
