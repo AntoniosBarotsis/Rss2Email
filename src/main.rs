@@ -48,9 +48,10 @@ fn core_main() -> Result<(), String> {
       std::env::var("RECIPIENT_ADDRESSES").expect("RECIPIENT_ADDRESSES must be set");
 
     let recipient_addresses = recipient_addresses.split(',').collect::<Vec<&str>>();
+    let subject = std::env::var("SUBJECT").expect("SUBJECT must be set.");
 
     if let Err(e) = get_email_provider()
-      .map(|provider| provider.send_email(&sender_address, recipient_addresses, &html))?
+      .map(|provider| provider.send_email(&sender_address, recipient_addresses, &subject, &html))?
     {
       error!("{}", e);
     };

@@ -11,14 +11,14 @@ fn load_sendgrid() {
 
   assert!(
     sendgrid
-      .send_email("address", vec!["person"], "email")
+      .send_email("address", vec!["person"], "subject", "email")
       .is_err(),
     "Mandatory API_KEY should cause an Err()"
   );
   env::set_var("API_KEY", "ASD");
   assert!(
     sendgrid
-      .send_email("address", vec!["person"], "email")
+      .send_email("address", vec!["person"], "subject", "email")
       .is_err(),
     "Failed to load proper Email Provider SendGrid"
   );

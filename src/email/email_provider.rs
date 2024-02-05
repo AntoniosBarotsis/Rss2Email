@@ -11,6 +11,7 @@ pub trait EmailProvider {
     &self,
     from_address: &str,
     recipient_addresses: Vec<&str>,
+    subject: &str,
     contents: &str,
   ) -> Result<(), EmailError>;
 }

@@ -24,6 +24,7 @@ impl EmailProvider for Resend {
     &self,
     from_address: &str,
     recipient_addresses: Vec<&str>,
+    subject: &str,
     contents: &str,
   ) -> Result<(), EmailError> {
     let api_key = self
@@ -35,7 +36,7 @@ impl EmailProvider for Resend {
     let client = ResendClient::new(api_key);
 
     for receipient_address in recipient_addresses {
-      let mail = Mail::new(from_address, receipient_address, "rss2email", contents);
+      let mail = Mail::new(from_address, receipient_address, subject, contents);
 
       match client.send(mail) {
         Ok(()) => {

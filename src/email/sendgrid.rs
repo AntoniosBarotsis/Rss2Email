@@ -24,6 +24,7 @@ impl EmailProvider for SendGrid {
     &self,
     from_address: &str,
     recipient_addresses: Vec<&str>,
+    subject: &str,
     contents: &str,
   ) -> Result<(), EmailError> {
     let api_key = self
@@ -35,8 +36,9 @@ impl EmailProvider for SendGrid {
       .iter()
       .map(|address| format!(r#"{{"to": [{{"email": "{address}"}}]}}"#))
       .join(",");
+
     let message = format!(
-      r#"{{"personalizations": [{personalizations}],"from": {{"email": "{from_address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
+      r#"{{"personalizations": [{personalizations}],"from": {{"email": "{from_address}"}},"subject": {subject},"content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );
 
     let http_client = reqwest::blocking::Client::new();

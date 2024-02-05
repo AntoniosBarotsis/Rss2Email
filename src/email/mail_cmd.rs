@@ -10,9 +10,10 @@ impl EmailProvider for MailCommand {
     &self,
     from_address: &str,
     recipient_addresses: Vec<&str>,
+    subject: &str,
     contents: &str,
   ) -> Result<(), EmailError> {
-    send_email(from_address, recipient_addresses, contents)
+    send_email(from_address, recipient_addresses, subject, contents)
   }
 }
 
@@ -20,6 +21,7 @@ impl EmailProvider for MailCommand {
 fn send_email(
   from_address: &str,
   recipient_addresses: Vec<&str>,
+  subject: &str,
   contents: &str,
 ) -> Result<(), EmailError> {
   use crate::info;
@@ -34,7 +36,7 @@ fn send_email(
 
   let recipients = recipient_addresses.join(",");
   let mail_command =
-    format!("mail -s \"Rss2Email\" \"{recipients}\" -aFrom:{from_address} < {TEMPORARY_FILE_NAME}");
+    format!("mail -s \"{subject}\" \"{recipients}\" -aFrom:{from_address} < {TEMPORARY_FILE_NAME}");
 
   let mut mail_sender = Command::new("sh")
     .args(["-c", &mail_command])
