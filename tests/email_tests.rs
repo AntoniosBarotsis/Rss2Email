@@ -10,12 +10,16 @@ fn load_sendgrid() {
     EmailProviders::try_from("SENDGRID".to_owned()).expect("The Sendgrid provider is defined");
 
   assert!(
-    sendgrid.send_email("address", "email").is_err(),
+    sendgrid
+      .send_email("address", vec!["person"], "email")
+      .is_err(),
     "Mandatory API_KEY should cause an Err()"
   );
   env::set_var("API_KEY", "ASD");
   assert!(
-    sendgrid.send_email("address", "email").is_err(),
+    sendgrid
+      .send_email("address", vec!["person"], "email")
+      .is_err(),
     "Failed to load proper Email Provider SendGrid"
   );
   env::remove_var("API_KEY");

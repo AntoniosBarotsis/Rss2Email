@@ -1,5 +1,7 @@
 //! [`EmailProvider`] implementation using [`SendGrid`](https://sendgrid.com/).
 
+use itertools::Itertools;
+
 use crate::info;
 
 use super::{email_provider::EmailProvider, error::EmailError, EnvLoader};
@@ -18,14 +20,23 @@ impl SendGrid {
 }
 
 impl EmailProvider for SendGrid {
-  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError> {
+  fn send_email(
+    &self,
+    from_address: &str,
+    recipient_addresses: Vec<&str>,
+    contents: &str,
+  ) -> Result<(), EmailError> {
     let api_key = self
       .api_key
       .as_ref()
       .ok_or_else(|| EmailError::Config("Cannot use SendGrid without API_KEY".to_owned()))?;
 
+    let personalizations = recipient_addresses
+      .iter()
+      .map(|address| format!(r#"{{"to": [{{"email": "{address}"}}]}}"#))
+      .join(",");
     let message = format!(
-      r#"{{"personalizations": [{{"to": [{{"email": "{address}"}}]}}],"from": {{"email": "{address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
+      r#"{{"personalizations": [{personalizations}],"from": {{"email": "{from_address}"}},"subject": "Rss2Email","content": [{{"type": "text/html", "value": "{contents}"}}]}}"#
     );
 
     let http_client = reqwest::blocking::Client::new();

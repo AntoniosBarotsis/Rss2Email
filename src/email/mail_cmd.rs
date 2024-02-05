@@ -6,13 +6,22 @@ use super::{email_provider::EmailProvider, error::EmailError};
 pub struct MailCommand {}
 
 impl EmailProvider for MailCommand {
-  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError> {
-    send_email(address, contents)
+  fn send_email(
+    &self,
+    from_address: &str,
+    recipient_addresses: Vec<&str>,
+    contents: &str,
+  ) -> Result<(), EmailError> {
+    send_email(from_address, recipient_addresses, contents)
   }
 }
 
 #[cfg(not(target_os = "windows"))]
-fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
+fn send_email(
+  from_address: &str,
+  recipient_addresses: Vec<&str>,
+  contents: &str,
+) -> Result<(), EmailError> {
   use crate::info;
   use std::{fs::File, io::Write, process::Command};
 
@@ -23,7 +32,9 @@ fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
     .write_all(contents.as_bytes())
     .map_err(|_e| EmailError::Io("Failed to write temporary email file".to_owned()))?;
 
-  let mail_command = format!("mail -s \"Rss2Email\" \"{address}\" < {TEMPORARY_FILE_NAME}");
+  let recipients = recipient_addresses.join(",");
+  let mail_command =
+    format!("mail -s \"Rss2Email\" \"{recipients}\" -aFrom:{from_address} < {TEMPORARY_FILE_NAME}");
 
   let mut mail_sender = Command::new("sh")
     .args(["-c", &mail_command])
