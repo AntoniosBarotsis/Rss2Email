@@ -4,6 +4,7 @@ description = "An RSS feed aggregator that notifies you of new posts via email."
 license = "GPL-3.0"
 repository = "https://github.com/AntoniosBarotsis/Rss2Email"
 keywords = ["rss", "atom", "email"]
+categories = ["feed", "email", "blog"]
 readme = "README.md"
 version = "1.1.1"
 edition = "2021"
@@ -20,12 +21,12 @@ path = "src/lib.rs"
 
 [dependencies]
 log = "0.4.17"
-quick-xml = { version = "0.30", features = ["serialize"] }
+quick-xml = { version = "0.31", features = ["serialize"] }
 serde = { version = "1.0.144", features = ["derive"] }
 serde_derive = "1.0.144"
 chrono = { version = "0.4.23", default-features = false, features = ["clock"] }
-itertools = "0.11.0"
-env_logger = "0.10.0"
+itertools = "0.12.1"
+env_logger = "0.11.1"
 dotenvy = "0.15.5"
 regex = "1.7.0"
 lazy_static = "1.4.0"
@@ -34,10 +35,10 @@ enum_dispatch = "0.3.8"
 futures = "0.3.24"
 tokio = { version = "1.25.0", default-features = false, features = ["macros"] }
 reqwest = { version = "0.11", default-features = false, features = ["rustls-tls", "blocking"] }
-http = "0.2.8"
+http = "1.0.0"
 resend-rs = "0.3.0"
 
-lambda_runtime = { version = "0.8.1", optional = true }
+lambda_runtime = { version = "0.9.1", optional = true }
 tracing = { version = "0.1", features = ["log"], optional = true }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"], optional = true }
 
