@@ -43,9 +43,16 @@ fn core_main() -> Result<(), String> {
     info!("{}", html);
   } else {
     // Only load email related variables if ran on release
-    let address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
+    let sender_address = std::env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set.");
+    let recipient_addresses =
+      std::env::var("RECIPIENT_ADDRESSES").expect("RECIPIENT_ADDRESSES must be set");
 
-    if let Err(e) = get_email_provider().map(|provider| provider.send_email(&address, &html))? {
+    let recipient_addresses = recipient_addresses.split(',').collect::<Vec<&str>>();
+    let subject = std::env::var("SUBJECT").expect("SUBJECT must be set.");
+
+    if let Err(e) = get_email_provider()
+      .map(|provider| provider.send_email(&sender_address, recipient_addresses, &subject, &html))?
+    {
       error!("{}", e);
     };
   }
@@ -77,7 +84,7 @@ mod aws_lambda {
   #[derive(Deserialize)]
   struct Request {}
 
-  #[allow(clippy::unused_async)]
+  #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
     let _res = core_main().map_err(|x| warn!("{}", x));

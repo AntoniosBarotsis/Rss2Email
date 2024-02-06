@@ -7,7 +7,13 @@ use enum_dispatch::enum_dispatch;
 #[enum_dispatch]
 pub trait EmailProvider {
   /// Sends an email to and from the specified address.
-  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError>;
+  fn send_email(
+    &self,
+    from_address: &str,
+    recipient_addresses: Vec<&str>,
+    subject: &str,
+    contents: &str,
+  ) -> Result<(), EmailError>;
 }
 
 /// An enum containing all Email Provider implementations.

@@ -1015,9 +1015,9 @@ dependencies = [
 
 [[package]]
 name = "resend-rs"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5d95821d1c4fa44ff7c2bf31c6a523c53c207ed2de9d953b6e2d3945229c2cb"
+checksum = "588e554d4a7fe8069a9668b1234fe7ca102cd6c90ccfcdfbd0f5c7c9dd5287ba"
 dependencies = [
  "reqwest",
  "thiserror",

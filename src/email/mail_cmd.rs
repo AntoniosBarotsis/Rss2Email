@@ -6,13 +6,24 @@ use super::{email_provider::EmailProvider, error::EmailError};
 pub struct MailCommand {}
 
 impl EmailProvider for MailCommand {
-  fn send_email(&self, address: &str, contents: &str) -> Result<(), EmailError> {
-    send_email(address, contents)
+  fn send_email(
+    &self,
+    from_address: &str,
+    recipient_addresses: Vec<&str>,
+    subject: &str,
+    contents: &str,
+  ) -> Result<(), EmailError> {
+    send_email(from_address, &recipient_addresses, subject, contents)
   }
 }
 
 #[cfg(not(target_os = "windows"))]
-fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
+fn send_email(
+  from_address: &str,
+  recipient_addresses: &[&str],
+  subject: &str,
+  contents: &str,
+) -> Result<(), EmailError> {
   use crate::info;
   use std::{fs::File, io::Write, process::Command};
 
@@ -23,7 +34,9 @@ fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
     .write_all(contents.as_bytes())
     .map_err(|_e| EmailError::Io("Failed to write temporary email file".to_owned()))?;
 
-  let mail_command = format!("mail -s \"Rss2Email\" \"{address}\" < {TEMPORARY_FILE_NAME}");
+  let recipients = recipient_addresses.join(",");
+  let mail_command =
+    format!("mail -s \"{subject}\" \"{recipients}\" -aFrom:{from_address} < {TEMPORARY_FILE_NAME}");
 
   let mut mail_sender = Command::new("sh")
     .args(["-c", &mail_command])
@@ -36,7 +49,7 @@ fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
   info!("Mail command finished with status {exit_status}");
 
   match std::fs::remove_file(TEMPORARY_FILE_NAME) {
-    Ok(_) => Ok(()),
+    Ok(()) => Ok(()),
     Err(e) => Err(EmailError::Io(format!(
       "Unable to delete {TEMPORARY_FILE_NAME} for error: {e}"
     ))),
@@ -44,7 +57,12 @@ fn send_email(address: &str, contents: &str) -> Result<(), EmailError> {
 }
 
 #[cfg(target_os = "windows")]
-fn send_email(_address: &str, _contents: &str) -> Result<(), EmailError> {
+fn send_email(
+  _from_address: &str,
+  _recipient_addresses: &[&str],
+  _subject: &str,
+  _contents: &str,
+) -> Result<(), EmailError> {
   Err(EmailError::Config(
     "No known mail/sendmail/smtp command for Windows OS".to_owned(),
   ))
