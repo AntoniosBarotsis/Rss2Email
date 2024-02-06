@@ -39,7 +39,6 @@ jobs:
         https://console.dev/profiles/rss.xml
         https://blog.jetbrains.com/feed/
         https://github.blog/feed/
-        https://stackoverflow.blog/feed/
         https://dusted.codes/feed/rss
         https://vladmihalcea.com/blog/feed/
         https://ossinsight.io/blog/rss.xml
