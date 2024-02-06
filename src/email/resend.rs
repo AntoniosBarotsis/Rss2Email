@@ -35,16 +35,15 @@ impl EmailProvider for Resend {
 
     let client = ResendClient::new(api_key);
 
-    for receipient_address in recipient_addresses {
-      let mail = Mail::new(from_address, receipient_address, subject, contents);
+    let mail = Mail::new(from_address, &recipient_addresses, subject, contents);
 
-      match client.send(mail) {
-        Ok(()) => {
-          info!("Email request sent");
-        }
-        Err(e) => return Err(EmailError::from(e)),
+    match client.send(mail) {
+      Ok(()) => {
+        info!("Email request sent");
       }
+      Err(e) => return Err(EmailError::from(e)),
     }
+    
     Ok(())
   }
 }
