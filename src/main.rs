@@ -84,7 +84,7 @@ mod aws_lambda {
   #[derive(Deserialize)]
   struct Request {}
 
-  #[allow(clippy::unused_async)]
+  #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
   async fn function_handler(_event: LambdaEvent<Request>) -> Result<(), Error> {
     // Extract some useful information from the request
     let _res = core_main().map_err(|x| warn!("{}", x));

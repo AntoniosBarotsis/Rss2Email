@@ -13,14 +13,14 @@ impl EmailProvider for MailCommand {
     subject: &str,
     contents: &str,
   ) -> Result<(), EmailError> {
-    send_email(from_address, recipient_addresses, subject, contents)
+    send_email(from_address, &recipient_addresses, subject, contents)
   }
 }
 
 #[cfg(not(target_os = "windows"))]
 fn send_email(
   from_address: &str,
-  recipient_addresses: Vec<&str>,
+  recipient_addresses: &[&str],
   subject: &str,
   contents: &str,
 ) -> Result<(), EmailError> {
@@ -49,7 +49,7 @@ fn send_email(
   info!("Mail command finished with status {exit_status}");
 
   match std::fs::remove_file(TEMPORARY_FILE_NAME) {
-    Ok(_) => Ok(()),
+    Ok(()) => Ok(()),
     Err(e) => Err(EmailError::Io(format!(
       "Unable to delete {TEMPORARY_FILE_NAME} for error: {e}"
     ))),
@@ -57,7 +57,12 @@ fn send_email(
 }
 
 #[cfg(target_os = "windows")]
-fn send_email(_address: &str, _contents: &str) -> Result<(), EmailError> {
+fn send_email(
+  _from_address: &str,
+  _recipient_addresses: &[&str],
+  _subject: &str,
+  _contents: &str,
+) -> Result<(), EmailError> {
   Err(EmailError::Config(
     "No known mail/sendmail/smtp command for Windows OS".to_owned(),
   ))

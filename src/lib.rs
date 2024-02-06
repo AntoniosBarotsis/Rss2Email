@@ -1,4 +1,6 @@
-use std::{env::VarError, fmt::Display, fs, time::SystemTime};
+#![allow(clippy::missing_panics_doc)]
+
+use std::{fmt::Display, fs, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 pub use error::Error;
@@ -151,7 +153,7 @@ fn within_n_days(n: i64, date: &DateTime<Utc>) -> bool {
 }
 
 fn is_supported_content(content_type: &str) -> bool {
-  let supported = vec![
+  let supported = [
     "application/xml",
     "text/xml",
     "application/rss+xml",

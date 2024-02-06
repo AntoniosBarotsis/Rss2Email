@@ -105,7 +105,7 @@ impl BlogPost for RssPost {
   fn into_post(self) -> Result<Post, ParserError> {
     let Some(link) = self.link else {
       return Err(ParserError::Parse("No link in post".to_string()));
-      };
+    };
 
     let (title, description) = match (
       self.title,
