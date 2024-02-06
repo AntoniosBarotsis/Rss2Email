@@ -43,7 +43,7 @@ impl EmailProvider for Resend {
       }
       Err(e) => return Err(EmailError::from(e)),
     }
-    
+
     Ok(())
   }
 }
