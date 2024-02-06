@@ -45,17 +45,16 @@ section of the wiki for more information.
 **Rss2email** requires some environment variables to work. These can be provided either in your
 shell or as entries in a `.env` file.
 
-- `EMAIL_ADDRESS`: the mail address you will receive the feed content
+- `EMAIL_ADDRESS`: the mail address you will use to send the emails
+- `RECIPIENT_ADDRESSES`: comma delimited list of recipient email addresses
+- `SUBJECT`: the email subject (could be `rss2email`)
 - `DAYS`: this value indicates up to how many days in the past we go to search for entries  
-
 - `FEEDS`: a list of semicolon-separated feed URLs.  
   _eg:_ `"https://blog.rust-lang.org/feed.xml;https://www.linux.org/articles/index.rss"`
-
 - `EMAIL` (optional, defaults to `SendGrid`):  Which provider to use to send the email.  
-  Can be set to `EMAIL_COMMAND` as an alternative if you have `mail` or `sendmail` installed in
-  your system  
-
-- `API_KEY` (optional): Your [SendGrid](https://sendgrid.com/) authentication key.
+  For the supported providers, you can check the 
+  [docs](https://docs.rs/rss2email/latest/rss2email_lib/email/email_provider/enum.EmailProviders.html).
+- `API_KEY` (optional): Your email provider's authentication key.
 
 More details are available in the 
 [Running the code](https://github.com/AntoniosBarotsis/Rss2Email/wiki/3.-Running-the-Code) wiki 
