@@ -124,9 +124,14 @@ const fn feeds_splitter(c: char) -> bool {
   c == '\n' || c == ';'
 }
 
+/// A basic <h1> element with the current date.
+pub fn html_title() -> String {
+  format!("<h1>Rss2Email - {}</h1>", Utc::now().date_naive())
+}
+
 /// Generates the HTML contents corresponding to the given Blog collection.
 pub fn map_to_html(blogs: &Vec<Blog>) -> String {
-  let mut res = format!("<h1>Rss2Email - {}</h1>", Utc::now().date_naive());
+  let mut res = html_title();
 
   for blog in blogs {
     let mut tmp = format!("<h2>{}</h2><ul>", blog.title);
