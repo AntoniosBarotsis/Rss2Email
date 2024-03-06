@@ -4,7 +4,7 @@ mod logger;
 use crate::email::email_provider::{get_email_provider, EmailProvider};
 use dotenvy::dotenv;
 use env_logger::Env;
-use rss2email_lib::{download_blogs, map_to_html, time_func};
+use rss2email_lib::{download_blogs, html_title, map_to_html, time_func};
 
 /// The core logic of the main function. This should be called regardless of where
 /// you are running the project at.
@@ -43,8 +43,11 @@ fn core_main() -> Result<(), String> {
     return Ok(());
   }
 
-  let html = map_to_html(&blogs);
-  let html = html.replace('\"', "\\\"");
+  let html = if blogs.is_empty() {
+    format!("{}\nNo new posts were found. You can set \"SKIP_IF_NO_NEW_POSTS\" to \"true\" to avoid sending this email.", html_title())
+  } else {
+    map_to_html(&blogs).replace('\"', "\\\"")
+  };
 
   if cfg!(debug_assertions) {
     info!("{}", html);
