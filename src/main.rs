@@ -39,6 +39,7 @@ fn core_main() -> Result<(), String> {
   if posts_amt == 0
     && std::env::var("SKIP_IF_NO_NEW_POSTS").map_or(false, |v| v.to_lowercase() == "true")
   {
+    info!("No posts found and SKIP_IF_NO_NEW_POSTS was set to true, exiting...");
     return Ok(());
   }
 
