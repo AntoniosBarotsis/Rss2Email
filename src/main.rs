@@ -36,6 +36,12 @@ fn core_main() -> Result<(), String> {
     posts_amt
   );
 
+  if posts_amt == 0
+    && std::env::var("SKIP_IF_NO_NEW_POSTS").map_or(false, |v| v.to_lowercase() == "true")
+  {
+    return Ok(());
+  }
+
   let html = map_to_html(&blogs);
   let html = html.replace('\"', "\\\"");
 
@@ -48,7 +54,9 @@ fn core_main() -> Result<(), String> {
       std::env::var("RECIPIENT_ADDRESSES").expect("RECIPIENT_ADDRESSES must be set");
 
     let recipient_addresses = recipient_addresses.split(',').collect::<Vec<&str>>();
-    let subject = std::env::var("SUBJECT").expect("SUBJECT must be set.");
+    let subject = std::env::var("SUBJECT")
+      .expect("SUBJECT must be set.")
+      .replace("$POST_COUNT", &posts_amt.to_string());
 
     if let Err(e) = get_email_provider()
       .map(|provider| provider.send_email(&sender_address, recipient_addresses, &subject, &html))?
