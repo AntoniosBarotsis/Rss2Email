@@ -47,7 +47,8 @@ shell or as entries in a `.env` file.
 
 - `EMAIL_ADDRESS`: the mail address you will use to send the emails
 - `RECIPIENT_ADDRESSES`: comma delimited list of recipient email addresses
-- `SUBJECT`: the email subject (could be `rss2email`)
+- `SUBJECT`: the email subject (could be `rss2email`). Including `$POST_COUNT` in your subject will
+  have it replaced with the number of posts fetched. For example `SUBJECT=rss2email - $POST_COUNT new posts`
 - `DAYS`: this value indicates up to how many days in the past we go to search for entries  
 - `FEEDS`: a list of semicolon-separated feed URLs.  
   _eg:_ `"https://blog.rust-lang.org/feed.xml;https://www.linux.org/articles/index.rss"`
@@ -55,6 +56,7 @@ shell or as entries in a `.env` file.
   For the supported providers, you can check the 
   [docs](https://docs.rs/rss2email/latest/rss2email_lib/email/email_provider/enum.EmailProviders.html).
 - `API_KEY` (optional): Your email provider's authentication key.
+- `SKIP_IF_NO_NEW_POSTS` (optional): Whether an email should be sent if the number of posts fetched is 0.
 
 More details are available in the 
 [Running the code](https://github.com/AntoniosBarotsis/Rss2Email/wiki/3.-Running-the-Code) wiki 
