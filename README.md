@@ -47,7 +47,8 @@ shell or as entries in a `.env` file.
 
 - `EMAIL_ADDRESS`: the mail address you will use to send the emails
 - `RECIPIENT_ADDRESSES`: comma delimited list of recipient email addresses
-- `SUBJECT`: the email subject (could be `rss2email`). `$POST_COUNT` is replaced with the number of posts fetched.
+- `SUBJECT`: the email subject (could be `rss2email`). Including `$POST_COUNT` in your subject will
+  have it replaced with the number of posts fetched. For example `SUBJECT=rss2email - $POST_COUNT new posts`
 - `DAYS`: this value indicates up to how many days in the past we go to search for entries  
 - `FEEDS`: a list of semicolon-separated feed URLs.  
   _eg:_ `"https://blog.rust-lang.org/feed.xml;https://www.linux.org/articles/index.rss"`
