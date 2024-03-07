@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add post descriptions](https://github.com/AntoniosBarotsis/Rss2Email/issues/38)
 
+## [2.1.0] - 2024-03-07
+
+### Added
+
+- Add ability to include the number of posts fetched in the subject
+- Add ability to skip sending if no posts fetched
+
+### Changed
+
+- The email now lets the user know that no new posts were found instead of being empty.
+
 ## [2.0.0] - 2024-02-06
 
 ### Added
@@ -54,7 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release 🎉
 
-[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v1.1.1...HEAD
+[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.0...HEAD
 [2.0.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v2.0.0
 [1.1.1]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.1
 [1.1.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.0
