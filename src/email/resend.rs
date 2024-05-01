@@ -1,6 +1,6 @@
 //! [`EmailProvider`] implementation using [`Resend`](https://resend.com/).
 
-use resend_rs::{mail::Mail, resend_client::ResendClient};
+use resend_rs::{types::SendEmail, Client};
 
 use crate::info;
 
@@ -33,12 +33,12 @@ impl EmailProvider for Resend {
       .ok_or_else(|| EmailError::Config("Cannot use Resend without API_KEY".to_owned()))
       .cloned()?;
 
-    let client = ResendClient::new(api_key);
+    let resend = Client::new(&api_key);
 
-    let mail = Mail::new(from_address, &recipient_addresses, subject, contents);
+    let email = SendEmail::new(from_address, recipient_addresses, subject).with_html(contents);
 
-    match client.send(mail) {
-      Ok(()) => {
+    match resend.emails.send(email) {
+      Ok(_id) => {
         info!("Email request sent");
       }
       Err(e) => return Err(EmailError::from(e)),

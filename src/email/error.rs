@@ -6,22 +6,22 @@ use std::fmt::Display;
 #[allow(dead_code)]
 pub enum EmailError {
   Config(String),
-  Request(Box<reqwest::Error>),
+  Request(reqwest::Error),
   Io(String),
   Other(String),
 }
 
 impl From<reqwest::Error> for EmailError {
   fn from(e: reqwest::Error) -> Self {
-    Self::Request(Box::new(e))
+    Self::Request(e)
   }
 }
 
-impl From<resend_rs::error::Error> for EmailError {
-  fn from(value: resend_rs::error::Error) -> Self {
+impl From<resend_rs::Error> for EmailError {
+  fn from(value: resend_rs::Error) -> Self {
     match value {
-      resend_rs::error::Error::ReqwestError(e) => Self::from(e),
-      resend_rs::error::Error::ResendError(e) => Self::Other(e),
+      resend_rs::Error::Http(e) => Self::from(e),
+      resend_rs::Error::Resend(e) => Self::Other(e.to_string()),
     }
   }
 }
