@@ -46,7 +46,7 @@ fn core_main() -> Result<(), String> {
   let html = if blogs.is_empty() {
     format!("{}\nNo new posts were found. You can set \"SKIP_IF_NO_NEW_POSTS\" to \"true\" to avoid sending this email.", html_title())
   } else {
-    map_to_html(&blogs).replace('\"', "\\\"")
+    map_to_html(&blogs)
   };
 
   if cfg!(debug_assertions) {
