@@ -108,7 +108,7 @@ pub fn read_feeds() -> Vec<String> {
 
   links
     .split(feeds_splitter)
-    .map(std::string::ToString::to_string)
+    .map(ToString::to_string)
     .map(|l| RE.replace_all(&l, "").to_string())
     .map(|l| l.trim().to_owned())
     .filter(|l| !l.is_empty())

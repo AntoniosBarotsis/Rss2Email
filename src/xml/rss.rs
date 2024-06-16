@@ -83,7 +83,7 @@ impl WebFeed for Result<RssFeed, DeError> {
             title,
             x.title
               .as_ref()
-              .map_or_else(|| "n/a".to_string(), std::clone::Clone::clone),
+              .map_or_else(|| "n/a".to_string(), Clone::clone),
             e
           );
           None
