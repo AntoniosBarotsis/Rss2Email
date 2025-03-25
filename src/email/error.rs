@@ -22,6 +22,12 @@ impl From<resend_rs::Error> for EmailError {
     match value {
       resend_rs::Error::Http(e) => Self::from(e),
       resend_rs::Error::Resend(e) => Self::Other(e.to_string()),
+      resend_rs::Error::Parse(e) => Self::Other(e),
+      resend_rs::Error::RateLimit {
+        ratelimit_limit: _,
+        ratelimit_remaining: _,
+        ratelimit_reset: _,
+      } => Self::Other(value.to_string()),
     }
   }
 }
