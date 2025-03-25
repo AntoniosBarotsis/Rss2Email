@@ -7,6 +7,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+concurrency:
+  group: ci/${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_test_run:
     name: Build and test on ${{ matrix.job.os }} (${{ matrix.job.target }})
@@ -17,7 +21,7 @@ jobs:
         job:
           - { target: aarch64-unknown-linux-gnu , os: ubuntu-22.04 }
           - { target: x86_64-unknown-linux-gnu  , os: ubuntu-22.04 }
-          - { target: x86_64-apple-darwin       , os: macos-12     }
+          - { target: x86_64-apple-darwin       , os: macos-15     }
           - { target: x86_64-pc-windows-msvc    , os: windows-2022 }
 
     env:
@@ -35,8 +39,6 @@ jobs:
         https://rustsec.org/feed.xml
         https://console.dev/tools/rss.xml
         https://console.dev/betas/rss.xml
-        https://console.dev/interviews/rss.xml
-        https://console.dev/profiles/rss.xml
         https://blog.jetbrains.com/feed/
         https://github.blog/feed/
         https://dusted.codes/feed/rss

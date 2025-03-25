@@ -1,6 +1,6 @@
 //! This file contains wrapper macros for the `env_logger` crate.
 //! I specifically wanted to wrap around `warn` as I wanted all warnings
-//! to panic if they occured in the Github Actions workflow.
+//! to panic if they occurred in the Github Actions workflow.
 
 /// Calls [`log::info!`].
 #[macro_export]
@@ -10,6 +10,7 @@ macro_rules! info {
   }}
 }
 
+#[allow(clippy::too_long_first_doc_paragraph)]
 /// Calls [`log::warn!`] if executed outside of Github Actions. If it is executed inside
 /// of GA, it instead panics. This is done to make sure that no warnings are missed during a
 /// workflow run. GA sets an environment variable `CI=TRUE` which is how I determine if this

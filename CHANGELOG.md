@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add post descriptions](https://github.com/AntoniosBarotsis/Rss2Email/issues/38)
 
+## [2.1.1] - 2025-03-25
+
+- Bump dependencies
+
 ## [2.1.0] - 2024-03-07
 
 ### Added
@@ -65,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release 🎉
 
-[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.0...HEAD
+[unreleased]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.1...HEAD
 [2.1.0]: https://github.com/AntoniosBarotsis/rss2email/compare/v2.1.0...HEAD
 [2.0.0]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v2.0.0
 [1.1.1]: https://github.com/AntoniosBarotsis/rss2email/releases/tag/v1.1.1
