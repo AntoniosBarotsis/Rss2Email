@@ -17,9 +17,12 @@ jobs:
 
       - name: Download cargo-msrv
         run: cargo install cargo-msrv
+      
+      - name: Pre-check
+        run: cargo check 
 
       - name: Get MSRV
-        run: echo "MSRV=$(cargo msrv find --output-format json | tail -n 1 | jq '. | .rustc' --raw-output)" >> $GITHUB_ENV
+        run: echo "MSRV=$(cargo msrv find --output-format json --min 1.70 | tail -n 1 | jq '. | .rustc' --raw-output)" >> $GITHUB_ENV
 
       - name: Update badge
         uses: schneegans/dynamic-badges-action@v1.7.0
