@@ -40,7 +40,6 @@ jobs:
         https://console.dev/tools/rss.xml
         https://console.dev/betas/rss.xml
         https://console.dev/interviews/rss.xml
-        https://console.dev/profiles/rss.xml
         https://blog.jetbrains.com/feed/
         https://github.blog/feed/
         https://dusted.codes/feed/rss
