@@ -15,11 +15,15 @@ jobs:
       - name: Use cached dependencies
         uses: Swatinem/rust-cache@v2
 
+
+      - name: Get cargo binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Download cargo-msrv
-        run: cargo install cargo-msrv
+        run: cargo binstall cargo-msrv
       
       - name: Pre-check
-        run: cargo check 
+        run: cargo check
 
       - name: Get MSRV
         run: echo "MSRV=$(cargo msrv find --output-format json --min 1.70 | tail -n 1 | jq '.result.version' --raw-output)" >> $GITHUB_ENV
